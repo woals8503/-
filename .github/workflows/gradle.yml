@@ -50,3 +50,16 @@ jobs:
         --region ap-northeast-2 \
         --acl private \
         ./shimpyo-build.zip s3://shimpyo-backend-bucket/
+
+		# Deploy
+    - name: Deploy
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        aws deploy create-deployment \
+        --application-name shimpyo \
+        --deployment-group-name shimpyo-deploy-group \
+        --file-exists-behavior OVERWRITE \
+        --s3-location bucket=shimpyo-backend-bucket,bundleType=zip,key=shimpyo-build.zip \
+        --region ap-northeast-2
