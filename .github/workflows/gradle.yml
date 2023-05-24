@@ -51,7 +51,7 @@ jobs:
         --acl private \
         ./shimpyo-build.zip s3://shimpyo-backend-bucket/
 
-		# Deploy
+    # Deploy
     - name: Deploy
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
