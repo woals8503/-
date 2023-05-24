@@ -1,0 +1,29 @@
+# workflow의 이름
+name: CI
+
+# 해당 workflow가 언제 실행될지 정의한다.
+on:
+  push: # master branch로 push 될 때 실행
+    branches: [ "master" ]
+  pull_request: # master branch로 pull request 될 때 실행
+    branches: [ "master" ]
+
+permissions: # 내용(contents)을 읽기(read) 권한으로 설정
+  contents: read
+
+#workflow는 1개 이상의 job을 가지며, 각각의 job은 여러 개의 step에 따라 단계를 나눌 수 있다.
+jobs:
+  build: #작업 이름을 build라 지정
+    runs-on: ubuntu-latest # 해당 작업이 실행되는 환경을 정의한다. - 우분투 최신버전
+
+    steps: # 작업이 실행되는 단계들을 정의
+    - uses: actions/checkout@v3 #checkout 액션을 사용해서 현재 레파지토리의 코드를 체크아웃 한다. (@V3은 액션의 버전)
+    - name: Set up JDK 11 # step의 이름을 정의
+      uses: actions/setup-java@v3 #setup-java 액션을 사용하여 자바 설정, with를 통해 버전 명시
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    - name: Build with Gradle #step 이름을 정의
+      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1 #gradle-build-action을 통해 Gradle로 빌드
+      with:
+        arguments: build #Gradle에게 build 명령어를 전달함으로써 프로젝트를 빌드한다.
