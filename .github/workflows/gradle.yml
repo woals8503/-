@@ -35,6 +35,10 @@ jobs:
     # appspec.yml 파일 복사
     - name: Copy appspec.yml
       run: cp appspec.yml ./deploy/
+        
+    #  script 파일 복사
+    - name: Copy shell
+      run: cp ./scripts/* ./deploy/
       
     # Jar 파일 Copy
     - name: Copy Jar
