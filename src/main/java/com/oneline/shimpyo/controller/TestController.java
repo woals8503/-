@@ -12,4 +12,9 @@ public class TestController {
         return "Completed??";
     }
 
+    @GetMapping("/test/data3")
+    public String test3Method(){
+        return "테스트 성공!";
+    }
+
 }
