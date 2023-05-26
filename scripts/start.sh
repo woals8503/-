@@ -36,7 +36,7 @@ if [ -z "$EXISTING_PID" ]; then
     echo "> 8081 포트를 사용 중인 프로세스가 없습니다."
 else
     echo "> 8081 포트를 사용 중인 프로세스를 종료합니다. PID: $EXISTING_PID"
-    kill -9 $EXISTING_PID
+    sudo kill -9 $EXISTING_PID
     sleep 2
 fi
 
