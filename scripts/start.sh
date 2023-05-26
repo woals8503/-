@@ -29,5 +29,5 @@ echo "> $JAR_NAME 실행"
 IDLE_PROFILE=$(find_idle_profile)
 
 echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다."
-sudo nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
 
+nohup java -jar /home/ubuntu/action/shimpyo-0.0.1-SNAPSHOT.jar
