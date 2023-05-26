@@ -17,4 +17,9 @@ public class TestController {
         return "테스트 성공!";
     }
 
+    @GetMapping("/test/woals")
+    public String test3Method2(){
+        return "woals";
+    }
+
 }
