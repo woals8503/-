@@ -9,7 +9,7 @@ public class TestController {
 
     @GetMapping("/test/data")
     public String testMethod(){
-        return "Please Run";
+        return "Test sssssssssssss";
     }
 
 }
