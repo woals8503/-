@@ -7,7 +7,6 @@ import com.oneline.shimpyo.domain.room.Room;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.bytebuddy.utility.nullability.MaybeNull;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

@@ -56,4 +56,11 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = ALL)
     private List<Wish> wishList = new ArrayList<>();
+
+    public Member(String email, String password, String phoneNumber, int point) {
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.point = point;
+    }
 }
