@@ -2,15 +2,13 @@ package com.oneline.shimpyo.controller;
 
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.dto.SampleDto;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 //@CrossOrigin(origins = "http://localhost:3000")
 @RestController
+@RequiredArgsConstructor
 public class TestController {
 
     @GetMapping("/test")
@@ -28,9 +26,10 @@ public class TestController {
         return "테스트 성공!";
     }
 
-    @GetMapping("/test/woals")
-    public String test3Method2() {
-        return "woals";
-    }
+//    @GetMapping("/test/woals")
+//    public String test3Method2() {
+//        Test test = testRepository.findById(2L).get();
+//        return test.getName();
+//    }
 
 }
