@@ -3,4 +3,4 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://{키}:3306/Shimpyo?createDatabaseIfNotExist=true
     username: asdf
-    password: 1123
+    password: 1234
