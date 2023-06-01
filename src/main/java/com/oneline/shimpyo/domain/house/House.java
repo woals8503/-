@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.house;
 
+import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.domain.wish.Wish;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.*;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
@@ -53,6 +55,8 @@ public class House {
     @Enumerated(value = STRING)
     private HouseType type;
 
-//    private MapLocation location;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
 }

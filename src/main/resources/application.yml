@@ -6,10 +6,10 @@ spring:
 
 #    config import 지정해줘야 데이터 저장됨
 
-    jpa:
+  jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         show_sql: true

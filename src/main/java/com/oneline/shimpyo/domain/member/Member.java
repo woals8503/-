@@ -2,6 +2,7 @@ package com.oneline.shimpyo.domain.member;
 
 import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.coupon.MyCoupon;
+import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.wish.Wish;
@@ -35,6 +36,10 @@ public class Member extends BaseEntity {
     private String password;
     @NotNull
     private String phoneNumber;
+    @NotNull
+    private int point;
+    @NotNull
+    private String nickname;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_grade_id")
@@ -42,8 +47,9 @@ public class Member extends BaseEntity {
 
     @Enumerated(value = STRING)
     private MemberRole role;
-    @NotNull
-    private int point;
+
+    @OneToOne(mappedBy = "member", cascade = ALL)
+    private MemberImage memberImage;
 
     @OneToMany(mappedBy = "member", cascade = ALL)
     private List<Reservation> reservations = new ArrayList<>();
@@ -57,10 +63,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = ALL)
     private List<Wish> wishList = new ArrayList<>();
 
-    public Member(String email, String password, String phoneNumber, int point) {
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.point = point;
-    }
+    @OneToMany(mappedBy = "member", cascade = ALL)
+    private List<House> houseList = new ArrayList<>();
+
 }

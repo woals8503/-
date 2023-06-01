@@ -14,11 +14,11 @@ import static com.oneline.shimpyo.domain.BaseResponseStatus.SUCCESS;
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})
 public class BaseResponse<T> {
     @JsonProperty("isSuccess")
-    private final Boolean isSuccess;
-    private final String message;
-    private final int code;
+    private final Boolean isSuccess;    // 성공했는지
+    private final String message;       // 
+    private final int code;             // 오류별로 코드 나타냄
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private T result;
+    private T result;                   //
 
     public BaseResponse() {
         this.isSuccess = SUCCESS.isSuccess();
