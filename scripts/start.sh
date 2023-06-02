@@ -56,10 +56,10 @@ IDLE_PROFILE=$(find_idle_profile)
 echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다."
 
 #nohup java -jar /home/ubuntu/action/shimpyo-0.0.1-SNAPSHOT.jar
-nohup java -jar /home/ubuntu/action/shimpyo-0.0.1-SNAPSHOT.jar > $REPOSITORY/nohup.out 2>&1 &
+#nohup java -jar /home/ubuntu/action/shimpyo-0.0.1-SNAPSHOT.jar > $REPOSITORY/nohup.out 2>&1 &
 
 nohup java -jar \
-        -Dspring.config.location=classpath:/application.properties,/home/ec2-user/parrot/application-db.properties, \
+        -Dspring.config.location=classpath:/application.properties,/home/ubuntu/action/application-db.properties, \
         $REPOSITORY/$JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
 
 # nohup 명령어 실행 후 10초 대기
