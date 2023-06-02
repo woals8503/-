@@ -1,6 +1,6 @@
 spring:
-  config:
-    import: db-config.yml
+#  config:
+#    import: db-config.yml
   profiles:
     active: local
 
