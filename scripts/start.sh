@@ -40,6 +40,8 @@ else
     sleep 2
 fi
 
+
+cd /home/ubuntu/action
 echo "> 새 어플리케이션 배포"
 JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
 
