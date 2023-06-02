@@ -1,10 +1,8 @@
 spring:
-#  config:
-#    import: db-config.yml
   profiles:
-    active: local
+    include: db
 
-#    config import 지정해줘야 데이터 저장됨
+  #    config import 지정해줘야 데이터 저장됨
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
