@@ -23,6 +23,9 @@ public class PayMent extends BaseEntity {
     private Long id;
 
     @NotNull
+    private String UUID;
+
+    @NotNull
     @Enumerated
     private PayStatus payStatus;
 

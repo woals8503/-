@@ -15,3 +15,4 @@ out/
 !**/src/test/**/out/
 
 src/main/resources/db-config.yml
+src/main/resources/db-configlocal.yml
