@@ -37,10 +37,10 @@ public class Member extends BaseEntity {
     private String email;
     @NotNull
     private String password;
-    @NotNull
-    private String phoneNumber;
+
     @NotNull
     private int point;
+
     @NotNull
     private String nickname;
 
@@ -76,7 +76,6 @@ public class Member extends BaseEntity {
     public Member(String email, String password, String phoneNumber, int point, String nickname, String provider, String providerId, MemberGrade memberGrade, MemberRole role) {
         this.email = email;
         this.password = password;
-        this.phoneNumber = phoneNumber;
         this.point = point;
         this.nickname = nickname;
         this.provider = provider;
