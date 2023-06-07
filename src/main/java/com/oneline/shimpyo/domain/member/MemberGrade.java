@@ -27,8 +27,7 @@ public class MemberGrade {
     @OneToMany(mappedBy = "memberGrade")
     private List<Member> members = new ArrayList<>();
 
-    public MemberGrade(Long id, String grade, int discount) {
-        this.id = id;
+    public MemberGrade(String grade, int discount) {
         this.grade = grade;
         this.discount = discount;
     }

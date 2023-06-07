@@ -33,4 +33,5 @@ public class MemberImage {
     private String savedPath;
     @NotNull
     private boolean thumbnail;
+
 }
