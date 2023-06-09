@@ -44,6 +44,8 @@ public class Member extends BaseEntity {
     @NotNull
     private String nickname;
 
+    private String phoneNumber;
+
     private String provider;
     private String providerId;
 
@@ -54,7 +56,7 @@ public class Member extends BaseEntity {
     @Enumerated(value = STRING)
     private MemberRole role;
 
-    @OneToOne(mappedBy = "member", cascade = ALL)
+    @OneToOne(mappedBy = "member", cascade = ALL, fetch = LAZY)
     private MemberImage memberImage;
 
     @OneToMany(mappedBy = "member", cascade = ALL)
@@ -86,10 +88,13 @@ public class Member extends BaseEntity {
 
     public Member(MemberReq request, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.email = request.getEmail();
-        System.out.println(request.getPassword());
         this.password = bCryptPasswordEncoder.encode(request.getPassword());
 //        this.phoneNumber = request.getPhoneNumber();
         this.nickname = request.getNickname();
         this.point = 0;
+    }
+
+    public void resetPassword(String password) {
+        this.password = password;
     }
 }
