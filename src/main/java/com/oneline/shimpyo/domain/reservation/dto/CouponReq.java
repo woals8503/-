@@ -12,14 +12,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CouponReq {
 
+    private long id;
     private String name;
     private String description;
+    private int discount;
     private String expiredDate;
 
     @QueryProjection
-    public CouponReq(String name, String description, LocalDateTime expiredDate) {
+    public CouponReq(long id, String name, String description, int discount, LocalDateTime expiredDate) {
+        this.id = id;
         this.name = name;
         this.description = description;
-        this.expiredDate = expiredDate.toString();
+        this.discount = discount;
+        this.expiredDate = expiredDate.toString(); //todo change
     }
 }

@@ -22,7 +22,7 @@ public class MyCouponQuerydsl {
     }
 
     public List<CouponReq> getMyCouponList(long memberId){
-        return jqf.select(new QCouponReq(coupon.name, coupon.description, myCoupon.expiredDate))
+        return jqf.select(new QCouponReq(coupon.id, coupon.name, coupon.description, coupon.discount, myCoupon.expiredDate))
                 .from(myCoupon)
                 .join(myCoupon.coupon, coupon)
                 .on(myCoupon.coupon.id.eq(coupon.id))

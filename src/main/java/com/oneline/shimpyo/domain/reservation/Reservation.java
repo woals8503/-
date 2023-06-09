@@ -4,9 +4,7 @@ import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.room.Room;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,7 +15,9 @@ import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
+@Builder
 @Getter @Setter
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "RESERVATION")
 public class Reservation extends BaseEntity {
