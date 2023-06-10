@@ -49,6 +49,8 @@ public class Member extends BaseEntity {
     private String provider;
     private String providerId;
 
+    private String refreshToken;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_grade_id")
     private MemberGrade memberGrade;
@@ -94,7 +96,16 @@ public class Member extends BaseEntity {
         this.point = 0;
     }
 
+    public Member(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     public void resetPassword(String password) {
         this.password = password;
+    }
+
+    public void updateRefreshToken(String newToken) {
+        this.refreshToken = newToken;
     }
 }

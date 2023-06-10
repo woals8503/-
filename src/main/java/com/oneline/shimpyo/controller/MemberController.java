@@ -5,18 +5,19 @@ import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.domain.member.responsebody.Result;
 import com.oneline.shimpyo.domain.member.responsebody.ResultData;
-import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import static com.oneline.shimpyo.security.JwtConstants.*;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RestController
 @RequiredArgsConstructor
@@ -90,12 +91,12 @@ public class MemberController {
 
         return ResponseEntity.ok().body(new Result<>(true, 1000, "요청에 성공하였습니다."));
     }
-
-    @GetMapping("/user")
-    public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        System.out.println("principalDetails.getMember() = " + principalDetails.getMember());
-        return "user";
-    }
+//
+//    @GetMapping("/user")
+//    public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+//        System.out.println("principalDetails.getMember() = " + principalDetails.getMember());
+//        return "user";
+//    }
 
     //이메일 찾기 시 휴대폰 인증
     @GetMapping("/api/{phoneNumber}")
@@ -123,5 +124,26 @@ public class MemberController {
                 .body(new ResultData<>(true, 1000, "요청에 성공하였습니다.", findEmail));
     }
 
+    // Access 토큰 만료 시 새로운 토큰을 발급하기 위함
+    @GetMapping("/api/refresh")
+    public ResponseEntity<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith(TOKEN_HEADER_PREFIX)) {
+            throw new RuntimeException("JWT Token이 존재하지 않습니다.");
+        }
+        String refreshToken = authorizationHeader.substring(TOKEN_HEADER_PREFIX.length());
+        Map<String, String> tokens = memberService.refresh(refreshToken);
+        response.setHeader(AT_HEADER, tokens.get(AT_HEADER));
+        if (tokens.get(RT_HEADER) != null) {
+            response.setHeader(RT_HEADER, tokens.get(RT_HEADER));
+        }
+        return ResponseEntity.ok(tokens);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<String> my() {
+        return ResponseEntity.ok("My");
+    }
 }
 

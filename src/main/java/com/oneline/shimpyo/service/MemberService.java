@@ -4,6 +4,8 @@ import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 
+import java.util.Map;
+
 public interface MemberService {
     // 회원가입
     void join(MemberReq member);
@@ -22,4 +24,8 @@ public interface MemberService {
     void certifiedPhoneNumber(String phoneNumber, String numStr);
 
     String findByEmailWithPhonNumber(String phoneNumber);
+
+    void updateRefreshToken(String username, String refreshToken);
+
+    Map<String, String> refresh(String refreshToken);
 }
