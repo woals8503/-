@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,31 +31,38 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         PrincipalDetails member = (PrincipalDetails) authentication.getPrincipal();
-        System.out.println(member.getUsername());
+        System.out.println("유저네임 : " + member.getUsername());
 
         String accessToken = JWT.create()
                 .withSubject(member.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + AT_EXP_TIME))
                 .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withClaim("username", member.getUsername())
                 .sign(Algorithm.HMAC256(JWT_SECRET));
         String refreshToken = JWT.create()
                 .withSubject(member.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + RT_EXP_TIME))
                 .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withClaim("username", member.getUsername())
                 .sign(Algorithm.HMAC256(JWT_SECRET));
 
         // Refresh Token DB에 저장
         memberService.updateRefreshToken(member.getUsername(), refreshToken);
 
-        // Access Token , Refresh Token 프론트 단에 Response Header로 전달
+        // 보안상 문제로 access 토큰은 body refresh 토큰은 set-Cookie로 전달
+        // 쿠키 생성하여 refresh_token 담기
+        Cookie cookie = new Cookie("refresh_token", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60 * 24);
+
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
-        response.setHeader(AT_HEADER, accessToken);
-        response.setHeader(RT_HEADER, refreshToken);
+        response.addCookie(cookie);
 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
-        responseMap.put(RT_HEADER, refreshToken);
         new ObjectMapper().writeValue(response.getWriter(), responseMap);
     }
 }

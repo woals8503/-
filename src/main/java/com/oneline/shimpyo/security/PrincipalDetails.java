@@ -47,7 +47,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 //        user.getRole(); // String타입이라 이것을 리턴할 수는 없다.
         // 그래서 타입을 만들어줘야한다.
         Collection<GrantedAuthority> collect = new ArrayList<>();
-//        collect.add((GrantedAuthority) member::getRole);
+        collect.add((GrantedAuthority) () -> String.valueOf(member.getRole()));
         // GrantedAuthority 생성자를 만들어 오버라이드한 메소드로 user.getRole()를 호출하여 리턴
         return collect;
     }

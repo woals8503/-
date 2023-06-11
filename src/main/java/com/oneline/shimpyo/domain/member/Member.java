@@ -7,6 +7,7 @@ import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.wish.Wish;
+import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.oneline.shimpyo.domain.member.MemberRole.*;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -91,9 +93,10 @@ public class Member extends BaseEntity {
     public Member(MemberReq request, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.email = request.getEmail();
         this.password = bCryptPasswordEncoder.encode(request.getPassword());
-//        this.phoneNumber = request.getPhoneNumber();
+        this.phoneNumber = "010-1111-1111";
         this.nickname = request.getNickname();
         this.point = 0;
+        this.role = CLIENT;
     }
 
     public Member(String email, String password) {
@@ -101,8 +104,8 @@ public class Member extends BaseEntity {
         this.password = password;
     }
 
-    public void resetPassword(String password) {
-        this.password = password;
+    public void resetPassword(String password, CustomBCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.password = bCryptPasswordEncoder.encode(password);
     }
 
     public void updateRefreshToken(String newToken) {

@@ -4,6 +4,7 @@ import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public interface MemberService {
@@ -27,5 +28,8 @@ public interface MemberService {
 
     void updateRefreshToken(String username, String refreshToken);
 
-    Map<String, String> refresh(String refreshToken);
+    Map<String, String> refresh(String refreshToken, HttpServletResponse response);
+
+    boolean duplicatePhoneNumber(String phoneNumber);
+
 }

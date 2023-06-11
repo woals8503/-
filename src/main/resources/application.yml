@@ -8,6 +8,8 @@ spring:
 #    import: db-config.yml
 
   #    config import 지정해줘야 데이터 저장됨
+  jwt:
+    secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect

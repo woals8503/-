@@ -16,19 +16,17 @@ import lombok.RequiredArgsConstructor;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.oneline.shimpyo.security.JwtConstants.*;
 
@@ -71,7 +69,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     public void changePassword(ResetPasswordReq request) {
         Member findMember = memberRepository.findByMemberWithPhoneNumber(request.getPhoneNumber());
         // 더티 체킹
-        findMember.resetPassword(request.getPassword());
+        findMember.resetPassword(request.getPassword(), bCryptPasswordEncoder);
     }
 
     @Override
@@ -113,7 +111,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public Map<String, String> refresh(String refreshToken) {
+    public Map<String, String> refresh(String refreshToken, HttpServletResponse response) {
 
         // === Refresh Token 유효성 검사 === //
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(JWT_SECRET)).build();
@@ -132,6 +130,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         String accessToken = JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(now + AT_EXP_TIME))
+                .withClaim("username", member.getEmail())
+                .withIssuedAt(new Date(System.currentTimeMillis()))
                 .sign(Algorithm.HMAC256(JWT_SECRET));
         Map<String, String> accessTokenResponseMap = new HashMap<>();
 
@@ -144,13 +144,33 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             String newRefreshToken = JWT.create()
                     .withSubject(member.getEmail())
                     .withExpiresAt(new Date(now + RT_EXP_TIME))
+                    .withIssuedAt(new Date(System.currentTimeMillis()))
+                    .withClaim("username", member.getEmail())
                     .sign(Algorithm.HMAC256(JWT_SECRET));
-            accessTokenResponseMap.put(RT_HEADER, newRefreshToken);
+
+            // 쿠키 생성하여 refresh_token 담기
+            Cookie cookie = new Cookie("refresh_token", newRefreshToken);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60 * 24);
+
+            response.addCookie(cookie);
+//            accessTokenResponseMap.put(RT_HEADER, newRefreshToken);   refresh 토큰 body에서 제외
             member.updateRefreshToken(newRefreshToken);
         }
 
         accessTokenResponseMap.put(AT_HEADER, accessToken);
         return accessTokenResponseMap;
+    }
+
+    @Override
+    public boolean duplicatePhoneNumber(String phoneNumber) {
+        Member findMember = memberRepository.findByMemberWithPhoneNumber(phoneNumber);
+        if(findMember != null)
+            return false;
+
+        return true;
     }
 
     @Override
@@ -163,4 +183,5 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         return new PrincipalDetails(member);
     }
+
 }
