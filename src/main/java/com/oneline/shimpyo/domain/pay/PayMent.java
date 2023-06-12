@@ -2,9 +2,7 @@ package com.oneline.shimpyo.domain.pay;
 
 import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.coupon.Coupon;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,7 +11,9 @@ import static javax.persistence.FetchType.*;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
+@Builder
 @Getter @Setter
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "PAYMENT")
 public class PayMent extends BaseEntity {
@@ -23,11 +23,17 @@ public class PayMent extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Enumerated
+    private String UUID;
+
+    @NotNull
+    private String impUid;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private PayStatus payStatus;
 
     @NotNull
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PayMethod payMethod;
 
     @NotNull

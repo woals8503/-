@@ -53,7 +53,6 @@ public class Room {
     private LocalTime checkIn;
     private LocalTime checkOut;
 
-    @NotNull
     @OneToMany(mappedBy = "room", cascade = ALL)
     private List<RoomImage> images = new ArrayList<>();
 
