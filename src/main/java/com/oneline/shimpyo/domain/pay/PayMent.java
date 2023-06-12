@@ -29,11 +29,11 @@ public class PayMent extends BaseEntity {
     private String impUid;
 
     @NotNull
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PayStatus payStatus;
 
     @NotNull
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PayMethod payMethod;
 
     @NotNull

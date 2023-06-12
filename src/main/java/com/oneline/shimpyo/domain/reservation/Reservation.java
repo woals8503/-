@@ -49,7 +49,7 @@ public class Reservation extends BaseEntity {
     private Member member;
 
     @NotNull
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
     @ManyToOne(fetch = LAZY)

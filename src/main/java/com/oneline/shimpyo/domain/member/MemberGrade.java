@@ -1,8 +1,6 @@
 package com.oneline.shimpyo.domain.member;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,6 +9,8 @@ import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
+@Builder
+@AllArgsConstructor
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)

@@ -6,9 +6,7 @@ import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.wish.Wish;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,6 +18,8 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
+@Builder
+@AllArgsConstructor
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
