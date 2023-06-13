@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.security;
 
 
+
 import com.oneline.shimpyo.security.filter.CustomAuthenticationFilter;
 import com.oneline.shimpyo.security.filter.CustomAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,13 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -49,6 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
 
 //      매번인증하지않고 필요한 경우만 토큰 만든다
+        http.cors().configurationSource(corsConfigurationSource());
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션 사용 X
 
@@ -69,5 +78,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "OPTIONS", "PUT","DELETE", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
