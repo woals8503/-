@@ -51,8 +51,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     @Override
     public boolean duplicateEmail(String email) {
         Member findEmail = memberRepository.findByEmail(email);
-        if(findEmail == null) return false;
-        return true;
+        if(findEmail == null) return true;  // 없으면
+        return false;   // 있으면
     }
 
     @Override

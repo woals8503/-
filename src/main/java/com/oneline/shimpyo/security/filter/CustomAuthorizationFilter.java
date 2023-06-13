@@ -73,6 +73,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 new ObjectMapper().writeValue(response.getWriter(), errorResponse);
             }
         }
+
         // JWT 토큰 값이 Bearer로 시작하지 않는다면
         else if(!authrizationHeader.startsWith(TOKEN_HEADER_PREFIX)) {
             // 잘못된 토큰값이라면
