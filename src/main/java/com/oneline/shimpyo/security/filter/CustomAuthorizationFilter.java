@@ -49,7 +49,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 || servletPath.equals("/api/login")
                 || servletPath.equals("/api/refresh")
                 || servletPath.equals("/api/join")
-                || servletPath.equals("/api/check-email/")
+                || servletPath.equals("/api/check-email")
         ) {
             filterChain.doFilter(request, response);
         }

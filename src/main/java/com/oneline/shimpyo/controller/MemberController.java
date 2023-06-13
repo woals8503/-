@@ -134,7 +134,8 @@ public class MemberController {
 
     @GetMapping("/test")
     public String test(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-
+        Member member = principalDetails.getMember();
+        member.getId();
         return "test";
     }
 
