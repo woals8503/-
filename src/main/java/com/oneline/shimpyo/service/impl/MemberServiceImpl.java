@@ -13,6 +13,7 @@ import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
 import com.oneline.shimpyo.security.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;
@@ -28,8 +29,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.oneline.shimpyo.security.JwtConstants.*;
+import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
+import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
+import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -69,7 +73,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     public void changePassword(ResetPasswordReq request) {
         Member findMember = memberRepository.findByMemberWithPhoneNumber(request.getPhoneNumber());
         // 더티 체킹
-        findMember.resetPassword(request.getPassword(), bCryptPasswordEncoder);
+        findMember.resetPassword(request.getFirstPassword(), bCryptPasswordEncoder);
     }
 
     @Override
@@ -88,10 +92,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         try {
             JSONObject obj = (JSONObject) coolsms.send(params);
-            System.out.println(obj.toString());
+            log.info(obj.toString());
         } catch (CoolsmsException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getCode());
+            log.info(e.getMessage());
+            log.info(String.valueOf(e.getCode()));
         }
     }
 
@@ -127,12 +131,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         if (!member.getRefreshToken().equals(refreshToken)) {
             throw new JWTVerificationException("유효하지 않은 Refresh Token 입니다.");
         }
-        String accessToken = JWT.create()
-                .withSubject(member.getEmail())
-                .withExpiresAt(new Date(now + AT_EXP_TIME))
-                .withClaim("username", member.getEmail())
-                .withIssuedAt(new Date(System.currentTimeMillis()))
-                .sign(Algorithm.HMAC256(JWT_SECRET));
+
+        String accessToken
+                = reissuanceAccessToken(username, true, AT_EXP_TIME, now);
+
         Map<String, String> accessTokenResponseMap = new HashMap<>();
 
         // === 현재시간과 Refresh Token 만료날짜를 통해 남은 만료기간 계산 === //
@@ -141,21 +143,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         long diffDays = (refreshExpireTime - now) / 1000 / (24 * 3600);
         long diffMin = (refreshExpireTime - now) / 1000 / 60;
         if (diffMin < 5) {
-            String newRefreshToken = JWT.create()
-                    .withSubject(member.getEmail())
-                    .withExpiresAt(new Date(now + RT_EXP_TIME))
-                    .withIssuedAt(new Date(System.currentTimeMillis()))
-                    .withClaim("username", member.getEmail())
-                    .sign(Algorithm.HMAC256(JWT_SECRET));
+            String newRefreshToken
+                    = ressuanceRefreshToken(member.getEmail(), true, RT_EXP_TIME, now);
 
-            // 쿠키 생성하여 refresh_token 담기
-            Cookie cookie = new Cookie("refresh_token", newRefreshToken);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(60 * 60 * 24);
-
-            response.addCookie(cookie);
+            response.addCookie(createCookie(newRefreshToken));
 //            accessTokenResponseMap.put(RT_HEADER, newRefreshToken);   refresh 토큰 body에서 제외
             member.updateRefreshToken(newRefreshToken);
         }

@@ -47,7 +47,7 @@ public class ReservationServiceImpl implements ReservationService {
         MemberGrade memberGrade = member.getMemberGrade();
         List<CouponReq> myCouponList = myCouponQuerydsl.getMyCouponList(memberId);
 
-        return new GetPrepareReservationReq(uuid, memberGrade.getGrade(), memberGrade.getDiscount(), myCouponList);
+        return new GetPrepareReservationReq(uuid, memberGrade.getGrade().getRank(), memberGrade.getDiscount(), myCouponList);
     }
 
     @Transactional

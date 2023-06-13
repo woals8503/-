@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.EnumType.*;
 import static lombok.AccessLevel.PROTECTED;
 
 @Builder
@@ -19,16 +20,19 @@ public class MemberGrade {
     @Id @GeneratedValue
     @Column(name = "member_grade_id")
     private Long id;
+
     @NotNull
-    private String grade;
+    @Enumerated(value = STRING)
+    private GradeName grade;
+
     @NotNull
     private int discount;
 
     @OneToMany(mappedBy = "memberGrade")
     private List<Member> members = new ArrayList<>();
 
-    public MemberGrade(String grade, int discount) {
-        this.grade = grade;
-        this.discount = discount;
-    }
+//    public MemberGrade(String grade, int discount) {
+//        this.grade = grade;
+//        this.discount = discount;
+//    }
 }

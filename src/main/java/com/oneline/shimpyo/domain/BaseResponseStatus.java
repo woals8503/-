@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.domain;
 
 import lombok.Getter;
+import org.springframework.security.authentication.BadCredentialsException;
 
 /**
  * 에러 코드 관리
@@ -40,6 +41,14 @@ public enum BaseResponseStatus {
     //member 3020
     MEMBER_NONEXISTENT(false, 3020,"존재하지 않는 회원입니다."),
     MEMBER_GRADE_NONEXISTENT(false, 3025,"존재하지 않는 회원 등급입니다."),
+    MEMBER_REGEX_WRONG(false, 3026, "회원 정보를 다시 입력해주세요."),
+    EMAIL_DUPLICATE(false, 3027, "중복된 이메일입니다."),
+    NICKNAME_DUPLICATE(false, 3028, "중복된 닉네임입니다."),
+    VERIFICATION_CODE_SEND_EXCEPTION(false, 3029, "인증번호 전송에 실패하였습니다."),
+    PHONE_NUMBER_DUPLICATE(false, 3030, "이미 등록된 휴대폰 번호입니다."),
+    PASSWORD_REGEX_WRONG(false, 3031, "비밀번호를 다시 확인해주세요."),
+
+
 
     //house 3040
     HOUSE_NONEXISTENT(false, 3040,"존재하지 않는 숙소입니다."),
@@ -59,11 +68,15 @@ public enum BaseResponseStatus {
     //coupon 3120
     COUPON_NONEXISTENT(false, 3120,"존재하지 않는 쿠폰입니다."),
 
-
     /**
      * 4000 : 기타 오류
      */
-    PORTONE_EXCEPTION(false, 4001,"포트원 오류.");
+    PORTONE_EXCEPTION(false, 4001,"포트원 오류."),
+    // jwt
+    JWT_TOKEN_NONEXISTENT(false, 4020, "JWT 토큰이 존재하지 않습니다."),
+
+    //auth
+    BAD_CREDENTIALS_EXCEPTION(false, 4040, "Provider - authenticate() : 비밀번호가 일치하지 않습니다.");
 
     private final boolean isSuccess;
     private final int code;

@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class ResetPasswordReq {
-    private String password;
+    private String firstPassword;
+    private String secondPassword;
     private String phoneNumber;
 }

@@ -1,4 +1,4 @@
-package com.oneline.shimpyo.security;
+package com.oneline.shimpyo.security.filter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -17,10 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-// 로그인 시 필터 실행
-// body의 email과 password를 꺼내옴
-
-// 1 AuthenticationManager인터페이스를 구현한 ProviderManager에게 넘겼다.
 @Slf4j  // 인증
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -32,6 +28,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        log.info("필터 2");
         String body = null;
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bufferedReader = null;
@@ -64,5 +61,4 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
         return null;
     }
-
 }
