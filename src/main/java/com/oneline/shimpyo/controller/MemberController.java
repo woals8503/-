@@ -7,10 +7,14 @@ import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.domain.member.dto.ResultRes;
 import com.oneline.shimpyo.domain.member.dto.EmailRes;
+import com.oneline.shimpyo.security.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +52,7 @@ public class MemberController {
             return new BaseResponse<>(EMAIL_DUPLICATE);
         return new BaseResponse<>();
     }
-    
+
     //휴대폰 번호 중복 검사
     @GetMapping("/api/check-phone/{phoneNumber}")
     public BaseResponse<Void> duplicatePhoneNumber(@PathVariable("phoneNumber") String phoneNumber) {
@@ -67,8 +71,8 @@ public class MemberController {
     }
 
     // 이메일 유무 검사
-    @GetMapping("/api/check-user/{email}")
-    public BaseResponse<Void> checkUser(@PathVariable("email") String email) {
+    @GetMapping("/api/check-user")
+    public BaseResponse<Void> checkUser(@RequestParam(value = "email") String email) {
         Member user = memberService.checkUser(email);
 
         if(user == null)
@@ -129,7 +133,8 @@ public class MemberController {
     }
 
     @GetMapping("/test")
-    public String test() {
+    public String test(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+
         return "test";
     }
 

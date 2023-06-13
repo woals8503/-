@@ -48,7 +48,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         if (servletPath.equals("/")
                 || servletPath.equals("/api/login")
                 || servletPath.equals("/api/refresh")
-                || servletPath.equals("/api/join")) {
+                || servletPath.equals("/api/join")
+                || servletPath.equals("JWT 인증 필요 없는 페이지")
+        ) {
             filterChain.doFilter(request, response);
         }
 

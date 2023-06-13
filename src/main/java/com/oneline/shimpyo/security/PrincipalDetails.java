@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.security;
 
 import com.oneline.shimpyo.domain.member.Member;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+@Data
 public class PrincipalDetails implements UserDetails, OAuth2User {
     // Authentication 객체 안에 들어가는 정보는 UserDetails 타입이여야 함으로
     // UserDetails를 상속하여 구현체로 받아들임 ( 즉 같은 타입이 됨 )

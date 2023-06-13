@@ -56,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/api/client/**").hasAnyAuthority("CLIENT");
         // 토큰이 아니라 그 회원이 가지고있는 Role
         http.authorizeRequests().antMatchers("/admin/**").hasAnyAuthority("ADMIN");
-//        http.authorizeRequests().anyRequest().authenticated();   // 이외 uri 요청 시 인증 필요 -> 추후 변경 예정
+//      http.authorizeRequests().anyRequest().authenticated();   // 이외 uri 요청 시 인증 필요 -> 추후 변경 예정
 
         http.addFilter(filter);
         http.addFilterBefore(customAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
