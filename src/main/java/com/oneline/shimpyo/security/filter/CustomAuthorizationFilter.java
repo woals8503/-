@@ -43,13 +43,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         log.info("권한 필터");
         String servletPath = request.getServletPath();
         String authrizationHeader = request.getHeader(AUTHORIZATION);
-
+        log.info(servletPath);
         // 로그인, 회원가입, 토큰 재발급의 url일 경우 토큰 검증 x
         if (servletPath.equals("/")
                 || servletPath.equals("/api/login")
                 || servletPath.equals("/api/refresh")
                 || servletPath.equals("/api/join")
-                || servletPath.equals("JWT 인증 필요 없는 페이지")
+                || servletPath.equals("/api/check-email/")
         ) {
             filterChain.doFilter(request, response);
         }
