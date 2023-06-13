@@ -45,8 +45,8 @@ public class MemberController {
     }
 
     //이메일 중복 검사
-    @GetMapping("/api/check-email/{email}")
-    public BaseResponse<Void> duplicateEmail(@PathVariable("email") String email) {
+    @GetMapping("/api/check-email")
+    public BaseResponse<Void> duplicateEmail(@RequestParam(value = "email") String email) {
         boolean check = memberService.duplicateEmail(email);
         if(!check)
             return new BaseResponse<>(EMAIL_DUPLICATE);
@@ -54,8 +54,8 @@ public class MemberController {
     }
 
     //휴대폰 번호 중복 검사
-    @GetMapping("/api/check-phone/{phoneNumber}")
-    public BaseResponse<Void> duplicatePhoneNumber(@PathVariable("phoneNumber") String phoneNumber) {
+    @GetMapping("/api/check-phone")
+    public BaseResponse<Void> duplicatePhoneNumber(@RequestParam(value = "phoneNumber") String phoneNumber) {
         boolean check = memberService.duplicatePhoneNumber(phoneNumber);
         if(!check)
             return new BaseResponse<>(PHONE_NUMBER_DUPLICATE);
@@ -64,7 +64,7 @@ public class MemberController {
 
     // 닉네임 중복 검사
     @GetMapping("/api/check-nickname/{nickname}")
-    public BaseResponse<Void> duplicateNickname(@PathVariable("nickname") String nickname) {
+    public BaseResponse<Void> duplicateNickname(@RequestParam(value ="nickname") String nickname) {
         boolean check = memberService.duplicateNickname(nickname);
         if(!check) return new BaseResponse<>(NICKNAME_DUPLICATE);
         return new BaseResponse<>();
@@ -95,7 +95,7 @@ public class MemberController {
     }
 
     @GetMapping("/api/certification/{phoneNumber}")
-    public BaseResponse<Void> CertificationPhone(@PathVariable("phoneNumber") String phoneNumber) {
+    public BaseResponse<Void> CertificationPhone(@RequestParam(value ="phoneNumber") String phoneNumber) {
         Random rand  = new Random();
         String numStr = "";
         for(int i=0; i<4; i++) {
