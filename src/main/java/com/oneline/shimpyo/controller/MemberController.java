@@ -45,7 +45,7 @@ public class MemberController {
     }
 
     //이메일 중복 검사
-    @GetMapping("/api/check-email")
+    @PostMapping("/api/check-email")
     public BaseResponse<Void> duplicateEmail(@RequestParam(value = "email") String email) {
         boolean check = memberService.duplicateEmail(email);
         if(!check)
@@ -54,7 +54,7 @@ public class MemberController {
     }
 
     //휴대폰 번호 중복 검사
-    @GetMapping("/api/check-phone")
+    @PostMapping("/api/check-phone")
     public BaseResponse<Void> duplicatePhoneNumber(@RequestParam(value = "phoneNumber") String phoneNumber) {
         boolean check = memberService.duplicatePhoneNumber(phoneNumber);
         if(!check)
@@ -63,7 +63,7 @@ public class MemberController {
     }
 
     // 닉네임 중복 검사
-    @GetMapping("/api/check-nickname/{nickname}")
+    @PostMapping("/api/check-nickname/{nickname}")
     public BaseResponse<Void> duplicateNickname(@RequestParam(value ="nickname") String nickname) {
         boolean check = memberService.duplicateNickname(nickname);
         if(!check) return new BaseResponse<>(NICKNAME_DUPLICATE);
@@ -71,7 +71,7 @@ public class MemberController {
     }
 
     // 이메일 유무 검사
-    @GetMapping("/api/check-user")
+    @PostMapping("/api/check-user")
     public BaseResponse<Void> checkUser(@RequestParam(value = "email") String email) {
         Member user = memberService.checkUser(email);
 
@@ -94,7 +94,7 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-    @GetMapping("/api/certification/{phoneNumber}")
+    @PostMapping("/api/certification/{phoneNumber}")
     public BaseResponse<Void> CertificationPhone(@RequestParam(value ="phoneNumber") String phoneNumber) {
         Random rand  = new Random();
         String numStr = "";
@@ -110,7 +110,7 @@ public class MemberController {
     }
     
     // 인증 성공 시 이메일 보여주기
-    @GetMapping("/api/show-email/{phoneNumber}")
+    @PostMapping("/api/show-email/{phoneNumber}")
     public BaseResponse<EmailRes> findEmail(
             @PathVariable("phoneNumber") String phoneNumber) {
         String findEmail = memberService.findByEmailWithPhonNumber(phoneNumber);
