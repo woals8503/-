@@ -34,7 +34,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping("/api/join")
+    @PostMapping("/public/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
         boolean isValid = validateRequest(memberReq);
         if(!isValid)
@@ -45,7 +45,7 @@ public class MemberController {
     }
 
     //이메일 중복 검사
-    @PostMapping("/api/check-email")
+    @PostMapping("/public/check-email")
     public BaseResponse<Void> duplicateEmail(@RequestParam(value = "email") String email) {
         boolean check = memberService.duplicateEmail(email);
         if(!check)
@@ -54,7 +54,7 @@ public class MemberController {
     }
 
     //휴대폰 번호 중복 검사
-    @PostMapping("/api/check-phone")
+    @PostMapping("/public/check-phone")
     public BaseResponse<Void> duplicatePhoneNumber(@RequestParam(value = "phoneNumber") String phoneNumber) {
         boolean check = memberService.duplicatePhoneNumber(phoneNumber);
         if(!check)
@@ -63,7 +63,7 @@ public class MemberController {
     }
 
     // 닉네임 중복 검사
-    @PostMapping("/api/check-nickname/{nickname}")
+    @PostMapping("/public/check-nickname")
     public BaseResponse<Void> duplicateNickname(@RequestParam(value ="nickname") String nickname) {
         boolean check = memberService.duplicateNickname(nickname);
         if(!check) return new BaseResponse<>(NICKNAME_DUPLICATE);
@@ -71,7 +71,7 @@ public class MemberController {
     }
 
     // 이메일 유무 검사
-    @PostMapping("/api/check-user")
+    @PostMapping("/public/check-user")
     public BaseResponse<Void> checkUser(@RequestParam(value = "email") String email) {
         Member user = memberService.checkUser(email);
 
@@ -82,9 +82,9 @@ public class MemberController {
     }
 
     @PatchMapping("/api/reset-pwd")
-    public BaseResponse<Void> resetPwd(@RequestBody ResetPasswordReq request) {
+    public BaseResponse<Void> resetPwd(@RequestBody ResetPasswordReq request,
+                                       @AuthenticationPrincipal PrincipalDetails principalDetails) {
         // 이메일 정규식 표현 필요
-
         boolean isValid = validatePassword(request.getFirstPassword(), request.getSecondPassword());
 
         if(isValid)
@@ -94,7 +94,7 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-    @PostMapping("/api/certification/{phoneNumber}")
+    @PostMapping("/public/certification")
     public BaseResponse<Void> CertificationPhone(@RequestParam(value ="phoneNumber") String phoneNumber) {
         Random rand  = new Random();
         String numStr = "";
@@ -110,16 +110,16 @@ public class MemberController {
     }
     
     // 인증 성공 시 이메일 보여주기
-    @PostMapping("/api/show-email/{phoneNumber}")
+    @PostMapping("/public/show-email")
     public BaseResponse<EmailRes> findEmail(
-            @PathVariable("phoneNumber") String phoneNumber) {
+            @RequestParam(value = "phoneNumber") String phoneNumber) {
         String findEmail = memberService.findByEmailWithPhonNumber(phoneNumber);
 
         return new BaseResponse<>(new EmailRes(findEmail));
     }
 
     // Access 토큰 만료 시 새로운 토큰을 발급
-    @GetMapping("/api/refresh")
+    @GetMapping("/public/refresh")
     public ResponseEntity<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
 
@@ -132,10 +132,8 @@ public class MemberController {
         return ResponseEntity.ok(tokens);
     }
 
-    @GetMapping("/test")
-    public String test(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        Member member = principalDetails.getMember();
-        member.getId();
+    @GetMapping("/api/test")
+    public String test() {
         return "test";
     }
 

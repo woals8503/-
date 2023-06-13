@@ -3,12 +3,17 @@ package com.oneline.shimpyo.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 import static com.oneline.shimpyo.security.jwt.JwtConstants.JWT_SECRET;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.RT_EXP_TIME;
 
+@Component
 public class JwtTokenUtil {
     public static String generateToken(String username, boolean isMember, long EXP_TIME) {
             return JWT.create()
@@ -18,6 +23,16 @@ public class JwtTokenUtil {
                     .withClaim("isMember", isMember)
                     .withClaim("username", username)
                     .sign(Algorithm.HMAC256(JWT_SECRET));
+    }
+
+    public static String generateNonMemberToken(String username, boolean isMember, long EXP_TIME) {
+        return JWT.create()
+                .withSubject(username)
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXP_TIME))
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withClaim("isMember", isMember)
+                .withClaim("username", username)
+                .sign(Algorithm.HMAC256(JWT_SECRET));
     }
 
     // 재발급 토큰
@@ -64,5 +79,9 @@ public class JwtTokenUtil {
                 .verify(token)
                 .getClaim("username")
                 .asString();
+    }
+
+    public Authentication generateAnonymousToken() {
+        return null;
     }
 }

@@ -23,9 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,8 +62,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     @Override
     public boolean duplicateNickname(String nickname) {
         Member findNickname = memberRepository.findByNickname(nickname);
-        if(findNickname == null) return false;
-        return true;
+        if(findNickname == null) return true;
+        return false;
     }
 
     @Override
@@ -167,10 +165,6 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(username);
-//                .orElseThrow(() -> new UsernameNotFoundException("UserDetailsService - loadUserByUsername : 사용자를 찾을 수 없습니다."));
-        if(member == null) {
-            new RuntimeException("사용자를 찾을 수 없습니다.");
-        }
 
         return new PrincipalDetails(member);
     }
