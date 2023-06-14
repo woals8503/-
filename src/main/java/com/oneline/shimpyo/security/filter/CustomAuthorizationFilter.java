@@ -2,6 +2,7 @@ package com.oneline.shimpyo.security.filter;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.exception.ErrorResponse;
 import com.oneline.shimpyo.repository.MemberRepository;
@@ -19,15 +20,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static com.oneline.shimpyo.domain.BaseResponseStatus.JWT_TOKEN_NONEXISTENT;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -46,7 +46,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = extractToken(request);
 
-        String servletPath = request.getServletPath();
+//        String servletPath = request.getServletPath();
 
         // 토큰이 비어있지 않다면
         if(!StringUtils.isEmpty(token)) {
@@ -87,9 +87,27 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
+        // access 토큰
         String bearerToken = request.getHeader(AUTHORIZATION);
+
+        // 쿠키 value 끄냄
+        Cookie[] cookies = request.getCookies();
+        String name = null;
+        String value = null;
+
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+                name = cookie.getName();
+                value = cookie.getValue();
+            }
+        }
+        
         if (bearerToken != null && bearerToken.startsWith(TOKEN_HEADER_PREFIX)) {
-            return bearerToken.substring(7);
+            return bearerToken.substring(7);    // Bearer를 뺀 토큰값 리턴
+        }
+
+        if (value != null || value.startsWith(TOKEN_HEADER_PREFIX)) {
+            return value.substring(7);          // Bearer를 뺀 토큰 값 리턴
         }
         return null;
     }
