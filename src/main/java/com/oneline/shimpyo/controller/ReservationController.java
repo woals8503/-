@@ -5,19 +5,17 @@ import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.reservation.dto.GetPrepareReservationReq;
 import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
 import com.oneline.shimpyo.domain.reservation.dto.PostReservationRes;
-import com.oneline.shimpyo.domain.reservation.dto.PutReservationReq;
-import com.oneline.shimpyo.service.PaymentService;
+import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/reservation")
+@RequestMapping("/api/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -36,12 +34,12 @@ public class ReservationController {
         return new BaseResponse<>(new PostReservationRes(reservationId));
     }
 
-    @PutMapping("/{reservationId}")
+    @PatchMapping("/{reservationId}")
     public BaseResponse<Void> cancelReservation(@PathVariable long reservationId,
-                                                @RequestBody PutReservationReq putReservationReq)
+                                                @RequestBody PatchReservationReq patchReservationReq)
             throws BaseException, IamportResponseException, IOException {
         //todo check memberId
-        reservationService.cancelReservation(reservationId, putReservationReq);
+        reservationService.cancelReservation(reservationId, patchReservationReq);
 
         return new BaseResponse<>();
     }

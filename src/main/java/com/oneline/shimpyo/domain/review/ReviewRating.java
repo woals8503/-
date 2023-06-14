@@ -1,6 +1,12 @@
 package com.oneline.shimpyo.domain.review;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.oneline.shimpyo.domain.BaseException;
 import lombok.Getter;
+
+import java.util.stream.Stream;
+
+import static com.oneline.shimpyo.domain.BaseResponseStatus.REVIEW_RATING_WRONG;
 
 @Getter
 public enum ReviewRating {
@@ -10,5 +16,13 @@ public enum ReviewRating {
 
     ReviewRating(String status) {
         this.status = status;
+    }
+
+    @JsonCreator
+    public static ReviewRating findByMethod(String method) throws BaseException {
+        return Stream.of(ReviewRating.values())
+                .filter(c -> c.name().equals(method))
+                .findFirst()
+                .orElseThrow(() -> new BaseException(REVIEW_RATING_WRONG));
     }
 }
