@@ -49,10 +49,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     @Override
     public boolean duplicateEmail(String email) {
         Member findEmail = memberRepository.findByEmail(email);
+        //  단건이 아니라 List 로 조회가 되서 서버쪽에서 에러가 난거에요
         if(findEmail == null) return true;  // 없으면
         return false;   // 있으면
     }
-
 
     @Override
     public Member checkUser(String email) {
@@ -77,17 +77,18 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     @Override
     public void certifiedPhoneNumber(String phoneNumber, String cerNum) {
-        String api_key = "NCSLPLZK7B7SXDD2";
-        String api_secret = "5BFDNWUEB6LI0ZCYUTHCKMZ6BROXND6I";
+        String api_key = "NCSLPLZK7B7SXDD2";    // API 키
+        String api_secret = "5BFDNWUEB6LI0ZCYUTHCKMZ6BROXND6I"; // API 시크릿 키
         Message coolsms = new Message(api_key, api_secret);
 
         // 4 params(to, from, type, text) are mandatory. must be filled
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("to", phoneNumber);    // 수신전화번호
-        params.put("from", "11111111");    // 발신전화번호. 테스트시에는 발신,수신 둘다 본인 번호로 하면 됨
+        params.put("from", "01032888503");    // 발신전화번호. 테스트시에는 발신,수신 둘다 본인 번호로 하면 됨
         params.put("type", "SMS");
         params.put("text", "인증번호는" + "["+cerNum+"]" + "입니다.");
-
+        params.put("app_version", "test app 1.2");
+        
         try {
             JSONObject obj = (JSONObject) coolsms.send(params);
             log.info(obj.toString());
@@ -134,7 +135,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 = reissuanceAccessToken(username, true, AT_EXP_TIME, now);
 
         Map<String, String> accessTokenResponseMap = new HashMap<>();
-        
+
         // === 현재시간과 Refresh Token 만료날짜를 통해 남은 만료기간 계산 === //
         // === Refresh Token 만료시간 계산해 1개월 미만일 시 refresh token도 발급 === //
         long refreshExpireTime = decodedJWT.getClaim("exp").asLong() * 1000;

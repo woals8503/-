@@ -128,21 +128,5 @@ public class MemberController {
         return ResponseEntity.ok(tokens);
     }
 
-    @GetMapping("/api/test")
-    public String test() {
-        return "test";
-    }
-
-    @GetMapping("/my")
-    public String my() {
-        System.out.println("zzz");
-        return "my";
-    }
-
-    @GetMapping("/api/admin")
-    public String admin() {
-        System.out.println("zzz");
-        return "admin";
-    }
 }
 
