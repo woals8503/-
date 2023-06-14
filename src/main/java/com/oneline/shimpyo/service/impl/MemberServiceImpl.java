@@ -53,6 +53,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         return false;   // 있으면
     }
 
+
     @Override
     public Member checkUser(String email) {
         Member findUser = memberRepository.findByEmail(email);
