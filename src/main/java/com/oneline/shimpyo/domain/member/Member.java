@@ -91,7 +91,7 @@ public class Member extends BaseEntity {
 
     public Member(MemberReq request, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.email = request.getEmail();
-        this.password = bCryptPasswordEncoder.encode(request.getFirstPassword());
+        this.password = bCryptPasswordEncoder.encode(request.getPassword());
         this.phoneNumber = request.getPhoneNumber();
         this.nickname = request.getNickname();
         this.point = 0;

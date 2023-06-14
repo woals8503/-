@@ -40,7 +40,6 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
         response.addCookie(createCookie(refreshToken));
-        response.setHeader(AT_HEADER, accessToken);
 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);

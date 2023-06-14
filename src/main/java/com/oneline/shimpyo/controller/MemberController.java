@@ -79,7 +79,7 @@ public class MemberController {
     @PatchMapping("/public/reset-pwd")
     public BaseResponse<Void> resetPwd(@RequestBody ResetPasswordReq request) {
         // 이메일 정규식 표현 필요
-        boolean isValid = validatePassword(request.getFirstPassword());
+        boolean isValid = validatePassword(request.getPassword());
 
         if(isValid)
             memberService.changePassword(request);

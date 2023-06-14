@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class MemberReq {
     private String email;
-    private String firstPassword;
+    private String password;
     private String nickname;
     private String phoneNumber;
 }

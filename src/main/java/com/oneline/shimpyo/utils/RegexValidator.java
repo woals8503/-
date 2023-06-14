@@ -12,7 +12,7 @@ public class RegexValidator {
 
     public static boolean validateRequest(MemberReq request) {
         boolean a = validateEmail(request.getEmail());
-        boolean b = validateFirstPassword(request.getFirstPassword());
+        boolean b = validateFirstPassword(request.getPassword());
 //        boolean c = validateSecondPassword(request.getSecondPassword(), request.getFirstPassword());
         boolean d = validateNickname(request.getNickname());
         boolean e = validatePhoneNumber(request.getPhoneNumber());
