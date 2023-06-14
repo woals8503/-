@@ -59,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //         login 전용 필터
         CustomAuthenticationFilter filter =
                 new CustomAuthenticationFilter(authenticationManagerBean());
-        filter.setFilterProcessesUrl("/login");
+        filter.setFilterProcessesUrl("/public/login");
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
 

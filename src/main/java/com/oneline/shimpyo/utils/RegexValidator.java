@@ -13,21 +13,19 @@ public class RegexValidator {
     public static boolean validateRequest(MemberReq request) {
         boolean a = validateEmail(request.getEmail());
         boolean b = validateFirstPassword(request.getFirstPassword());
-        boolean c = validateSecondPassword(request.getSecondPassword(), request.getFirstPassword());
+//        boolean c = validateSecondPassword(request.getSecondPassword(), request.getFirstPassword());
         boolean d = validateNickname(request.getNickname());
         boolean e = validatePhoneNumber(request.getPhoneNumber());
 
-        if(!a || !b || !c || !d || !e) {
+        if(!a || !b || !d || !e) {
             return false;
         }
         return true;
     }
 
-    public static boolean validatePassword(String first, String second) {
-        boolean a = validateFirstPassword(first);
-        boolean b = validateSecondPassword(second, first);
-        if(!a || !b) return false;
-
+    public static boolean validatePassword(String password) {
+        if(validateFirstPassword(password))
+            return false;
         return true;
     }
 

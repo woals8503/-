@@ -3,10 +3,7 @@ package com.oneline.shimpyo.controller;
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
-import com.oneline.shimpyo.domain.member.dto.MemberReq;
-import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
-import com.oneline.shimpyo.domain.member.dto.ResultRes;
-import com.oneline.shimpyo.domain.member.dto.EmailRes;
+import com.oneline.shimpyo.domain.member.dto.*;
 import com.oneline.shimpyo.security.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +43,8 @@ public class MemberController {
 
     //이메일 중복 검사
     @PostMapping("/public/check-email")
-    public BaseResponse<Void> duplicateEmail(@RequestParam(value = "email") String email) {
-        boolean check = memberService.duplicateEmail(email);
+    public BaseResponse<Void> duplicateEmail(@RequestBody EmailReq request) {
+        boolean check = memberService.duplicateEmail(request.getEmail());
         if(!check)
             return new BaseResponse<>(EMAIL_DUPLICATE);
         return new BaseResponse<>();
@@ -55,8 +52,8 @@ public class MemberController {
 
     //휴대폰 번호 중복 검사
     @PostMapping("/public/check-phone")
-    public BaseResponse<Void> duplicatePhoneNumber(@RequestParam(value = "phoneNumber") String phoneNumber) {
-        boolean check = memberService.duplicatePhoneNumber(phoneNumber);
+    public BaseResponse<Void> duplicatePhoneNumber(@RequestBody DuplicatePhoneReq request) {
+        boolean check = memberService.duplicatePhoneNumber(request.getPhoneNumber());
         if(!check)
             return new BaseResponse<>(PHONE_NUMBER_DUPLICATE);
         return new BaseResponse<>();
@@ -72,20 +69,20 @@ public class MemberController {
 
     // 이메일 유무 검사
     @PostMapping("/public/check-user")
-    public BaseResponse<Void> checkUser(@RequestParam(value = "email") String email) {
-        Member user = memberService.checkUser(email);
+    public BaseResponse<EmailRes> checkUser(@RequestBody EmailReq emailReq) {
+
+        Member user = memberService.checkUser(emailReq.getEmail());
 
         if(user == null)
             return new BaseResponse<>(MEMBER_NONEXISTENT);
 
-        return new BaseResponse<>();
+        return new BaseResponse<>(new EmailRes(user.getEmail()));
     }
 
-    @PatchMapping("/api/reset-pwd")
-    public BaseResponse<Void> resetPwd(@RequestBody ResetPasswordReq request,
-                                       @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    @PatchMapping("/public/reset-pwd")
+    public BaseResponse<Void> resetPwd(@RequestBody ResetPasswordReq request) {
         // 이메일 정규식 표현 필요
-        boolean isValid = validatePassword(request.getFirstPassword(), request.getSecondPassword());
+        boolean isValid = validatePassword(request.getFirstPassword());
 
         if(isValid)
             memberService.changePassword(request);
@@ -95,7 +92,7 @@ public class MemberController {
     }
 
     @PostMapping("/public/certification")
-    public BaseResponse<Void> CertificationPhone(@RequestParam(value ="phoneNumber") String phoneNumber) {
+    public BaseResponse<CertificationPhoneNumberRes> CertificationPhone(CertificationPhoneNumberReq request) {
         Random rand  = new Random();
         String numStr = "";
         for(int i=0; i<4; i++) {
@@ -103,23 +100,25 @@ public class MemberController {
             numStr+=ran;
         }
 
-        log.info("수신자 번호 : " + phoneNumber);
+        log.info("수신자 번호 : " + request.getPhoneNumber());
         log.info("인증번호 : " + numStr);
-        memberService.certifiedPhoneNumber(phoneNumber,numStr);
-        return new BaseResponse<>();
+        memberService.certifiedPhoneNumber(request.getPhoneNumber(),numStr);
+
+
+        return new BaseResponse<>(new CertificationPhoneNumberRes(numStr));
     }
-    
-    // 인증 성공 시 이메일 보여주기
+
+    // 이메일 찾기
     @PostMapping("/public/show-email")
     public BaseResponse<EmailRes> findEmail(
-            @RequestParam(value = "phoneNumber") String phoneNumber) {
-        String findEmail = memberService.findByEmailWithPhonNumber(phoneNumber);
+            @RequestBody FindEmailReq request) {
+        String findEmail = memberService.findByEmailWithPhonNumber(request.getPhoneNumber());
 
         return new BaseResponse<>(new EmailRes(findEmail));
     }
 
     // Access 토큰 만료 시 새로운 토큰을 발급
-    @GetMapping("/public/refresh")
+    @GetMapping("/api/refresh")
     public ResponseEntity<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
 

@@ -6,7 +6,6 @@ import lombok.Data;
 public class MemberReq {
     private String email;
     private String firstPassword;
-    private String secondPassword;
     private String nickname;
     private String phoneNumber;
 }
