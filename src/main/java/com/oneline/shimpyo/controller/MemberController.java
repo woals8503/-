@@ -116,7 +116,7 @@ public class MemberController {
 
     // Access 토큰 만료 시 새로운 토큰을 발급
     @GetMapping("/api/refresh")
-    public ResponseEntity<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
+    public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(TOKEN_HEADER_PREFIX)) {
@@ -125,7 +125,7 @@ public class MemberController {
         String refreshToken = authorizationHeader.substring(TOKEN_HEADER_PREFIX.length());
         Map<String, String> tokens = memberService.refresh(refreshToken, response);
         response.setHeader(AT_HEADER, tokens.get(AT_HEADER));
-        return ResponseEntity.ok(tokens);
+        return new BaseResponse<>(tokens);
     }
 
 }
