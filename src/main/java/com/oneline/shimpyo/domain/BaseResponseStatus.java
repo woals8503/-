@@ -25,6 +25,7 @@ public enum BaseResponseStatus {
     //room 2060
 
     //review 2080
+    REVIEW_RATING_WRONG(false, 2080,"잘못된 리뷰 별점입니다."),
 
     //reservation 2100
     PAYMENT_METHOD_WRONG(false, 2110,"잘못된 결제 수단입니다."),
@@ -48,6 +49,9 @@ public enum BaseResponseStatus {
     ROOM_NONEXISTENT(false, 3060,"존재하지 않는 방입니다."),
 
     //review 3080
+    REVIEW_NONEXISTENT(false, 3080,"존재하지 않는 리뷰입니다."),
+    REVIEW_RESERVATION_WRONG_STATUS(false, 3081,"이용완료된 예약이 아닙니다."),
+    REVIEW_ANOTHER_MEMBER(false, 3082,"요청한 회원과 예약자가 다른 사람입니다."),
 
     //reservation 3100
     RESERVATION_NONEXISTENT(false, 3100,"존재하지 않는 예약입니다."),

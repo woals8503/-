@@ -9,7 +9,7 @@ import com.oneline.shimpyo.domain.pay.PayStatus;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
-import com.oneline.shimpyo.domain.reservation.dto.PutReservationReq;
+import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.service.PaymentService;
@@ -71,7 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Reservation cancelPayment(long reservationId, PutReservationReq putReservationReq)
+    public Reservation cancelPayment(long reservationId, PatchReservationReq patchReservationReq)
             throws IamportResponseException, IOException, BaseException {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
@@ -80,12 +80,12 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         PayMent payMent = reservation.getPayMent();
-        if (payMent.getPrice() < putReservationReq.getRefundAmount()) {
+        if (payMent.getPrice() < patchReservationReq.getRefundAmount()) {
             throw new BaseException(REFUND_WRONG);
         }
 
         IamportResponse<Payment> response = iamportClient.paymentByImpUid(payMent.getImpUid());
-        CancelData cancelData = createCancelData(response, putReservationReq.getRefundAmount());
+        CancelData cancelData = createCancelData(response, patchReservationReq.getRefundAmount());
         iamportClient.cancelPaymentByImpUid(cancelData);
 
         payMent.setPayStatus(PayStatus.CANCEL);
@@ -119,15 +119,9 @@ public class PaymentServiceImpl implements PaymentService {
     private int validatePaid(long memberId, PostReservationReq postReservationReq)
             throws BaseException, IOException, IamportResponseException {
         int priceToPay;
-        if (postReservationReq.getHouseType() == HouseType.PENSION) {
-            House house = houseRepository.findById(postReservationReq.getHouseRoomId())
-                    .orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
-            priceToPay = house.getPrice();
-        } else {
-            Room room = roomRepository.findById(postReservationReq.getHouseRoomId())
-                    .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
-            priceToPay = room.getPrice();
-        }
+        Room room = roomRepository.findById(postReservationReq.getRoomId())
+                .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
+        priceToPay = room.getPrice();
 
         int paidPrice = getPaidPriceInPortone(postReservationReq.getImpUid());
 
