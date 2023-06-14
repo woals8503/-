@@ -33,6 +33,7 @@ public class MemberController {
 
     @PostMapping("/public/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
+
         boolean isValid = validateRequest(memberReq);
         if(!isValid)
             return new BaseResponse<>(MEMBER_REGEX_WRONG);
