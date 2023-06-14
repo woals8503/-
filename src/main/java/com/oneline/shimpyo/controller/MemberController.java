@@ -4,14 +4,10 @@ import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.*;
-import com.oneline.shimpyo.security.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -93,7 +89,8 @@ public class MemberController {
     }
 
     @PostMapping("/public/certification")
-    public BaseResponse<CertificationPhoneNumberRes> CertificationPhone(CertificationPhoneNumberReq request) {
+    public BaseResponse<CertificationPhoneNumberRes> CertificationPhone(@RequestBody CertificationPhoneNumberReq request) {
+
         Random rand  = new Random();
         String numStr = "";
         for(int i=0; i<4; i++) {
@@ -104,7 +101,6 @@ public class MemberController {
         log.info("수신자 번호 : " + request.getPhoneNumber());
         log.info("인증번호 : " + numStr);
         memberService.certifiedPhoneNumber(request.getPhoneNumber(),numStr);
-
 
         return new BaseResponse<>(new CertificationPhoneNumberRes(numStr));
     }
