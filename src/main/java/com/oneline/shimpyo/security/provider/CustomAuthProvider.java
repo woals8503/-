@@ -1,5 +1,7 @@
 package com.oneline.shimpyo.security.provider;
 
+import com.oneline.shimpyo.domain.BaseException;
+import com.oneline.shimpyo.domain.BaseResponseStatus;
 import com.oneline.shimpyo.security.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import com.oneline.shimpyo.service.impl.MemberServiceImpl;
@@ -14,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 
 // 인증 과정을 처리
 @RequiredArgsConstructor
@@ -33,7 +37,7 @@ public class CustomAuthProvider implements AuthenticationProvider {
         PrincipalDetails principalDetails = (PrincipalDetails) memberService.loadUserByUsername(username);
         // PW 검사
         if (!passwordEncoder.matches(password, principalDetails.getPassword())) {
-            throw new BadCredentialsException("Provider - authenticate() : 비밀번호가 일치하지 않습니다.");
+            throw new BaseException(BAD_CREDENTIALS_EXCEPTION);
         }
 
         // 인증 완료 시 완료된 Authentication 객체를 리턴

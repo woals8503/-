@@ -16,8 +16,8 @@ public class JwtConstants {
     public static final String JWT_SECRET = "cos";
 
     // Header
-    public static final String AT_HEADER = "access_token";
-    public static final String RT_HEADER = "refresh_token";
+    public static final String AT_HEADER = "accessToken";
+    public static final String RT_HEADER = "refreshToken";
     public static final String TOKEN_HEADER_PREFIX = "Bearer ";
     public static final long NON_MEMBER_EXPIRATION_TIME = 86400000; // 비회원 24 시간
 }

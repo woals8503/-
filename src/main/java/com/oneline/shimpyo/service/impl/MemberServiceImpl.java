@@ -72,7 +72,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     public void changePassword(ResetPasswordReq request) {
         Member findMember = memberRepository.findByMemberWithPhoneNumber(request.getPhoneNumber());
         // 더티 체킹
-        findMember.resetPassword(request.getFirstPassword(), bCryptPasswordEncoder);
+        findMember.resetPassword(request.getPassword(), bCryptPasswordEncoder);
     }
 
     @Override

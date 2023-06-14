@@ -1,6 +1,8 @@
 package com.oneline.shimpyo.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oneline.shimpyo.domain.BaseResponse;
+import com.oneline.shimpyo.domain.member.dto.AccessTokenRes;
 import com.oneline.shimpyo.security.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -43,13 +45,14 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
-        new ObjectMapper().writeValue(response.getWriter(), responseMap);
+        BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
+        new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
     }
 
     public static Cookie createCookie(String refreshToken) {
         // 보안상 문제로 access 토큰은 body refresh 토큰은 set-Cookie로 전달
         // 쿠키 생성하여 refresh_token 담기
-        Cookie cookie = new Cookie("refresh_token", refreshToken);
+        Cookie cookie = new Cookie(RT_HEADER, refreshToken);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");
