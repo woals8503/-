@@ -83,17 +83,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 new ObjectMapper().writeValue(response.getWriter(), errorResponse);
             }
         }
-
-        if(servletPath.startsWith("/api") && StringUtils.isEmpty(token)) {
-            String nonMember_token = generateNonMemberToken("non_member", false, NON_MEMBER_EXP_TIME);
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put(AT_HEADER, nonMember_token);
-            new ObjectMapper().writeValue(response.getWriter(), responseMap);
-            return;
-        }
-
         filterChain.doFilter(request, response);
-
     }
 
     private String extractToken(HttpServletRequest request) {
