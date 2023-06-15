@@ -1,6 +1,5 @@
 package com.oneline.shimpyo.controller;
 
-import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.*;
@@ -10,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -118,22 +116,10 @@ public class MemberController {
     // Access 토큰 만료 시 새로운 토큰을 발급
     @GetMapping("/api/refresh")
     public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
 
-        Cookie[] cookies = request.getCookies();
-        String name = null;
-        String value = null;
-        if(cookies != null) {
-            for (Cookie cookie : cookies) {
-                name = cookie.getName();
-                value = cookie.getValue();
-            }
-        }
-//        String authorizationHeader = request.getHeader("Cookie");
-
-        if (value == null || !value.startsWith(TOKEN_HEADER_PREFIX)) {
-            throw new BaseException(JWT_TOKEN_NONEXISTENT);
-        }
-        String refreshToken = value.substring(TOKEN_HEADER_PREFIX.length());
+        if (authorizationHeader == null || !authorizationHeader.startsWith(TOKEN_HEADER_PREFIX));
+        String refreshToken = authorizationHeader.substring(TOKEN_HEADER_PREFIX.length());
         System.out.println(refreshToken);
         Map<String, String> tokens = memberService.refresh(refreshToken, response);
         response.setHeader(AT_HEADER, tokens.get(AT_HEADER));
@@ -141,4 +127,3 @@ public class MemberController {
     }
 
 }
-

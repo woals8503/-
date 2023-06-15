@@ -55,7 +55,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         // 쿠키 생성하여 refresh_token 담기
         Cookie cookie = new Cookie(RT_HEADER, refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+//        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60 * 24);
         return cookie;

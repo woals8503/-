@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
 
+import static com.auth0.jwt.algorithms.Algorithm.*;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.JWT_SECRET;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.RT_EXP_TIME;
 
@@ -22,7 +23,7 @@ public class JwtTokenUtil {
                     .withIssuedAt(new Date(System.currentTimeMillis()))
                     .withClaim("isMember", isMember)
                     .withClaim("username", username)
-                    .sign(Algorithm.HMAC256(JWT_SECRET));
+                    .sign(HMAC256(JWT_SECRET));
     }
 
     public static String generateNonMemberToken(String username, boolean isMember, long EXP_TIME) {
@@ -32,7 +33,7 @@ public class JwtTokenUtil {
                 .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withClaim("isMember", isMember)
                 .withClaim("username", username)
-                .sign(Algorithm.HMAC256(JWT_SECRET));
+                .sign(HMAC256(JWT_SECRET));
     }
 
     // 재발급 토큰
@@ -43,7 +44,7 @@ public class JwtTokenUtil {
                 .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withClaim("isMember", isMember)
                 .withClaim("username", username)
-                .sign(Algorithm.HMAC256(JWT_SECRET));
+                .sign(HMAC256(JWT_SECRET));
     }
 
     public static String ressuanceRefreshToken(String username, boolean isMember, long EXP_TIME, long now) {
@@ -52,13 +53,13 @@ public class JwtTokenUtil {
                 .withExpiresAt(new Date(now + RT_EXP_TIME))
                 .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withClaim("username", username)
-                .sign(Algorithm.HMAC256(JWT_SECRET));
+                .sign(HMAC256(JWT_SECRET));
     }
 
     // 토큰 확인
     public static boolean validateToken(String token) {
         try {
-            JWT.require(Algorithm.HMAC256(JWT_SECRET)).build()
+            JWT.require(HMAC256(JWT_SECRET)).build()
                     .verify(token);
             return true;
         } catch (Exception e) {
@@ -68,14 +69,14 @@ public class JwtTokenUtil {
 
     // 회원인지 아닌지
     public static boolean isMember(String token) {
-        return JWT.require(Algorithm.HMAC256(JWT_SECRET)).build()
+        return JWT.require(HMAC256(JWT_SECRET)).build()
                 .verify(token)
                 .getClaim("isMember")
                 .asBoolean();
     }
 
     public static String getUsernameFromToken(String token) {
-        return JWT.require(Algorithm.HMAC256(JWT_SECRET)).build()
+        return JWT.require(HMAC256(JWT_SECRET)).build()
                 .verify(token)
                 .getClaim("username")
                 .asString();
