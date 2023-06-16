@@ -50,8 +50,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
         BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
-        response.addHeader(AT_HEADER, TOKEN_HEADER_PREFIX + accessToken);
-
+//        response.addHeader(AT_HEADER, TOKEN_HEADER_PREFIX + accessToken);
 
         //리다이렉트 타겟 url 생성
         String targetUrl;
