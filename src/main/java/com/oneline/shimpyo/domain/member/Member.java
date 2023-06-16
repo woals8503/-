@@ -86,16 +86,18 @@ public class Member extends BaseEntity {
         this.provider = provider;
         this.providerId = providerId;
         this.memberGrade = memberGrade;
-        this.role = role;
+        this.role = CLIENT;
     }
 
-    public Member(MemberReq request, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public Member(MemberReq request, BCryptPasswordEncoder bCryptPasswordEncoder, MemberGrade memberGrade) {
         this.email = request.getEmail();
         this.password = bCryptPasswordEncoder.encode(request.getPassword());
         this.phoneNumber = request.getPhoneNumber();
         this.nickname = request.getNickname();
         this.point = 0;
+        this.memberGrade = memberGrade;
         this.role = CLIENT;
+        memberGrade.getMembers().add(this);
     }
 
     public Member(String email, String password) {

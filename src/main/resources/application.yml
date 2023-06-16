@@ -40,6 +40,7 @@ spring:
           google:
             client-id: 479304112287-brdp845tmalh8o7obogv81hi1387pso8.apps.googleusercontent.com
             client-secret: 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
+            redirect-uri: http://localhost:8081/public/login/oauth2/code/google
             scope:
               - email
               - profile
@@ -52,7 +53,7 @@ spring:
               - email
             client-name: Naver
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8081/login/oauth2/code/naver
+            redirect-uri: http://localhost:8081/public/login/oauth2/code/naver
 
         provider:
           naver:

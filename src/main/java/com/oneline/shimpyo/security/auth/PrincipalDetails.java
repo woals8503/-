@@ -1,4 +1,4 @@
-package com.oneline.shimpyo.security;
+package com.oneline.shimpyo.security.auth;
 
 import com.oneline.shimpyo.domain.member.Member;
 import lombok.Data;

@@ -2,12 +2,11 @@ package com.oneline.shimpyo.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oneline.shimpyo.domain.BaseResponse;
-import com.oneline.shimpyo.domain.member.dto.AccessTokenRes;
-import com.oneline.shimpyo.security.PrincipalDetails;
-import com.oneline.shimpyo.security.jwt.JwtConstants;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -26,6 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Component
 @Slf4j
+@Primary
 public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     private final MemberService memberService;
@@ -51,8 +51,6 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     public static Cookie createCookie(String refreshToken) {
-        // 보안상 문제로 access 토큰은 body refresh 토큰은 set-Cookie로 전달
-        // 쿠키 생성하여 refresh_token 담기
         Cookie cookie = new Cookie(RT_HEADER, refreshToken);
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);

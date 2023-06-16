@@ -7,11 +7,10 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.CascadeType.*;
 import static javax.persistence.EnumType.*;
 import static lombok.AccessLevel.PROTECTED;
 
-@Builder
-@AllArgsConstructor
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
@@ -31,8 +30,8 @@ public class MemberGrade {
     @OneToMany(mappedBy = "memberGrade")
     private List<Member> members = new ArrayList<>();
 
-//    public MemberGrade(String grade, int discount) {
-//        this.grade = grade;
-//        this.discount = discount;
-//    }
+    public MemberGrade(GradeName grade, int discount) {
+        this.grade = grade;
+        this.discount = discount;
+    }
 }

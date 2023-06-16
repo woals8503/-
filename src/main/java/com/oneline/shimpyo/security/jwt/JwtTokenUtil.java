@@ -3,6 +3,7 @@ package com.oneline.shimpyo.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,17 @@ public class JwtTokenUtil {
                 .withClaim("isMember", isMember)
                 .withClaim("username", username)
                 .sign(HMAC256(JWT_SECRET));
+    }
+
+    public static String generateOAuth2Token(PrincipalDetails principal, boolean isMember, long EXP_TIME) {
+        return JWT.create()
+                .withSubject(principal.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + (60000 * 10)))
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withClaim("id", principal.getMember().getId())
+                .withClaim("isMember", true)
+                .withClaim("username", principal.getUsername())
+                .sign(Algorithm.HMAC512(JWT_SECRET));
     }
 
     // 재발급 토큰

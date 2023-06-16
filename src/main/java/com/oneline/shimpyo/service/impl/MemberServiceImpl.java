@@ -5,12 +5,14 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.oneline.shimpyo.domain.member.GradeName;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
-import com.oneline.shimpyo.security.PrincipalDetails;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +25,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.oneline.shimpyo.domain.member.GradeName.*;
 import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
@@ -38,12 +42,15 @@ import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
 public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     private final MemberRepository memberRepository;
+    private final EntityManager em;
     private final CustomBCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     @Transactional(readOnly = false)
     public void join(MemberReq request) {
-        memberRepository.save(new Member(request, bCryptPasswordEncoder));
+        MemberGrade memberGrade = new MemberGrade(SILVER, 3);
+        em.persist(memberGrade);
+        memberRepository.save(new Member(request, bCryptPasswordEncoder, memberGrade));
     }
 
     @Override

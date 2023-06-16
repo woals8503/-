@@ -2,32 +2,25 @@ package com.oneline.shimpyo.security.filter;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.exception.ErrorResponse;
 import com.oneline.shimpyo.repository.MemberRepository;
-import com.oneline.shimpyo.security.PrincipalDetails;
-import com.oneline.shimpyo.security.jwt.JwtTokenUtil;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.*;
 
-import static com.oneline.shimpyo.domain.BaseResponseStatus.JWT_TOKEN_NONEXISTENT;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -92,6 +85,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         if (bearerToken != null && bearerToken.startsWith(TOKEN_HEADER_PREFIX)) {
             return bearerToken.substring(7);    // Bearer를 뺀 토큰값 리턴
         }
+
         return null;
     }
 

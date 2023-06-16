@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.exception.ErrorResponse;
 import com.oneline.shimpyo.repository.MemberRepository;
-import com.oneline.shimpyo.security.PrincipalDetails;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.security.jwt.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;

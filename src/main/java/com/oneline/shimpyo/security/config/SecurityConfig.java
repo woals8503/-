@@ -1,13 +1,14 @@
 package com.oneline.shimpyo.security.config;
 
-
-
+import com.oneline.shimpyo.security.auth.PrincipalOauth2UserService;
 import com.oneline.shimpyo.security.filter.CustomAuthenticationFilter;
 import com.oneline.shimpyo.security.filter.CustomAuthorizationFilter;
 import com.oneline.shimpyo.security.filter.JwtTokenFilter;
+import com.oneline.shimpyo.security.handler.OAuth2SuccessHandler;
 import com.oneline.shimpyo.security.jwt.JwtTokenUtil;
 import com.oneline.shimpyo.security.provider.CustomAuthProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,6 +36,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
+import static org.springframework.security.config.http.SessionCreationPolicy.*;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
@@ -42,12 +45,12 @@ import java.util.Arrays;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationProvider authenticationProvider;
-//    private final CustomAuthProvider authProvider;
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final CustomAuthorizationFilter customAuthorizationFilter;
     private final AccessDeniedHandler accessDeniedHandler;
-    private final JwtTokenUtil jwtTokenProvider;
+    private final OAuth2SuccessHandler successHandler;
+    private final PrincipalOauth2UserService principalOauth2UserService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
@@ -56,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//         login 전용 필터
+        // login 필터
         CustomAuthenticationFilter filter =
                 new CustomAuthenticationFilter(authenticationManagerBean());
         filter.setFilterProcessesUrl("/public/login");
@@ -65,12 +68,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.cors().configurationSource(corsConfigurationSource());
         http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션 사용 X
+        http.sessionManagement().sessionCreationPolicy(STATELESS); // 세션 사용 X
         http.authorizeRequests().antMatchers("/public/**").permitAll();    // api/public 붙으면 토큰 인증 X
         http.authorizeRequests().antMatchers("/api/**").authenticated();
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(filter);
         http.addFilterBefore(customAuthorizationFilter, BasicAuthenticationFilter.class);
+        http.oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorization/**")
+                .and()
+                .successHandler(successHandler)
+                .userInfoEndpoint()
+                .userService(principalOauth2UserService)
+                .and()
+                .defaultSuccessUrl("/public/loginForm");
 
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
     }
