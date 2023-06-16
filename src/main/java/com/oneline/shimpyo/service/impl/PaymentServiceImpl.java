@@ -71,18 +71,13 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Reservation cancelPayment(long reservationId, PatchReservationReq patchReservationReq)
+    public Reservation cancelPayment(long memberId, long reservationId, PatchReservationReq patchReservationReq)
             throws IamportResponseException, IOException, BaseException {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
-        if (reservation.getReservationStatus() == ReservationStatus.CANCEL) {
-            throw new BaseException(RESERVATION_CANCEL);
-        }
-
         PayMent payMent = reservation.getPayMent();
-        if (payMent.getPrice() < patchReservationReq.getRefundAmount()) {
-            throw new BaseException(REFUND_WRONG);
-        }
+
+        validateCancel(memberId, patchReservationReq, reservation, payMent);
 
         IamportResponse<Payment> response = iamportClient.paymentByImpUid(payMent.getImpUid());
         CancelData cancelData = createCancelData(response, patchReservationReq.getRefundAmount());
@@ -91,6 +86,21 @@ public class PaymentServiceImpl implements PaymentService {
         payMent.setPayStatus(PayStatus.CANCEL);
 
         return reservation;
+    }
+
+    private static void validateCancel(long memberId, PatchReservationReq patchReservationReq,
+                                       Reservation reservation, PayMent payMent) {
+        if(memberId != reservation.getMember().getId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        if (reservation.getReservationStatus() == ReservationStatus.CANCEL) {
+            throw new BaseException(RESERVATION_CANCEL);
+        }
+
+        if (payMent.getPrice() < patchReservationReq.getRefundAmount()) {
+            throw new BaseException(REFUND_WRONG);
+        }
     }
 
     private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {

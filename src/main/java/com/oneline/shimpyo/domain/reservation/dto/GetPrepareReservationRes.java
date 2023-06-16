@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetPrepareReservationReq {
+public class GetPrepareReservationRes {
 
     private String merchantUid;
     private String grade;
