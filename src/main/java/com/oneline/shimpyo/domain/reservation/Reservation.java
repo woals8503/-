@@ -3,6 +3,7 @@ package com.oneline.shimpyo.domain.reservation;
 import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.pay.PayMent;
+import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.room.Room;
 import lombok.*;
 
@@ -51,6 +52,9 @@ public class Reservation extends BaseEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
+
+    @OneToOne(mappedBy = "reservation")
+    private Review review;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "room_id")

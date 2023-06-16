@@ -38,6 +38,7 @@ dependencies {
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	implementation group: 'net.nurigo', name: 'javaSDK', version: '2.2'
 	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:2.7.4'
 	implementation 'com.auth0:java-jwt:3.10.2'
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

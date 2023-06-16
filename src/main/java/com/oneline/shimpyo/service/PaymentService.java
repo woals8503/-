@@ -13,7 +13,7 @@ public interface PaymentService {
 
     PayMent createPayment(long memberId, PostReservationReq postReservationReq)
             throws IamportResponseException, IOException, BaseException;
-    Reservation cancelPayment(long reservationId, PatchReservationReq patchReservationReq)
+    Reservation cancelPayment(long memberId, long reservationId, PatchReservationReq patchReservationReq)
             throws IamportResponseException, IOException, BaseException;
 
 }
