@@ -50,6 +50,7 @@ public class Member extends BaseEntity {
     private String provider;
     private String providerId;
 
+    @Lob
     private String refreshToken;
 
     @ManyToOne(fetch = LAZY)
@@ -86,10 +87,10 @@ public class Member extends BaseEntity {
         this.provider = provider;
         this.providerId = providerId;
         this.memberGrade = memberGrade;
-        this.role = CLIENT;
+        this.role = role;
     }
 
-    public Member(MemberReq request, BCryptPasswordEncoder bCryptPasswordEncoder, MemberGrade memberGrade) {
+    public Member(MemberReq request, CustomBCryptPasswordEncoder bCryptPasswordEncoder,  MemberGrade memberGrade) {
         this.email = request.getEmail();
         this.password = bCryptPasswordEncoder.encode(request.getPassword());
         this.phoneNumber = request.getPhoneNumber();
@@ -112,4 +113,5 @@ public class Member extends BaseEntity {
     public void updateRefreshToken(String newToken) {
         this.refreshToken = newToken;
     }
+
 }

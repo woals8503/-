@@ -38,10 +38,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = extractToken(request);
-
         String servletPath = request.getServletPath();
 
-        // 토큰이 비어있지 않다면
         if(!StringUtils.isEmpty(token)) {
             try {
                 if(validateToken(token)) {
@@ -49,7 +47,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     Member member = memberRepository.findByEmail(username);
                     PrincipalDetails principalDetails = new PrincipalDetails(member);
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, principalDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(auth); // Security의 session에 저장
+                    SecurityContextHolder.getContext().setAuthentication(auth);
                 }
                 else {
                     log.info("JWT 토큰이 잘못되었습니다.");
@@ -80,12 +78,10 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
-        // access 토큰
         String bearerToken = request.getHeader(AUTHORIZATION);
         if (bearerToken != null && bearerToken.startsWith(TOKEN_HEADER_PREFIX)) {
-            return bearerToken.substring(7);    // Bearer를 뺀 토큰값 리턴
+            return bearerToken.substring(7);
         }
-
         return null;
     }
 

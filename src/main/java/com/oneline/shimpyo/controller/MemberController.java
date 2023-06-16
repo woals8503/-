@@ -4,10 +4,14 @@ import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.*;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
+import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -18,6 +22,7 @@ import java.util.Random;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
+import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.getIdFromToken;
 import static com.oneline.shimpyo.utils.RegexValidator.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -27,6 +32,8 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class MemberController {
 
     private final MemberService memberService;
+    private final JwtService jwtService;
+
 
     @PostMapping("/public/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
@@ -130,8 +137,17 @@ public class MemberController {
         return new BaseResponse<>(tokens);
     }
 
-    @GetMapping("/public/loginForm")
+    @GetMapping("/api/test2")
     public String test() {
-        return "loginForm";
+        Long storeId = jwtService.getStoreId();
+        System.out.println(storeId);
+        return "test";
     }
+
+    @GetMapping("/api/test3")
+    public String test3() {
+        Long storeId = jwtService.getStoreId();
+        return "test";
+    }
+
 }

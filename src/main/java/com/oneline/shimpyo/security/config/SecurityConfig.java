@@ -1,39 +1,27 @@
 package com.oneline.shimpyo.security.config;
 
-import com.oneline.shimpyo.security.auth.PrincipalOauth2UserService;
 import com.oneline.shimpyo.security.filter.CustomAuthenticationFilter;
 import com.oneline.shimpyo.security.filter.CustomAuthorizationFilter;
-import com.oneline.shimpyo.security.filter.JwtTokenFilter;
-import com.oneline.shimpyo.security.handler.OAuth2SuccessHandler;
-import com.oneline.shimpyo.security.jwt.JwtTokenUtil;
-import com.oneline.shimpyo.security.provider.CustomAuthProvider;
+import com.oneline.shimpyo.security.oAuth.PrincipalOauth2UserService;
+import com.oneline.shimpyo.security.oAuth.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.*;
@@ -44,9 +32,10 @@ import static org.springframework.security.config.http.SessionCreationPolicy.*;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    // Client
     private final AuthenticationProvider authenticationProvider;
-    private final AuthenticationFailureHandler authenticationFailureHandler;
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;    // 구현체의 CustomFailureHandler 작동
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;    // 구현체의 CustomSuccessHandler 작동
     private final CustomAuthorizationFilter customAuthorizationFilter;
     private final AccessDeniedHandler accessDeniedHandler;
     private final OAuth2SuccessHandler successHandler;
@@ -66,23 +55,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
 
+        http
+        .csrf().disable()
+        .formLogin().disable()
+        .httpBasic().disable()
+        .sessionManagement().sessionCreationPolicy(STATELESS);
         http.cors().configurationSource(corsConfigurationSource());
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(STATELESS); // 세션 사용 X
+
         http.authorizeRequests().antMatchers("/public/**").permitAll();    // api/public 붙으면 토큰 인증 X
+        http.authorizeRequests().antMatchers("/oauth2/**").permitAll();
         http.authorizeRequests().antMatchers("/api/**").authenticated();
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(filter);
+
+        http.oauth2Login().successHandler(successHandler).userInfoEndpoint().userService(principalOauth2UserService);
+
         http.addFilterBefore(customAuthorizationFilter, BasicAuthenticationFilter.class);
-        http.oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorization/**")
-                .and()
-                .successHandler(successHandler)
-                .userInfoEndpoint()
-                .userService(principalOauth2UserService)
-                .and()
-                .defaultSuccessUrl("/public/loginForm");
 
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
     }

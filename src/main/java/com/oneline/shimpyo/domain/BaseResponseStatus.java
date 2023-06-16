@@ -78,9 +78,9 @@ public enum BaseResponseStatus {
     PORTONE_EXCEPTION(false, 4001,"포트원 오류."),
     // jwt
     JWT_TOKEN_NONEXISTENT(false, 4020, "JWT 토큰이 존재하지 않습니다."),
-
+    JWT_TOKEN_INVALID(false, 4021, "유효하지 않은 JWT 토큰입니다."),
     //auth
-    BAD_CREDENTIALS_EXCEPTION(false, 4040, "Provider - authenticate() : 비밀번호가 일치하지 않습니다.");
+    BAD_CREDENTIALS_EXCEPTION(false, 4040, "비밀번호가 일치하지 않습니다.");
 
     private final boolean isSuccess;
     private final int code;

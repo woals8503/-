@@ -1,23 +1,26 @@
-package com.oneline.shimpyo.security.provider;
+package com.oneline.shimpyo.security.oAuth.provider;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
-public class NaverUserInfo implements OAuth2UserInfo {
+@Slf4j
+public class GoogleUserInfo implements OAuth2UserInfo{
+
     private Map<String, Object> attributes; // getAttributes();
 
-    // {id=아이디값, email=이메일값, name=이름}
-    public NaverUserInfo(Map<String, Object> attributes) {
+    public GoogleUserInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
 
     @Override
     public String getProviderId() {
-        return (String) attributes.get("id");
+        return (String) attributes.get("sub");
     }
 
     @Override
     public String getProvider() {
-        return "naver";
+        return "google";
     }
 
     @Override

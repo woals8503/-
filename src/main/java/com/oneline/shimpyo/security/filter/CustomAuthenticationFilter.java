@@ -28,6 +28,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        log.info("a");
         String body = null;
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bufferedReader = null;
@@ -51,8 +52,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             String password = (String) object.get("password");
 
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-            // 성공 시 AuthenticationSuccessHandler 실행
-            return authenticationManager.authenticate(token);   // Manager에게 인증해달라고 던져주는 작업
+            return authenticationManager.authenticate(token);
         } catch (IOException ex) {
             ex.printStackTrace();
         } catch (ParseException e) {

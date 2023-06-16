@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.oneline.shimpyo.domain.member.GradeName;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
@@ -39,7 +38,7 @@ import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class MemberServiceImpl implements MemberService, UserDetailsService {
+public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final EntityManager em;
@@ -123,7 +122,6 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     @Override
     public Map<String, String> refresh(String refreshToken, HttpServletResponse response) {
-
         // === Refresh Token 유효성 검사 === //
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(JWT_SECRET)).build();
         DecodedJWT decodedJWT = verifier.verify(refreshToken);
@@ -140,7 +138,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         }
 
         String accessToken
-                = reissuanceAccessToken(username, true, AT_EXP_TIME, now);
+                = reissuanceAccessToken(member, true, AT_EXP_TIME, now);
 
         Map<String, String> accessTokenResponseMap = new HashMap<>();
 
@@ -151,7 +149,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         long diffMin = (refreshExpireTime - now) / 1000 / 60;
         if (diffMin < 5) {
             String newRefreshToken
-                    = ressuanceRefreshToken(member.getEmail(), true, RT_EXP_TIME, now);
+                    = ressuanceRefreshToken(member, true, RT_EXP_TIME, now);
 
             response.addCookie(createCookie(newRefreshToken));
 //            accessTokenResponseMap.put(RT_HEADER, newRefreshToken);   refresh 토큰 body에서 제외
@@ -170,12 +168,11 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         return true;
     }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(username);
-
-        return new PrincipalDetails(member);
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        Member member = memberRepository.findByEmail(username);
+//
+//        return new PrincipalDetails(member);
+//    }
 
 }

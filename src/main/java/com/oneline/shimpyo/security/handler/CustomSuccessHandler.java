@@ -34,12 +34,10 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         PrincipalDetails member = (PrincipalDetails) authentication.getPrincipal();
 
-        String accessToken = generateToken(member.getUsername(), true, AT_EXP_TIME);
-        String refreshToken = generateToken(member.getUsername(), true, RT_EXP_TIME);
-
+        String accessToken = generateToken(member, true, AT_EXP_TIME);
+        String refreshToken = generateToken(member, true, RT_EXP_TIME);
         // Refresh Token DB에 저장
         memberService.updateRefreshToken(member.getUsername(), refreshToken);
-
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
         response.addCookie(createCookie(refreshToken));

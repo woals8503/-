@@ -2,6 +2,7 @@ package com.oneline.shimpyo.security.auth;
 
 import com.oneline.shimpyo.domain.member.Member;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Map;
 
 @Data
+@Slf4j
 public class PrincipalDetails implements UserDetails, OAuth2User {
     // Authentication 객체 안에 들어가는 정보는 UserDetails 타입이여야 함으로
     // UserDetails를 상속하여 구현체로 받아들임 ( 즉 같은 타입이 됨 )
@@ -53,7 +55,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
         // GrantedAuthority 생성자를 만들어 오버라이드한 메소드로 user.getRole()를 호출하여 리턴
         return collect;
     }
-
+    
     @Override
     public String getPassword() {
         return member.getPassword();
@@ -69,7 +71,6 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     public boolean isAccountNonExpired() {
         return true;
     }
-
 
     @Override
     public boolean isAccountNonLocked() {

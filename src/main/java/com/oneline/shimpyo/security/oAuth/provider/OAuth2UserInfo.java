@@ -1,4 +1,4 @@
-package com.oneline.shimpyo.security.provider;
+package com.oneline.shimpyo.security.oAuth.provider;
 
 public interface OAuth2UserInfo {
     String getProviderId();
