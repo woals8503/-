@@ -3,6 +3,7 @@ package com.oneline.shimpyo.domain.review;
 import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.reservation.Reservation;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,6 +33,11 @@ public class Review extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @NotNull
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
 
     @NotNull
     private String contents;

@@ -5,7 +5,6 @@ import com.oneline.shimpyo.domain.BaseResponseStatus;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.reservation.Reservation;
-import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.review.dto.GetReviewRes;
 import com.oneline.shimpyo.domain.review.dto.PatchReviewReq;
@@ -15,10 +14,13 @@ import com.oneline.shimpyo.repository.ReservationRepository;
 import com.oneline.shimpyo.repository.ReviewRepository;
 import com.oneline.shimpyo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
@@ -29,9 +31,9 @@ import static com.oneline.shimpyo.domain.reservation.ReservationStatus.FINISHED;
 @Transactional(readOnly = true)
 public class ReviewServiceImpl implements ReviewService {
 
-    private ReviewRepository reviewRepository;
-    private MemberRepository memberRepository;
-    private ReservationRepository reservationRepository;
+    private final ReviewRepository reviewRepository;
+    private final MemberRepository memberRepository;
+    private final ReservationRepository reservationRepository;
 
     @Transactional
     @Override
@@ -40,19 +42,19 @@ public class ReviewServiceImpl implements ReviewService {
         Reservation reservation = reservationRepository.findById(postReviewReq.getReservationId())
                 .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
 
-        if(reservation.getReservationStatus() != FINISHED){
-            throw new BaseException(REVIEW_RESERVATION_WRONG_STATUS);
-        }
-
-        if(reservation.getMember().getId() != memberId){
-            throw new BaseException(REVIEW_RESERVATION_WRONG_STATUS);
-        }
+        validateCreateReview(memberId, reservation);
 
         House house = reservation.getRoom().getHouse();
 
-        Review review = Review.builder().member(member).house(house)
+        Review review = Review.builder().member(member).house(house).reservation(reservation)
                 .contents(postReviewReq.getContents()).reviewRating(postReviewReq.getReviewRating()).build();
         reviewRepository.save(review);
+    }
+
+    @Override
+    public List<GetReviewRes> readReviewList(long memberId, Pageable pageable) {
+        Page<Review> reviews = reviewRepository.findByMemberId(memberId, pageable);
+        return reviews.stream().map(GetReviewRes::new).collect(Collectors.toList());
     }
 
     @Transactional
@@ -74,12 +76,20 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.delete(review);
     }
 
-    @Override
-    public List<GetReviewRes> getReviewList(long memberId) {
-        List<Review> reviewList = reviewRepository.findByMemberId(memberId);
+    private void validateCreateReview(long memberId, Reservation reservation) {
+        //이미 있는 리뷰인지 확인
+        Optional<Review> review = reviewRepository.findByReservationId(reservation.getId());
+        if(review.isPresent()){
+            throw new BaseException(REVIEW_ALREADY_EXIST);
+        }
 
-        return reviewList.stream().map(GetReviewRes::new).collect(Collectors.toList());
+        if(reservation.getReservationStatus() != FINISHED){
+            throw new BaseException(REVIEW_RESERVATION_WRONG_STATUS);
+        }
+
+        if(reservation.getMember().getId() != memberId){
+            throw new BaseException(INVALID_USER);
+        }
     }
-
 
 }
