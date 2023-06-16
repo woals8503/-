@@ -22,8 +22,7 @@ public class JwtService {
         return request.getHeader(AUTHORIZATION);
     }
 
-    //
-    public Long getStoreId() throws BaseException {
+    public Long getMemberId() throws BaseException {
         //1. JWT 추출
         String accessToken = getJwt().substring(7);
         if (accessToken == null || accessToken.length() == 0) {
@@ -49,7 +48,7 @@ public class JwtService {
     }
 
     public void checkJwtByStoreId(long memberId) throws BaseException {
-        long userIdxByJwt = getStoreId();
+        long userIdxByJwt = getMemberId();
         
         if (memberId != userIdxByJwt) {
             throw new BaseException(JWT_TOKEN_INVALID);

@@ -137,16 +137,10 @@ public class MemberController {
         return new BaseResponse<>(tokens);
     }
 
-    @GetMapping("/api/test2")
-    public String test() {
-        Long storeId = jwtService.getStoreId();
-        System.out.println(storeId);
-        return "test";
-    }
-
     @GetMapping("/api/test3")
     public String test3() {
-        Long storeId = jwtService.getStoreId();
+        Long memberId = jwtService.getMemberId();
+
         return "test";
     }
 
