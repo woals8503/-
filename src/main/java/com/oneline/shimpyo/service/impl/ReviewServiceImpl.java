@@ -63,15 +63,23 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.REVIEW_NONEXISTENT));
 
+        if(review.getMember().getId() != memberId){
+            throw new BaseException(INVALID_MEMBER);
+        }
+
         review.setContents(patchReviewReq.getContents());
         review.setReviewRating(patchReviewReq.getReviewRating());
     }
 
     @Transactional
     @Override
-    public void deleteReview(long reviewId) {
+    public void deleteReview(long memberId, long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.REVIEW_NONEXISTENT));
+
+        if(review.getMember().getId() != memberId){
+            throw new BaseException(INVALID_MEMBER);
+        }
 
         reviewRepository.delete(review);
     }
@@ -88,7 +96,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if(reservation.getMember().getId() != memberId){
-            throw new BaseException(INVALID_USER);
+            throw new BaseException(INVALID_MEMBER);
         }
     }
 

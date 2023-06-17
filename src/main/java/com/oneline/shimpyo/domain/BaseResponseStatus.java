@@ -1,7 +1,6 @@
 package com.oneline.shimpyo.domain;
 
 import lombok.Getter;
-import org.springframework.security.authentication.BadCredentialsException;
 
 /**
  * 에러 코드 관리
@@ -17,7 +16,7 @@ public enum BaseResponseStatus {
      * 2000 : Request 오류
      */
     //common 2000
-    INVALID_USER(false,2003,"권한이 없는 유저의 접근입니다."),
+    INVALID_MEMBER(false,2003,"권한이 없는 유저의 접근입니다."),
 
     //member 2020
 

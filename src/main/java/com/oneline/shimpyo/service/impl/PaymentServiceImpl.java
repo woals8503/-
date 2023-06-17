@@ -2,14 +2,12 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.coupon.Coupon;
-import com.oneline.shimpyo.domain.house.House;
-import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.pay.PayStatus;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
-import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
 import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
+import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.service.PaymentService;
@@ -38,7 +36,6 @@ public class PaymentServiceImpl implements PaymentService {
     private static final String API_KEY = "6354023824364652";
     private static final String API_SECRET = "oCGC7lJGsgCzkJG6i9JyIKwU1MtNE5SBJ7GnkCVqVzxbqaLo3DxIY5CwUQAoq5kqxsCXo2iQS4v2oeu6";
     private final IamportClient iamportClient;
-    private final HouseRepository houseRepository;
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private final CouponRepository couponRepository;
@@ -47,9 +44,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     public PaymentServiceImpl(RoomRepository roomRepository, MemberRepository memberRepository,
                               CouponRepository couponRepository, PaymentRepository paymentRepository,
-                              HouseRepository houseRepository, ReservationRepository reservationRepository) {
+                              ReservationRepository reservationRepository) {
         this.iamportClient = new IamportClient(API_KEY, API_SECRET);
-        this.houseRepository = houseRepository;
         this.roomRepository = roomRepository;
         this.memberRepository = memberRepository;
         this.couponRepository = couponRepository;
@@ -76,7 +72,6 @@ public class PaymentServiceImpl implements PaymentService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
         PayMent payMent = reservation.getPayMent();
-
         validateCancel(memberId, patchReservationReq, reservation, payMent);
 
         IamportResponse<Payment> response = iamportClient.paymentByImpUid(payMent.getImpUid());
@@ -91,7 +86,7 @@ public class PaymentServiceImpl implements PaymentService {
     private static void validateCancel(long memberId, PatchReservationReq patchReservationReq,
                                        Reservation reservation, PayMent payMent) {
         if(memberId != reservation.getMember().getId()){
-            throw new BaseException(INVALID_USER);
+            throw new BaseException(INVALID_MEMBER);
         }
 
         if (reservation.getReservationStatus() == ReservationStatus.CANCEL) {
