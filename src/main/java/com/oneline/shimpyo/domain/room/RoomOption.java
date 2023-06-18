@@ -14,6 +14,4 @@ public class RoomOption {
     private int bedroomCount;
 
     private int bathroomCount;
-
-    private int pcCount;
 }

@@ -3,6 +3,7 @@ package com.oneline.shimpyo.domain.room;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.reservation.NonMemberReservation;
 import com.oneline.shimpyo.domain.reservation.Reservation;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +25,6 @@ import static lombok.AccessLevel.PROTECTED;
 public class Room {
 
     @Id @GeneratedValue
-    @Column(name = "room_id")
     private Long id;
 
     @NotNull
@@ -36,15 +36,18 @@ public class Room {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "house_id")
     private House house;
-
-    @Embedded
-    private RoomOption roomOption;
-
     @NotNull
     private int minPeople;
 
     @NotNull
     private int maxPeople;
+
+    @NotNull
+    private int bedCount;
+    @NotNull
+    private int bedroomCount;
+    @NotNull
+    private int bathroomCount;
 
     @NotNull
     //제공할 수 있는 총 객실 수
@@ -61,5 +64,25 @@ public class Room {
 
     @OneToMany(mappedBy = "room", cascade = ALL)
     private List<NonMemberReservation> nonMemberReservations = new ArrayList<>();
+
+    @Builder
+    public Room(Long id, String name, int price, House house, int minPeople, int maxPeople, int bedCount, int bedroomCount, int bathroomCount, int totalCount, LocalTime checkIn, LocalTime checkOut
+                , List<RoomImage> images, List<Reservation> reservations, List<NonMemberReservation> nonMemberReservations) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.house = house;
+        this.minPeople = minPeople;
+        this.maxPeople = maxPeople;
+        this.bedCount = bedCount;
+        this.bedroomCount = bedroomCount;
+        this.bathroomCount = bathroomCount;
+        this.totalCount = totalCount;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.images = images;
+        this.reservations = reservations;
+        this.nonMemberReservations = nonMemberReservations;
+    }
 
 }
