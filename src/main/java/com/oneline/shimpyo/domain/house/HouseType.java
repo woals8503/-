@@ -17,9 +17,9 @@ public enum HouseType {
     }
 
     @JsonCreator
-    public static HouseType findByMethod(String method) throws BaseException {
+    public static HouseType findByMethod(String type) throws BaseException {
         return Stream.of(HouseType.values())
-                .filter(c -> c.name().equals(method))
+                .filter(c -> c.name().equals(type))
                 .findFirst()
                 .orElseThrow(() -> new BaseException(HOUSE_TYPE_WRONG));
     }
