@@ -76,7 +76,10 @@ public enum BaseResponseStatus {
     JWT_TOKEN_NONEXISTENT(false, 4020, "JWT 토큰이 존재하지 않습니다."),
 
     //auth
-    BAD_CREDENTIALS_EXCEPTION(false, 4040, "Provider - authenticate() : 비밀번호가 일치하지 않습니다.");
+    BAD_CREDENTIALS_EXCEPTION(false, 4040, "Provider - authenticate() : 비밀번호가 일치하지 않습니다."),
+
+    // AWS S3
+    AWS_S3_EXCEPTION(false, 4060, "AWS 연결 또는 서버에 오류가 발생했습니다.");
 
     private final boolean isSuccess;
     private final int code;
