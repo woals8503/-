@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.domain;
 
 import lombok.Getter;
+import org.springframework.security.authentication.BadCredentialsException;
 
 /**
  * 에러 코드 관리
@@ -16,7 +17,7 @@ public enum BaseResponseStatus {
      * 2000 : Request 오류
      */
     //common 2000
-    INVALID_MEMBER(false,2003,"권한이 없는 유저의 접근입니다."),
+    INVALID_USER(false,2003,"권한이 없는 유저의 접근입니다."),
 
     //member 2020
 
@@ -80,6 +81,8 @@ public enum BaseResponseStatus {
     // jwt
     JWT_TOKEN_NONEXISTENT(false, 4020, "JWT 토큰이 존재하지 않습니다."),
     JWT_TOKEN_INVALID(false, 4021, "유효하지 않은 JWT 토큰입니다."),
+    JWT_TOKEN_WRONG(false, 4022, "잘못된 JWT 토큰입니다."),
+    JWT_REFRESH_WRONG(false, 4023, "유효하지 않은 Refresh Token 입니다."),
     //auth
     BAD_CREDENTIALS_EXCEPTION(false, 4040, "비밀번호가 일치하지 않습니다.");
 

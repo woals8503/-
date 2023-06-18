@@ -1,17 +1,13 @@
 package com.oneline.shimpyo.security.jwt;
 
-
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 import static com.auth0.jwt.algorithms.Algorithm.*;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.JWT_SECRET;
@@ -31,15 +27,17 @@ public class JwtTokenUtil {
                     .sign(HMAC256(JWT_SECRET));
     }
 
-    public static String generateNonMemberToken(String username, boolean isMember, long EXP_TIME) {
+    public static String generateRefreshToken(PrincipalDetails member, boolean isMember, long EXP_TIME) {
         return JWT.create()
-                .withSubject(username)
+                .withSubject(member.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXP_TIME))
                 .withIssuedAt(new Date(System.currentTimeMillis()))
-                .withClaim("isMember", isMember)
-                .withClaim("username", username)
+                .withClaim("refresh", true)
+                .withClaim("username", member.getMember().getEmail())
+                .withClaim("id", member.getMember().getId())
                 .sign(HMAC256(JWT_SECRET));
     }
+
 
     // 재발급 토큰
     public static String reissuanceAccessToken(Member member, boolean isMember, long EXP_TIME, long now) {
@@ -72,6 +70,16 @@ public class JwtTokenUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static boolean verifyRefreshToken(String token) {
+        Boolean refresh = JWT.require(HMAC256(JWT_SECRET)).build()
+                .verify(token)
+                .getClaim("refresh")
+                .asBoolean();
+        if(refresh == null) return false;
+
+        return true;
     }
 
     // 회원인지 아닌지

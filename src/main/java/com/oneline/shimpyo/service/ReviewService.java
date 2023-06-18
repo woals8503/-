@@ -12,7 +12,7 @@ public interface ReviewService {
 
     void updateReview(long memberId, long reviewId, PatchReviewReq patchReviewReq);
 
-    void deleteReview(long memberId, long reviewId);
+    void deleteReview(long reviewId);
 
     List<GetReviewRes> readReviewList(long memberId, Pageable pageable);
 }

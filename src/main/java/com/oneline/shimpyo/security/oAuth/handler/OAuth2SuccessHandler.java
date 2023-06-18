@@ -40,8 +40,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = generateToken(principal, true, AT_EXP_TIME);
         String refreshToken = generateToken(principal, true, RT_EXP_TIME);
 
-
-
         memberService.updateRefreshToken(principal.getMember().getEmail(), refreshToken);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
@@ -50,13 +48,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
         BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
-//        response.addHeader(AT_HEADER, TOKEN_HEADER_PREFIX + accessToken);
 
-        //리다이렉트 타겟 url 생성
+        // 리다이렉트 타겟 url 생성 ( 로그인 성공 시 리다이렉트 URL )
         String targetUrl;
-        targetUrl = UriComponentsBuilder.fromUriString("/api/test").build().toUriString();
-        log.info("targetUrl : " + targetUrl);
-        log.info("accessToken : " + accessToken);
+        targetUrl = UriComponentsBuilder.fromUriString("/public/test4").build().toUriString();
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
