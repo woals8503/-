@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -49,6 +48,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         responseMap.put(AT_HEADER, accessToken);
         BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
         new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
+
     }
 
     public static ResponseCookie createCookie(String refreshToken) {

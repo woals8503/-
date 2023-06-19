@@ -85,6 +85,7 @@ public enum BaseResponseStatus {
     JWT_REFRESH_WRONG(false, 4023, "유효하지 않은 Refresh Token 입니다."),
     //auth
     BAD_CREDENTIALS_EXCEPTION(false, 4040, "Provider - authenticate() : 비밀번호가 일치하지 않습니다."),
+    BAD_AUTHENTICATION(false, 4041, "인증이 정상적으로 처리되지 않았습니다."),
 
     // AWS S3
     AWS_S3_EXCEPTION(false, 4060, "AWS 연결 또는 서버에 오류가 발생했습니다.");

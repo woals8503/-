@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @EnableJpaAuditing
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+@SpringBootApplication
 public class ShimpyoApplication {
 
 	public static void main(String[] args) {
