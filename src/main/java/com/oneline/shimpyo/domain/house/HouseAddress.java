@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.house;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,17 +24,11 @@ public class HouseAddress {
     @NotNull
     private String sido;    // 시/도-서울특별시 or 경기도 or 부산광역시
     @NotNull
-    private String gungu;   //
-    @NotNull
     private String postCode; //
     @NotNull
     private String sigungu; // 마포구, 서대문구, 해운대구, 분당구
     @NotNull
-    private String address;
-//    @NotNull
-//    private String doro;  // 어디 몇동 몇호
-//    @NotNull
-//    private String dong;
+    private String fullAddress;
 
     @NotNull
     private double lat; // 위도
@@ -43,4 +38,16 @@ public class HouseAddress {
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "house_id")
     private House house;
+
+    @Builder
+    public HouseAddress(Long id, String sido, String postCode, String sigungu, String fullAddress, double lat, double lng, House house) {
+        this.id = id;
+        this.sido = sido;
+        this.postCode = postCode;
+        this.sigungu = sigungu;
+        this.fullAddress = fullAddress;
+        this.lat = lat;
+        this.lng = lng;
+        this.house = house;
+    }
 }

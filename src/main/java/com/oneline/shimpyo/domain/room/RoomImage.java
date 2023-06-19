@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.room;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,9 +26,14 @@ public class RoomImage {
     @NotNull
     private String originalFileName;
     @NotNull
-    private String savedFileName;
-    @NotNull
-    private String savedPath;
-    @NotNull
-    private String thumbnail;
+    @Column(name = "saved_url")
+    private String savedURL;
+
+    @Builder
+    public RoomImage(Long id, Room room, String originalFileName, String savedURL) {
+        this.id = id;
+        this.room = room;
+        this.originalFileName = originalFileName;
+        this.savedURL = savedURL;
+    }
 }

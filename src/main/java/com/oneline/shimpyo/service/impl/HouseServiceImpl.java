@@ -1,13 +1,168 @@
 package com.oneline.shimpyo.service.impl;
 
+import com.oneline.shimpyo.domain.BaseException;
+import com.oneline.shimpyo.domain.house.House;
+import com.oneline.shimpyo.domain.house.HouseAddress;
+import com.oneline.shimpyo.domain.house.HouseImage;
+import com.oneline.shimpyo.domain.house.HouseOptions;
+import com.oneline.shimpyo.domain.house.dto.FileReq;
+import com.oneline.shimpyo.domain.house.dto.HouseReq;
+import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.room.Room;
+import com.oneline.shimpyo.domain.room.RoomImage;
+import com.oneline.shimpyo.modules.FileUpload;
+import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.oneline.shimpyo.domain.BaseResponseStatus.AWS_S3_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class HouseServiceImpl implements HouseService {
 
+    private final HouseRepository houseRepository;
+    private final RoomRepository roomRepository;
+    private final HouseOptionRepository houseOptionRepository;
+    private final HouseAddressRepository houseAddressRepository;
+    private final HouseImageRepository houseImageRepository;
+    private final RoomImageRepository roomImageRepository;
+    private final FileUpload fileUpload;
+
+    @Override
+    @Transactional
+    public long createHouse(Member member, HouseReq houseReq, List<MultipartFile> houseImages, List<MultipartFile> roomImages) throws BaseException {
+        // 1-1. 숙소 이미지 S3 버킷 저장
+        List<FileReq> savedHouseImages = new ArrayList<>();
+        for (MultipartFile houseImage : houseImages) {
+            Optional<FileReq> uploadedFile = fileUpload.s3Upload(houseImage);
+            if (uploadedFile.isPresent()) {
+                savedHouseImages.add(uploadedFile.get());
+            } else {
+                new BaseException(AWS_S3_EXCEPTION);
+            }
+        }
+        // 1-2. 저장된 파일 정보 DTO에 저장
+        houseReq.setFiles(savedHouseImages);
+
+        // 2-1. 객실 이미지 S3 버킷 저장
+        List<FileReq> savedRoomImages = new ArrayList<>();
+        for (MultipartFile roomImage : roomImages) {
+            Optional<FileReq> uploadedFile = fileUpload.s3Upload(roomImage);
+            if (uploadedFile.isPresent()) {
+                savedRoomImages.add(uploadedFile.get());
+            } else {
+                new BaseException(AWS_S3_EXCEPTION);
+            }
+        }
+        // 2-2. 객실별 저장된 파일 정보 개별 객실 DTO에 저장
+        int startNum = 0;
+        for (int i = 0; i < houseReq.getRooms().size(); i++) {
+            if (i > 0) {
+                startNum += houseReq.getRooms().get(i-1).getImageCount();
+            }
+            List<FileReq> splitedImages = savedRoomImages.subList(startNum, startNum + houseReq.getRooms().get(i).getImageCount());
+            houseReq.getRooms().get(i).setFiles(splitedImages);
+        }
+
+        // 1. 숙소정보 저장
+        House toSaveHouse = House.builder()
+                .member(member)
+                .name(houseReq.getName())
+                .type(houseReq.getType())
+                .contents(houseReq.getContents())
+                .build();
+        House savedHouse = houseRepository.save(toSaveHouse);
+
+        
+        // 2. 숙소 옵션 저장
+        List<HouseOptions> toSaveOptions = new ArrayList<>();
+        if (houseReq.getOption().isWifi()) {
+            toSaveOptions.add(HouseOptions.builder()
+                    .name("wifi")
+                    .house(savedHouse)
+                    .build());
+        }
+        if (houseReq.getOption().isPc()) {
+            toSaveOptions.add(HouseOptions.builder()
+                    .name("pc")
+                    .house(savedHouse)
+                    .build());
+        }
+        if (houseReq.getOption().isParking()) {
+            toSaveOptions.add(HouseOptions.builder()
+                    .name("parking")
+                    .house(savedHouse)
+                    .build());
+        }
+        if (houseReq.getOption().isBbq()) {
+            toSaveOptions.add(HouseOptions.builder()
+                    .name("bbq")
+                    .house(savedHouse)
+                    .build());
+        }
+        houseOptionRepository.saveAll(toSaveOptions);
+
+        // 3. 숙소 주소 저장
+        HouseAddress toSaveAddress = HouseAddress.builder()
+                .postCode(houseReq.getAddress().getPostCode())
+                .sido(houseReq.getAddress().getSido())
+                .sigungu(houseReq.getAddress().getSigungu())
+                .fullAddress(houseReq.getAddress().getFullAddress())
+                .lat(houseReq.getAddress().getLat())
+                .lng(houseReq.getAddress().getLng())
+                .house(savedHouse)
+                .build();
+        houseAddressRepository.save(toSaveAddress);
+
+        // 4. 숙소 이미지 저장 (객실이미지X)
+        List<HouseImage> toSaveHouseImages = new ArrayList<>();
+        for (int i = 0; i < houseReq.getFiles().size(); i++) {
+            HouseImage toSaveHouseImage = HouseImage.builder()
+                    .house(savedHouse)
+                    .originalFileName(houseReq.getFiles().get(i).getOriginalFileName())
+                    .savedURL(houseReq.getFiles().get(i).getSavedURL())
+                    .build();
+            toSaveHouseImages.add(toSaveHouseImage);
+        }
+        houseImageRepository.saveAll(toSaveHouseImages);
+
+        // 5-1. 객실 저장
+        for (int i = 0; i < houseReq.getRooms().size(); i++) {
+            Room toSaveRoom = Room.builder()
+                    .name(houseReq.getRooms().get(i).getName())
+                    .price(houseReq.getRooms().get(i).getPrice())
+                    .house(savedHouse)
+                    .minPeople(houseReq.getRooms().get(i).getMinPeople())
+                    .maxPeople(houseReq.getRooms().get(i).getMaxPeople())
+                    .bedCount(houseReq.getRooms().get(i).getBedCount())
+                    .bedroomCount(houseReq.getRooms().get(i).getBedroomCount())
+                    .bathroomCount(houseReq.getRooms().get(i).getBathroomCount())
+                    .totalCount(houseReq.getRooms().get(i).getTotalCount())
+                    .checkIn(houseReq.getRooms().get(i).getCheckIn())
+                    .checkOut(houseReq.getRooms().get(i).getCheckOut())
+                    .build();
+            Room savedRoom = roomRepository.save(toSaveRoom);
+            // 5-2. 객실 이미지 저장
+            List<RoomImage> toSaveRoomImages = new ArrayList<>();
+            for (int j = 0; j < houseReq.getRooms().get(i).getFiles().size(); j++) {
+                RoomImage toSaveRoomImage = RoomImage.builder()
+                        .room(savedRoom)
+                        .originalFileName(houseReq.getRooms().get(i).getFiles().get(j).getOriginalFileName())
+                        .savedURL(houseReq.getRooms().get(i).getFiles().get(j).getSavedURL())
+                        .build();
+                toSaveRoomImages.add(toSaveRoomImage);
+            }
+            roomImageRepository.saveAll(toSaveRoomImages);
+        }
+        return savedHouse.getId();
+    }
 }

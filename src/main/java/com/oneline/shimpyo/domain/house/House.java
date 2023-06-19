@@ -4,10 +4,9 @@ import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.domain.wish.Wish;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import javax.annotation.meta.When;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,24 +26,23 @@ public class House {
     @Column(name = "house_id")
     private Long id;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     private String name;
 
-    @OneToMany(mappedBy = "house", cascade = ALL)
-    private List<HouseOptions> houseOptions = new ArrayList<>();
-
-    private int price;
-
-    @OneToMany(mappedBy = "house", cascade = ALL)
-    private List<HouseImage> images = new ArrayList<>();
-
-    @OneToMany(mappedBy = "house",cascade = ALL)
-    private List<Room> rooms = new ArrayList<>();
-
+    @Enumerated(value = STRING)
+    private HouseType type;
+    private String contents;    // 사장님 한마디
     @OneToOne(mappedBy = "house")
     private HouseAddress houseAddress;
-
-    private String contents;    // 사장님 한마디
-//    private String houseInfo;   //  숙소 정보
+    @OneToMany(mappedBy = "house", cascade = ALL)
+    private List<HouseOptions> houseOptions = new ArrayList<>();
+    @OneToMany(mappedBy = "house",cascade = ALL)
+    private List<Room> rooms = new ArrayList<>();
+    @OneToMany(mappedBy = "house", cascade = ALL)
+    private List<HouseImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "house", cascade = ALL)
     private List<Review> reviews = new ArrayList<>();
@@ -52,11 +50,24 @@ public class House {
     @OneToMany(mappedBy = "house", cascade = ALL)
     private List<Wish> wishList = new ArrayList<>();
 
-    @Enumerated(value = STRING)
-    private HouseType type;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+
+
+
+    @Builder
+    public House(Long id, Member member, String name, HouseType type, List<HouseOptions> houseOptions, String contents, HouseAddress houseAddress
+                , List<Room> rooms, List<HouseImage> images, List<Review> reviews, List<Wish> wishList) {
+        this.id = id;
+        this.member = member;
+        this.name = name;
+        this.type = type;
+        this.houseOptions = houseOptions;
+        this.contents = contents;
+        this.houseAddress = houseAddress;
+        this.rooms = rooms;
+        this.images = images;
+        this.reviews = reviews;
+        this.wishList = wishList;
+    }
 
 }

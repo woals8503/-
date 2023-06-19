@@ -1,9 +1,6 @@
 package com.oneline.shimpyo.domain.house;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,7 +13,6 @@ import static javax.persistence.FetchType.LAZY;
 @Table(name = "HOUSE_IMAGE")
 public class HouseImage {
     @Id @GeneratedValue
-    @Column(name = "houseImage_id")
     private Long id;
 
     @NotNull
@@ -27,9 +23,14 @@ public class HouseImage {
     @NotNull
     private String originalFileName;
     @NotNull
-    private String savedFileName;
-    @NotNull
-    private String savedPath;
-    @NotNull
-    private boolean thumbnail;
+    @Column(name = "saved_url")
+    private String savedURL;
+
+    @Builder
+    public HouseImage(Long id, House house, String originalFileName, String savedURL) {
+        this.id = id;
+        this.house = house;
+        this.originalFileName = originalFileName;
+        this.savedURL = savedURL;
+    }
 }

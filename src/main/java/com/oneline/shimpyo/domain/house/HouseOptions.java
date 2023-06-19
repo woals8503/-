@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.house;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,5 +29,12 @@ public class HouseOptions {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "house_id")
     private House house;
+
+    @Builder
+    public HouseOptions(Long id, String name, House house) {
+        this.id = id;
+        this.name = name;
+        this.house = house;
+    }
 
 }
