@@ -68,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // login 필터
         CustomAuthenticationFilter filter =
                 new CustomAuthenticationFilter(authenticationManagerBean());
-        filter.setFilterProcessesUrl("/public/login");
+        filter.setFilterProcessesUrl("/api/login");
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
 
@@ -84,7 +84,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().configurationSource(corsConfigurationSource());
 
         // 모두 접근 가능
-        http.authorizeRequests().antMatchers("/public/**").permitAll();
         http.authorizeRequests().antMatchers("/oauth2/**").permitAll();
         
         // 비회원 회원 둘다 접근 가능
