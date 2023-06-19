@@ -13,11 +13,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/public/houses")
 public class HouseController {
 
     private final HouseService houseService;
 
-    @PostMapping("/public/houses")
+    @PostMapping("")
     public BaseResponse<HouseRegisterRes> createHouse(@RequestPart HouseReq houseReq, @RequestPart List<MultipartFile> houseImages
                                 , @RequestPart List<MultipartFile> roomImages) {
         // Member 테스트용
@@ -28,6 +29,11 @@ public class HouseController {
         long houseId = houseService.createHouse(member, houseReq, houseImages, roomImages);
 
         return new BaseResponse<>(new HouseRegisterRes(houseId));
+    }
+
+    @PatchMapping("/{houseId}")
+    public void updateHouse(@PathVariable long houseId) {
+
     }
 
 }
