@@ -24,7 +24,7 @@ allprojects {
 
 dependencies {
 	implementation 'com.github.iamport:iamport-rest-client-java:0.2.21'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA는 프로젝트 진행 시 추가할 것. 테스트를 위해 잠시 꺼둠
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -38,6 +38,7 @@ dependencies {
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	implementation group: 'net.nurigo', name: 'javaSDK', version: '2.2'
 	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:2.7.4'
 	implementation 'com.auth0:java-jwt:3.10.2'
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

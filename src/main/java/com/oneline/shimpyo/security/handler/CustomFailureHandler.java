@@ -3,6 +3,7 @@ package com.oneline.shimpyo.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oneline.shimpyo.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -16,15 +17,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Component
 @Slf4j
+@Primary
 public class CustomFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        log.info("5");
+        log.info("d");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
         ErrorResponse errorResponse = new ErrorResponse(401, "ID 또는 비밀번호가 일치하지 않습니다.");
         new ObjectMapper().writeValue(response.getWriter(), errorResponse);
     }
+
 }

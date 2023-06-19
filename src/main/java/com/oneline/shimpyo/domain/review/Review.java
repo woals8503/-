@@ -3,9 +3,8 @@ package com.oneline.shimpyo.domain.review;
 import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.member.Member;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.oneline.shimpyo.domain.reservation.Reservation;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -15,6 +14,8 @@ import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
+@Builder
+@AllArgsConstructor
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "REVIEW")
@@ -32,6 +33,11 @@ public class Review extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @NotNull
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
 
     @NotNull
     private String contents;

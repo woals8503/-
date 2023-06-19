@@ -5,28 +5,31 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.oneline.shimpyo.domain.BaseException;
+import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
-import com.oneline.shimpyo.security.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
+import static com.oneline.shimpyo.domain.member.GradeName.*;
 import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
@@ -35,20 +38,24 @@ import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class MemberServiceImpl implements MemberService, UserDetailsService {
+public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final EntityManager em;
     private final CustomBCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     @Transactional(readOnly = false)
     public void join(MemberReq request) {
-        memberRepository.save(new Member(request, bCryptPasswordEncoder));
+        MemberGrade memberGrade = new MemberGrade(SILVER, 3);
+        em.persist(memberGrade);
+        memberRepository.save(new Member(request, bCryptPasswordEncoder, memberGrade));
     }
 
     @Override
     public boolean duplicateEmail(String email) {
         Member findEmail = memberRepository.findByEmail(email);
+        //  단건이 아니라 List 로 조회가 되서 서버쪽에서 에러가 난거에요
         if(findEmail == null) return true;  // 없으면
         return false;   // 있으면
     }
@@ -71,23 +78,24 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     public void changePassword(ResetPasswordReq request) {
         Member findMember = memberRepository.findByMemberWithPhoneNumber(request.getPhoneNumber());
         // 더티 체킹
-        findMember.resetPassword(request.getFirstPassword(), bCryptPasswordEncoder);
+        findMember.resetPassword(request.getPassword(), bCryptPasswordEncoder);
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void certifiedPhoneNumber(String phoneNumber, String cerNum) {
-        String api_key = "본인의 API KEY";
-        String api_secret = "본인의 API SECRET";
+        String api_key = "NCSTRVCRRQWQRTLB";    // API 키
+        String api_secret = "KCGD2SG3U7E0J3OONGYZYYKXP5SOS3Y3"; // API 시크릿 키
         Message coolsms = new Message(api_key, api_secret);
 
         // 4 params(to, from, type, text) are mandatory. must be filled
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("to", phoneNumber);    // 수신전화번호
-        params.put("from", "발송할 번호 입력");    // 발신전화번호. 테스트시에는 발신,수신 둘다 본인 번호로 하면 됨
+        params.put("from", "01065991802");    // 발신전화번호. 테스트시에는 발신,수신 둘다 본인 번호로 하면 됨
         params.put("type", "SMS");
-        params.put("text", "핫띵크 휴대폰인증 테스트 메시지 : 인증번호는" + "["+cerNum+"]" + "입니다.");
-        params.put("app_version", "test app 1.2"); // application name and version
-
+        params.put("text", "인증번호는" + "["+cerNum+"]" + "입니다.");
+        params.put("app_version", "test app 1.2");
+        
         try {
             JSONObject obj = (JSONObject) coolsms.send(params);
             log.info(obj.toString());
@@ -113,41 +121,29 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
+    @Transactional
     public Map<String, String> refresh(String refreshToken, HttpServletResponse response) {
+        Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new BaseException(JWT_TOKEN_WRONG));
 
         // === Refresh Token 유효성 검사 === //
-        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(JWT_SECRET)).build();
-        DecodedJWT decodedJWT = verifier.verify(refreshToken);
+        boolean verifyRefreshToken = verifyRefreshToken(refreshToken);
+
+        if(!verifyRefreshToken) new BaseResponse<>(JWT_REFRESH_WRONG);
 
         // === Access Token 재발급 === //
         long now = System.currentTimeMillis();
-        String username = decodedJWT.getSubject();
-        Member member = memberRepository.findByEmail(username);
-        if(member == null)
-            new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
 
-        if (!member.getRefreshToken().equals(refreshToken)) {
-            throw new JWTVerificationException("유효하지 않은 Refresh Token 입니다.");
-        }
+        if(member == null)
+            new BaseResponse<>(MEMBER_NONEXISTENT);
 
         String accessToken
-                = reissuanceAccessToken(username, true, AT_EXP_TIME, now);
+                = reissuanceAccessToken(member, true, AT_EXP_TIME, now);
 
         Map<String, String> accessTokenResponseMap = new HashMap<>();
 
-        // === 현재시간과 Refresh Token 만료날짜를 통해 남은 만료기간 계산 === //
-        // === Refresh Token 만료시간 계산해 1개월 미만일 시 refresh token도 발급 === //
-        long refreshExpireTime = decodedJWT.getClaim("exp").asLong() * 1000;
-        long diffDays = (refreshExpireTime - now) / 1000 / (24 * 3600);
-        long diffMin = (refreshExpireTime - now) / 1000 / 60;
-        if (diffMin < 5) {
-            String newRefreshToken
-                    = ressuanceRefreshToken(member.getEmail(), true, RT_EXP_TIME, now);
-
-            response.addCookie(createCookie(newRefreshToken));
-//            accessTokenResponseMap.put(RT_HEADER, newRefreshToken);   refresh 토큰 body에서 제외
-            member.updateRefreshToken(newRefreshToken);
-        }
+        String newRefreshToken = ressuanceRefreshToken(member, true, RT_EXP_TIME, now);
+        response.addCookie(createCookie(newRefreshToken));
+        member.updateRefreshToken(newRefreshToken);
 
         accessTokenResponseMap.put(AT_HEADER, accessToken);
         return accessTokenResponseMap;
@@ -163,10 +159,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(username);
-
-        return new PrincipalDetails(member);
+    @Transactional
+    public void removeRefreshToken(Long id) {
+        memberRepository.removeRefreshToken(id);
     }
 
 }

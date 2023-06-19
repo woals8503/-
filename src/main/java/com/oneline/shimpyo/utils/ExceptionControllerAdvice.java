@@ -32,5 +32,4 @@ public class ExceptionControllerAdvice {
 
         return new BaseResponse<>(PORTONE_EXCEPTION);
     }
-
 }

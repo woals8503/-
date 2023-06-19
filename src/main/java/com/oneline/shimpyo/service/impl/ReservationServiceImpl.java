@@ -7,9 +7,9 @@ import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.CouponReq;
-import com.oneline.shimpyo.domain.reservation.dto.GetPrepareReservationReq;
+import com.oneline.shimpyo.domain.reservation.dto.GetPrepareReservationRes;
 import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
-import com.oneline.shimpyo.domain.reservation.dto.PutReservationReq;
+import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.ReservationRepository;
@@ -41,13 +41,13 @@ public class ReservationServiceImpl implements ReservationService {
     private final MyCouponQuerydsl myCouponQuerydsl;
 
     @Override
-    public GetPrepareReservationReq prepareReservation(long memberId) throws BaseException {
+    public GetPrepareReservationRes prepareReservation(long memberId) throws BaseException {
         String uuid = UUID.randomUUID().toString();
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
         MemberGrade memberGrade = member.getMemberGrade();
         List<CouponReq> myCouponList = myCouponQuerydsl.getMyCouponList(memberId);
 
-        return new GetPrepareReservationReq(uuid, memberGrade.getGrade().getRank(), memberGrade.getDiscount(), myCouponList);
+        return new GetPrepareReservationRes(uuid, memberGrade.getGrade().getRank(), memberGrade.getDiscount(), myCouponList);
     }
 
     @Transactional
@@ -57,7 +57,7 @@ public class ReservationServiceImpl implements ReservationService {
         PayMent payment = paymentService.createPayment(memberId, postReservationReq);
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
-        Room room = roomRepository.findById(postReservationReq.getHouseRoomId())
+        Room room = roomRepository.findById(postReservationReq.getRoomId())
                 .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
 
         Reservation reservation = Reservation.builder().room(room).member(member).payMent(payment)
@@ -73,9 +73,10 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Transactional
     @Override
-    public void cancelReservation(long reservationId, PutReservationReq putReservationReq)
+    public void cancelReservation(long memberId, long reservationId, PatchReservationReq patchReservationReq)
             throws BaseException, IamportResponseException, IOException {
-        Reservation reservation = paymentService.cancelPayment(reservationId, putReservationReq);
+        Reservation reservation = paymentService.cancelPayment(memberId, reservationId, patchReservationReq);
+
         reservation.setReservationStatus(ReservationStatus.CANCEL);
     }
 

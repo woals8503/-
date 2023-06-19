@@ -4,15 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetPrepareReservationReq {
+public class PatchReservationReq {
 
-    private String merchantUid;
-    private String grade;
-    private int discount;
-    private List<CouponReq> couponList;
+    private int refundAmount;
 }

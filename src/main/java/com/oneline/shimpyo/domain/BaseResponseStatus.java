@@ -17,6 +17,7 @@ public enum BaseResponseStatus {
      * 2000 : Request 오류
      */
     //common 2000
+    INVALID_USER(false,2003,"권한이 없는 유저의 접근입니다."),
 
     //member 2020
 
@@ -26,6 +27,7 @@ public enum BaseResponseStatus {
     //room 2060
 
     //review 2080
+    REVIEW_RATING_WRONG(false, 2080,"잘못된 리뷰 별점입니다."),
 
     //reservation 2100
     PAYMENT_METHOD_WRONG(false, 2110,"잘못된 결제 수단입니다."),
@@ -57,6 +59,10 @@ public enum BaseResponseStatus {
     ROOM_NONEXISTENT(false, 3060,"존재하지 않는 방입니다."),
 
     //review 3080
+    REVIEW_NONEXISTENT(false, 3080,"존재하지 않는 리뷰입니다."),
+    REVIEW_RESERVATION_WRONG_STATUS(false, 3081,"이용완료된 예약이 아닙니다."),
+    REVIEW_ANOTHER_MEMBER(false, 3082,"요청한 회원과 예약자가 다른 사람입니다."),
+    REVIEW_ALREADY_EXIST(false, 3083,"이미 작성된 리뷰가 있습니다."),
 
     //reservation 3100
     RESERVATION_NONEXISTENT(false, 3100,"존재하지 않는 예약입니다."),
@@ -74,7 +80,9 @@ public enum BaseResponseStatus {
     PORTONE_EXCEPTION(false, 4001,"포트원 오류."),
     // jwt
     JWT_TOKEN_NONEXISTENT(false, 4020, "JWT 토큰이 존재하지 않습니다."),
-
+    JWT_TOKEN_INVALID(false, 4021, "유효하지 않은 JWT 토큰입니다."),
+    JWT_TOKEN_WRONG(false, 4022, "잘못된 JWT 토큰입니다."),
+    JWT_REFRESH_WRONG(false, 4023, "유효하지 않은 Refresh Token 입니다."),
     //auth
     BAD_CREDENTIALS_EXCEPTION(false, 4040, "Provider - authenticate() : 비밀번호가 일치하지 않습니다."),
 
