@@ -31,7 +31,6 @@ public class House {
     private Member member;
 
     private String name;
-    private int price;
 
     @Enumerated(value = STRING)
     private HouseType type;
@@ -56,12 +55,11 @@ public class House {
 
 
     @Builder
-    public House(Long id, Member member, String name, int price, HouseType type, List<HouseOptions> houseOptions, String contents, HouseAddress houseAddress
+    public House(Long id, Member member, String name, HouseType type, List<HouseOptions> houseOptions, String contents, HouseAddress houseAddress
                 , List<Room> rooms, List<HouseImage> images, List<Review> reviews, List<Wish> wishList) {
         this.id = id;
         this.member = member;
         this.name = name;
-        this.price = price;
         this.type = type;
         this.houseOptions = houseOptions;
         this.contents = contents;
