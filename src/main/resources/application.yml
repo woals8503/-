@@ -2,10 +2,10 @@ server:
   port: 8081
 
 spring:
-#  profiles:
-#    include: db
-  config:
-    import: db-config.yml
+  profiles:
+    include: db
+#  config:
+#    import: db-config.yml
 
   #    config import 지정해줘야 데이터 저장됨
   jwt:
