@@ -142,7 +142,7 @@ public class MemberServiceImpl implements MemberService {
         Map<String, String> accessTokenResponseMap = new HashMap<>();
 
         String newRefreshToken = ressuanceRefreshToken(member, true, RT_EXP_TIME, now);
-        response.addCookie(createCookie(newRefreshToken));
+        response.addHeader("Set-Cookie", createCookie(newRefreshToken).toString());
         member.updateRefreshToken(newRefreshToken);
 
         accessTokenResponseMap.put(AT_HEADER, accessToken);
