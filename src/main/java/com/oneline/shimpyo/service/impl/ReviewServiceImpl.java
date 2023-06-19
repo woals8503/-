@@ -63,13 +63,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional
     @Override
-    public void updateReview(long memberId, long reviewId, PatchReviewReq patchReviewReq) {
+    public void updateReview(long reviewId, PatchReviewReq patchReviewReq) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.REVIEW_NONEXISTENT));
-
-        if(review.getMember().getId() != memberId){
-            throw new BaseException(INVALID_MEMBER);
-        }
 
         review.setContents(patchReviewReq.getContents());
         review.setReviewRating(patchReviewReq.getReviewRating());
@@ -77,13 +73,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional
     @Override
-    public void deleteReview(long memberId, long reviewId) {
+    public void deleteReview(long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.REVIEW_NONEXISTENT));
-
-        if(review.getMember().getId() != memberId){
-            throw new BaseException(INVALID_MEMBER);
-        }
 
         reviewRepository.delete(review);
     }

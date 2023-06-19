@@ -25,9 +25,9 @@ public class ReservationQuerydsl {
     }
 
     public Page<GetReservationListRes> readReservationList(long memberId, Pageable pageable) {
-        List<GetReservationListRes> reservationList = jqf.select(new QGetReservationListRes(reservation.id, houseImage.savedPath, houseImage.savedFileName, house.name,
-                        house.member.nickname, house.type, reservation.checkInDate, reservation.checkOutDate,
-                        house.name, reservation.reservationStatus))
+        List<GetReservationListRes> reservationList = jqf.select(new QGetReservationListRes(reservation.id,
+                        houseImage.savedURL, house.name, house.member.nickname, house.type, reservation.checkInDate,
+                        reservation.checkOutDate, house.name, reservation.reservationStatus))
                 .from(reservation)
                 .join(reservation.room.house, house)
                 .join(house.images, houseImage)

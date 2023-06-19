@@ -1,17 +1,13 @@
 package com.oneline.shimpyo.controller;
 
-import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.*;
-import com.oneline.shimpyo.security.auth.PrincipalDetails;
+import com.oneline.shimpyo.security.auth.CurrentMember;
 import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -21,10 +17,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
-import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
-import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.getIdFromToken;
-import static com.oneline.shimpyo.utils.RegexValidator.*;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static com.oneline.shimpyo.modules.RegexValidator.*;
 
 @Slf4j
 @RestController
@@ -33,7 +26,6 @@ public class MemberController {
 
     private final MemberService memberService;
     private final JwtService jwtService;
-
 
     @PostMapping("/public/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
@@ -126,20 +118,43 @@ public class MemberController {
     // Access 토큰 만료 시 새로운 토큰을 발급
     @GetMapping("/api/refresh")
     public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if (authorizationHeader == null || !authorizationHeader.startsWith(TOKEN_HEADER_PREFIX)) {
-            throw new BaseException(JWT_TOKEN_NONEXISTENT);
+        Cookie[] cookies = request.getCookies();
+        String name = null;
+        String value = null;
+        for (Cookie cookie : cookies) {
+            name = cookie.getName();
+            value = cookie.getValue();
         }
-        String refreshToken = authorizationHeader.substring(TOKEN_HEADER_PREFIX.length());
+        System.out.println(name);
+        System.out.println(value);
+        String refreshToken = value;
 
         Map<String, String> tokens = memberService.refresh(refreshToken, response);
-        response.setHeader(AT_HEADER, tokens.get(AT_HEADER));
         return new BaseResponse<>(tokens);
     }
 
-    @GetMapping("/api/test3")
-    public String test3() {
+    @GetMapping("/public/test4")
+    public String test4() {
         Long memberId = jwtService.getMemberId();
+        if(memberId == null) {
+            System.out.println("비회원");
+        }
+        else System.out.println("회원");
+        return "ok";
+    }
+
+    @GetMapping("/api/test3")
+    public String test3(@CurrentMember Member member) {
+        if(member != null)
+            System.out.println("회원");
+
+        else
+            System.out.println("비회원");
+        return "test";
+    }
+
+    @GetMapping("/mypage/test")
+    public String test5() {
 
         return "test";
     }

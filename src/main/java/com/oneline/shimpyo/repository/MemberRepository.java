@@ -1,12 +1,11 @@
 package com.oneline.shimpyo.repository;
 
 import com.oneline.shimpyo.domain.member.Member;
-import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -23,4 +22,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m where m.phoneNumber = :phoneNumber")
     Member findByMemberWithPhoneNumber(@Param("phoneNumber") String phoneNumber);
 
+    @Modifying
+    @Query("update Member m set m.refreshToken = null where m.id = :id")
+    void removeRefreshToken(@Param("id") Long id);
+
+    @Query("select m from Member m where m.refreshToken = :refreshToken")
+    Optional<Member> findByRefreshToken(@Param("refreshToken") String refreshToken);
 }

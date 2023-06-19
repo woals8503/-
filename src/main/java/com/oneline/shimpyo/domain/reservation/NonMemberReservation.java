@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.reservation;
 
+import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.room.Room;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "NON_MEMBER_RESERVATION")
-public class NonMemberReservation {
+public class NonMemberReservation extends BaseEntity {
     @Id @GeneratedValue
     @Column(name = "non_member_id")
     private Long id;

@@ -91,5 +91,4 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
         // 현재시간 - 로그인 시간 -> 1년 초과할 시 return false
         return true;    // 아니오 ( true )
     }
-    //========================================
 }

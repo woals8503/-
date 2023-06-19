@@ -1,6 +1,9 @@
 package com.oneline.shimpyo.security.jwt;
 
 import com.oneline.shimpyo.domain.BaseException;
+import com.oneline.shimpyo.security.config.SecurityConfig;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -23,11 +26,10 @@ public class JwtService {
     }
 
     public Long getMemberId() throws BaseException {
-        //1. JWT 추출
         String accessToken = getJwt().substring(7);
-        if (accessToken == null || accessToken.length() == 0) {
+
+        if (accessToken == null || accessToken.length() == 0 )
             throw new BaseException(JWT_TOKEN_NONEXISTENT);
-        }
 
         // 2. JWT parsing
         try {

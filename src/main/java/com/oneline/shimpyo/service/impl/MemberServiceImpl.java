@@ -5,21 +5,20 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.oneline.shimpyo.domain.BaseException;
+import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
-import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 import static com.oneline.shimpyo.domain.member.GradeName.*;
 import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
@@ -121,40 +121,29 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public Map<String, String> refresh(String refreshToken, HttpServletResponse response) {
+        Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new BaseException(JWT_TOKEN_WRONG));
+
         // === Refresh Token 유효성 검사 === //
-        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(JWT_SECRET)).build();
-        DecodedJWT decodedJWT = verifier.verify(refreshToken);
+        boolean verifyRefreshToken = verifyRefreshToken(refreshToken);
+
+        if(!verifyRefreshToken) new BaseResponse<>(JWT_REFRESH_WRONG);
 
         // === Access Token 재발급 === //
         long now = System.currentTimeMillis();
-        String username = decodedJWT.getSubject();
-        Member member = memberRepository.findByEmail(username);
-        if(member == null)
-            new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
 
-        if (!member.getRefreshToken().equals(refreshToken)) {
-            throw new JWTVerificationException("유효하지 않은 Refresh Token 입니다.");
-        }
+        if(member == null)
+            new BaseResponse<>(MEMBER_NONEXISTENT);
 
         String accessToken
                 = reissuanceAccessToken(member, true, AT_EXP_TIME, now);
 
         Map<String, String> accessTokenResponseMap = new HashMap<>();
 
-        // === 현재시간과 Refresh Token 만료날짜를 통해 남은 만료기간 계산 === //
-        // === Refresh Token 만료시간 계산해 1개월 미만일 시 refresh token도 발급 === //
-        long refreshExpireTime = decodedJWT.getClaim("exp").asLong() * 1000;
-        long diffDays = (refreshExpireTime - now) / 1000 / (24 * 3600);
-        long diffMin = (refreshExpireTime - now) / 1000 / 60;
-        if (diffMin < 5) {
-            String newRefreshToken
-                    = ressuanceRefreshToken(member, true, RT_EXP_TIME, now);
-
-            response.addCookie(createCookie(newRefreshToken));
-//            accessTokenResponseMap.put(RT_HEADER, newRefreshToken);   refresh 토큰 body에서 제외
-            member.updateRefreshToken(newRefreshToken);
-        }
+        String newRefreshToken = ressuanceRefreshToken(member, true, RT_EXP_TIME, now);
+        response.addCookie(createCookie(newRefreshToken));
+        member.updateRefreshToken(newRefreshToken);
 
         accessTokenResponseMap.put(AT_HEADER, accessToken);
         return accessTokenResponseMap;
@@ -168,11 +157,11 @@ public class MemberServiceImpl implements MemberService {
 
         return true;
     }
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        Member member = memberRepository.findByEmail(username);
-//
-//        return new PrincipalDetails(member);
-//    }
+
+    @Override
+    @Transactional
+    public void removeRefreshToken(Long id) {
+        memberRepository.removeRefreshToken(id);
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.oneline.shimpyo.utils;
+package com.oneline.shimpyo.modules;
 
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 

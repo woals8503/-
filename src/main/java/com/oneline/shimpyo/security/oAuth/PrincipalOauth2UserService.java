@@ -47,25 +47,27 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         if(social.equals("google")) {
             log.info("구글 로그인 요청");
             oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
-        }else if(social.equals("naver")) {
+        } else if(social.equals("naver")) {
             log.info("네이버 로그인 요청");
             // 네이버는 response키를 가진 Map 형태 안에 attribute를 가지고 있기 때문에 아래와 같이 작성함
             oAuth2UserInfo = new NaverUserInfo((Map<String, Object>) oAuth2User.getAttributes().get("response"));
         }
 
-        String provider = oAuth2UserInfo.getProvider();
-        String providerId = oAuth2UserInfo.getProviderId();
-        String username = provider + "_" + providerId;
-        log.info(oAuth2UserInfo.getEmail());
+        String username = oAuth2UserInfo.getEmail();
+
         Member member = memberRepository.findByEmail(username);
-        MemberGrade memberGrade = new MemberGrade(SILVER, 3);
-        em.persist(memberGrade);
-        em.flush();
 
         if(member == null) {
             log.info("OAuth 최초 로그인");
+            String provider = oAuth2UserInfo.getProvider();
+            String providerId = oAuth2UserInfo.getProviderId();
+
+            MemberGrade memberGrade = new MemberGrade(SILVER, 3);
+            em.persist(memberGrade);
+            em.flush();
+
             member = member.builder()
-                    .email(oAuth2UserInfo.getEmail())
+                    .email(username)
                     .password(bCryptPasswordEncoder.encode("비밀번호"))
                     .point(0)
                     .nickname(oAuth2UserInfo.getName())

@@ -9,9 +9,9 @@ import org.springframework.data.domain.Pageable;
 public interface ReviewService {
     void createReview(long memberId, PostReviewReq postReviewReq);
 
-    void updateReview(long memberId, long reviewId, PatchReviewReq patchReviewReq);
+    void updateReview(long reviewId, PatchReviewReq patchReviewReq);
 
-    void deleteReview(long memberId, long reviewId);
+    void deleteReview(long reviewId);
 
     GetPageRes<GetReviewRes> readReviewList(long memberId, Pageable pageable);
 }

@@ -32,8 +32,8 @@ public class CustomAuthProvider implements AuthenticationProvider {
         log.info("f");
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
-        UserDetails userDetails = principalDetailsService.loadUserByUsername(username);
-//        PrincipalDetails principalDetails = (PrincipalDetails) memberService.loadUserByUsername(username);
+        PrincipalDetails userDetails = (PrincipalDetails) principalDetailsService.loadUserByUsername(username);
+
         // PW 검사
         if (!passwordEncoder.matches(password, userDetails.getPassword()))
             throw new BaseException(BAD_CREDENTIALS_EXCEPTION);

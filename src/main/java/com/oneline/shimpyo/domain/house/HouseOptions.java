@@ -1,5 +1,7 @@
 package com.oneline.shimpyo.domain.house;
 
+import com.oneline.shimpyo.domain.base.BaseEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +17,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "HOUSE_OPTIONS")
-public class HouseOptions {
+public class HouseOptions extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "option_id")
@@ -28,5 +30,12 @@ public class HouseOptions {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "house_id")
     private House house;
+
+    @Builder
+    public HouseOptions(Long id, String name, House house) {
+        this.id = id;
+        this.name = name;
+        this.house = house;
+    }
 
 }

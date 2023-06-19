@@ -32,4 +32,5 @@ public interface MemberService {
 
     boolean duplicatePhoneNumber(String phoneNumber);
 
+    void removeRefreshToken(Long id);
 }

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
+import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.generateRefreshToken;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.generateToken;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -35,7 +36,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         PrincipalDetails member = (PrincipalDetails) authentication.getPrincipal();
 
         String accessToken = generateToken(member, true, AT_EXP_TIME);
-        String refreshToken = generateToken(member, true, RT_EXP_TIME);
+        String refreshToken = generateRefreshToken(member, true, RT_EXP_TIME);
+
         // Refresh Token DB에 저장
         memberService.updateRefreshToken(member.getUsername(), refreshToken);
         response.setContentType(APPLICATION_JSON_VALUE);
