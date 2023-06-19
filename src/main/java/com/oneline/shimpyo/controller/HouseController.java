@@ -22,7 +22,7 @@ public class HouseController {
     private final CheckMember checkMember;
 
     @PostMapping("")
-    public BaseResponse<HouseRegisterRes> createHouse(@ModelAttribute HouseReq houseReq, @ModelAttribute List<MultipartFile> houseImages
+    public BaseResponse<HouseRegisterRes> createHouse(@RequestPart HouseReq houseReq, @ModelAttribute List<MultipartFile> houseImages
                                 , @ModelAttribute List<MultipartFile> roomImages, @CurrentMember Member member) {
 
         long houseId = houseService.createHouse(member, houseReq, houseImages, roomImages);
