@@ -22,8 +22,8 @@ public class HouseController {
     private final CheckMember checkMember;
 
     @PostMapping("")
-    public BaseResponse<HouseRegisterRes> createHouse(@RequestPart HouseReq houseReq, @RequestPart List<MultipartFile> houseImages
-                                , @RequestPart List<MultipartFile> roomImages, @CurrentMember Member member) {
+    public BaseResponse<HouseRegisterRes> createHouse(HouseReq houseReq, List<MultipartFile> houseImages
+                                , List<MultipartFile> roomImages, @CurrentMember Member member) {
 
         long houseId = houseService.createHouse(member, houseReq, houseImages, roomImages);
 
