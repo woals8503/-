@@ -8,6 +8,7 @@ import com.oneline.shimpyo.modules.CheckMember;
 import com.oneline.shimpyo.security.auth.CurrentMember;
 import com.oneline.shimpyo.service.HouseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,7 @@ public class HouseController {
     private final HouseService houseService;
     private final CheckMember checkMember;
 
-    @PostMapping("")
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<HouseRegisterRes> createHouse(@RequestPart(value = "houseReq") HouseReq houseReq, @RequestPart(value = "houseImages") List<MultipartFile> houseImages
                                 , @RequestPart(value = "roomImages") List<MultipartFile> roomImages, @CurrentMember Member member) {
 
