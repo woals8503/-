@@ -37,7 +37,6 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
@@ -68,7 +67,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 
             member = member.builder()
                     .email(username)
-                    .password(bCryptPasswordEncoder.encode("비밀번호"))
+                    .password("쉼표")
                     .point(0)
                     .nickname(oAuth2UserInfo.getName())
                     .provider(provider)

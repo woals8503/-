@@ -91,7 +91,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 그 외에 인증 필요
         http.authorizeRequests().anyRequest().authenticated();
 
-
         // 로그아웃 설정
         http.logout()
                 .logoutUrl("/api/logout") // [POST]

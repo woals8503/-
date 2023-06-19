@@ -7,6 +7,7 @@ import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -42,7 +43,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         memberService.updateRefreshToken(member.getUsername(), refreshToken);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
-        response.addCookie(createCookie(refreshToken));
+        response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
@@ -50,12 +51,20 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
     }
 
-    public static Cookie createCookie(String refreshToken) {
-        Cookie cookie = new Cookie(RT_HEADER, refreshToken);
-        cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24);
+    public static ResponseCookie createCookie(String refreshToken) {
+
+        ResponseCookie cookie = ResponseCookie.from(RT_HEADER, refreshToken)
+                .path("/")
+                .sameSite("Lax")
+                .secure(false)
+                .httpOnly(true)
+                .maxAge(60 * 60 * 24).build();
+
+//        Cookie cookie = new Cookie(RT_HEADER, refreshToken);
+//        cookie.setHttpOnly(true);
+////        cookie.setSecure(true);
+//        cookie.setPath("/");
+//        cookie.setMaxAge(60 * 60 * 24);
         return cookie;
     }
 }

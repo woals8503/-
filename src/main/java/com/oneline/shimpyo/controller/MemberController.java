@@ -125,8 +125,6 @@ public class MemberController {
             name = cookie.getName();
             value = cookie.getValue();
         }
-        System.out.println(name);
-        System.out.println(value);
         String refreshToken = value;
 
         Map<String, String> tokens = memberService.refresh(refreshToken, response);
