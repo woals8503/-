@@ -27,7 +27,7 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtService jwtService;
 
-    @PostMapping("/public/join")
+    @PostMapping("/api/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
 
         boolean isValid = validateRequest(memberReq);
@@ -39,7 +39,7 @@ public class MemberController {
     }
 
     //이메일 중복 검사
-    @PostMapping("/public/check-email")
+    @PostMapping("/api/check-email")
     public BaseResponse<Void> duplicateEmail(@RequestBody EmailReq request) {
         boolean check = memberService.duplicateEmail(request.getEmail());
         if(!check)
@@ -48,7 +48,7 @@ public class MemberController {
     }
 
     //휴대폰 번호 중복 검사
-    @PostMapping("/public/check-phone")
+    @PostMapping("/api/check-phone")
     public BaseResponse<Void> duplicatePhoneNumber(@RequestBody DuplicatePhoneReq request) {
         boolean check = memberService.duplicatePhoneNumber(request.getPhoneNumber());
         if(!check)
@@ -57,7 +57,7 @@ public class MemberController {
     }
 
     // 닉네임 중복 검사
-    @PostMapping("/public/check-nickname")
+    @PostMapping("/api/check-nickname")
     public BaseResponse<Void> duplicateNickname(@RequestParam(value ="nickname") String nickname) {
         boolean check = memberService.duplicateNickname(nickname);
         if(!check) return new BaseResponse<>(NICKNAME_DUPLICATE);
@@ -65,7 +65,7 @@ public class MemberController {
     }
 
     // 이메일 유무 검사
-    @PostMapping("/public/check-user")
+    @PostMapping("/api/check-user")
     public BaseResponse<EmailRes> checkUser(@RequestBody EmailReq emailReq) {
 
         Member user = memberService.checkUser(emailReq.getEmail());
@@ -76,7 +76,7 @@ public class MemberController {
         return new BaseResponse<>(new EmailRes(user.getEmail()));
     }
 
-    @PatchMapping("/public/reset-pwd")
+    @PatchMapping("/api/reset-pwd")
     public BaseResponse<Void> resetPwd(@RequestBody ResetPasswordReq request) {
         // 이메일 정규식 표현 필요
         boolean isValid = validatePassword(request.getPassword());
@@ -88,7 +88,7 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-    @PostMapping("/public/certification")
+    @PostMapping("/api/certification")
     public BaseResponse<CertificationPhoneNumberRes> CertificationPhone(
             @RequestBody CertificationPhoneNumberReq request) {
 
@@ -107,7 +107,7 @@ public class MemberController {
     }
 
     // 이메일 찾기
-    @PostMapping("/public/show-email")
+    @PostMapping("/api/show-email")
     public BaseResponse<EmailRes> findEmail(
             @RequestBody FindEmailReq request) {
         String findEmail = memberService.findByEmailWithPhonNumber(request.getPhoneNumber());
@@ -118,7 +118,6 @@ public class MemberController {
     // Access 토큰 만료 시 새로운 토큰을 발급
     @GetMapping("/user/refresh")
     public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response, @CurrentMember Member member) {
-
         Cookie[] cookies = request.getCookies();
         String name = null;
         String value = null;
