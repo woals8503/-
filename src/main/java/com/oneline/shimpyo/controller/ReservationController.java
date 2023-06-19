@@ -2,14 +2,14 @@ package com.oneline.shimpyo.controller;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
-import com.oneline.shimpyo.domain.reservation.dto.GetPrepareReservationRes;
-import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
-import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
-import com.oneline.shimpyo.domain.reservation.dto.PostReservationRes;
+import com.oneline.shimpyo.domain.reservation.dto.*;
+import com.oneline.shimpyo.domain.GetPageRes;
 import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -33,6 +33,14 @@ public class ReservationController {
 
         long reservationId = reservationService.createReservation(jwtService.getMemberId(), postReservationReq);
         return new BaseResponse<>(new PostReservationRes(reservationId));
+    }
+
+    @GetMapping("/members/{memberId}")
+    public BaseResponse<GetPageRes<GetReservationListRes>> readReservationList(
+            @PathVariable long memberId,
+            @PageableDefault Pageable pageable){
+        //todo check authorization
+        return new BaseResponse<>(reservationService.readReservationList(memberId, pageable));
     }
 
     @PatchMapping("/{reservationId}")

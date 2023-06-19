@@ -1,24 +1,24 @@
 package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
+import com.oneline.shimpyo.domain.GetPageRes;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
-import com.oneline.shimpyo.domain.reservation.dto.CouponReq;
-import com.oneline.shimpyo.domain.reservation.dto.GetPrepareReservationRes;
-import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
-import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
+import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.ReservationRepository;
 import com.oneline.shimpyo.repository.RoomRepository;
 import com.oneline.shimpyo.repository.dsl.MyCouponQuerydsl;
+import com.oneline.shimpyo.repository.dsl.ReservationQuerydsl;
 import com.oneline.shimpyo.service.PaymentService;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +36,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
+    private final ReservationQuerydsl reservationQuerydsl;
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
     private final MyCouponQuerydsl myCouponQuerydsl;
@@ -69,6 +70,13 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
 
         return reservation.getId();
+    }
+
+    @Override
+    public GetPageRes<GetReservationListRes> readReservationList(long memberId, Pageable pageable) {
+        memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
+
+        return new GetPageRes<>(reservationQuerydsl.readReservationList(memberId, pageable));
     }
 
     @Transactional

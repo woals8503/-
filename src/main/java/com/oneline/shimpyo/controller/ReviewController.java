@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.controller;
 
 import com.oneline.shimpyo.domain.BaseResponse;
+import com.oneline.shimpyo.domain.GetPageRes;
 import com.oneline.shimpyo.domain.review.dto.GetReviewRes;
 import com.oneline.shimpyo.domain.review.dto.PatchReviewReq;
 import com.oneline.shimpyo.domain.review.dto.PostReviewReq;
@@ -11,8 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,9 +28,10 @@ public class ReviewController {
     }
 
     @GetMapping("/members/{memberId}")
-    public BaseResponse<List<GetReviewRes>> readReviewList(@PathVariable long memberId,
-                                                           @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
-                                                           Pageable pageable){
+    public BaseResponse<GetPageRes<GetReviewRes>> readReviewList(
+            @PathVariable long memberId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+
         jwtService.checkJwtByStoreId(memberId);
         return new BaseResponse<>(reviewService.readReviewList(memberId, pageable));
     }

@@ -2,6 +2,7 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponseStatus;
+import com.oneline.shimpyo.domain.GetPageRes;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.reservation.Reservation;
@@ -52,9 +53,12 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<GetReviewRes> readReviewList(long memberId, Pageable pageable) {
+    public GetPageRes<GetReviewRes> readReviewList(long memberId, Pageable pageable) {
         Page<Review> reviews = reviewRepository.findByMemberId(memberId, pageable);
-        return reviews.stream().map(GetReviewRes::new).collect(Collectors.toList());
+
+        List<GetReviewRes> list = reviews.stream().map(GetReviewRes::new).collect(Collectors.toList());
+        return new GetPageRes<>(reviews.getTotalPages(), reviews.getTotalElements(), reviews.getSize(),
+                reviews.getNumberOfElements(), list);
     }
 
     @Transactional
