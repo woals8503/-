@@ -49,6 +49,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         responseMap.put(AT_HEADER, accessToken);
         BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
         new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
+
     }
 
     public static ResponseCookie createCookie(String refreshToken) {

@@ -116,8 +116,8 @@ public class MemberController {
     }
 
     // Access 토큰 만료 시 새로운 토큰을 발급
-    @GetMapping("/api/refresh")
-    public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
+    @GetMapping("/user/refresh")
+    public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response, @CurrentMember Member member) {
         Cookie[] cookies = request.getCookies();
         String name = null;
         String value = null;
