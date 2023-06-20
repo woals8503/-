@@ -79,13 +79,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(STATELESS);
-
         // cors 설정
         http.cors().configurationSource(corsConfigurationSource());
 
         // 모두 접근 가능
         http.authorizeRequests().antMatchers("/oauth2/**").permitAll();
-        
         // 비회원 회원 둘다 접근 가능
         http.authorizeRequests().antMatchers("/api/**").hasAnyAuthority("ROLE_ANONYMOUS", "CLIENT");
         // 회원만 접근 가능

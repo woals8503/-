@@ -58,7 +58,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             // 리다이렉트 타겟 url 생성 ( 로그인 성공 시 리다이렉트 URL )
             String targetUrl;
-            targetUrl = UriComponentsBuilder.fromUriString("/public/test4").build().toUriString();
+            targetUrl = UriComponentsBuilder.fromUriString("/api/test4").build().toUriString();
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
         }
 
@@ -71,9 +71,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             responseMap.put("providerId", principal.getMember().getProviderId());
 //            BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
 //            new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
-
+            
+            // 메인페이지로 이동
             String targetUrl;
-            targetUrl = UriComponentsBuilder.fromUriString("/public/test5").build().toUriString();
+            targetUrl = UriComponentsBuilder.fromUriString("/api/test5").build().toUriString();
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
         }
 
