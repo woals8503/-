@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.room;
 
+import com.oneline.shimpyo.domain.base.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "ROOM_IMAGE")
-public class RoomImage {
+public class RoomImage extends BaseEntity {
     @Id @GeneratedValue
     private Long id;
 

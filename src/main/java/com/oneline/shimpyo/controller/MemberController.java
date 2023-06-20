@@ -1,18 +1,21 @@
 package com.oneline.shimpyo.controller;
 
-import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.*;
 import com.oneline.shimpyo.security.auth.CurrentMember;
-import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.OAuth2AuthorizationContext;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -22,10 +25,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
-import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
-import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.getIdFromToken;
-import static com.oneline.shimpyo.utils.RegexValidator.*;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static com.oneline.shimpyo.modules.RegexValidator.*;
 
 @Slf4j
 @RestController
@@ -35,7 +35,7 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtService jwtService;
 
-    @PostMapping("/public/join")
+    @PostMapping("/api/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
 
         boolean isValid = validateRequest(memberReq);
@@ -47,7 +47,7 @@ public class MemberController {
     }
 
     //이메일 중복 검사
-    @PostMapping("/public/check-email")
+    @PostMapping("/api/check-email")
     public BaseResponse<Void> duplicateEmail(@RequestBody EmailReq request) {
         boolean check = memberService.duplicateEmail(request.getEmail());
         if(!check)
@@ -56,7 +56,7 @@ public class MemberController {
     }
 
     //휴대폰 번호 중복 검사
-    @PostMapping("/public/check-phone")
+    @PostMapping("/api/check-phone")
     public BaseResponse<Void> duplicatePhoneNumber(@RequestBody DuplicatePhoneReq request) {
         boolean check = memberService.duplicatePhoneNumber(request.getPhoneNumber());
         if(!check)
@@ -65,7 +65,7 @@ public class MemberController {
     }
 
     // 닉네임 중복 검사
-    @PostMapping("/public/check-nickname")
+    @PostMapping("/api/check-nickname")
     public BaseResponse<Void> duplicateNickname(@RequestParam(value ="nickname") String nickname) {
         boolean check = memberService.duplicateNickname(nickname);
         if(!check) return new BaseResponse<>(NICKNAME_DUPLICATE);
@@ -73,7 +73,7 @@ public class MemberController {
     }
 
     // 이메일 유무 검사
-    @PostMapping("/public/check-user")
+    @PostMapping("/api/check-user")
     public BaseResponse<EmailRes> checkUser(@RequestBody EmailReq emailReq) {
 
         Member user = memberService.checkUser(emailReq.getEmail());
@@ -84,7 +84,7 @@ public class MemberController {
         return new BaseResponse<>(new EmailRes(user.getEmail()));
     }
 
-    @PatchMapping("/public/reset-pwd")
+    @PatchMapping("/api/reset-pwd")
     public BaseResponse<Void> resetPwd(@RequestBody ResetPasswordReq request) {
         // 이메일 정규식 표현 필요
         boolean isValid = validatePassword(request.getPassword());
@@ -96,7 +96,7 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-    @PostMapping("/public/certification")
+    @PostMapping("/api/certification")
     public BaseResponse<CertificationPhoneNumberRes> CertificationPhone(
             @RequestBody CertificationPhoneNumberReq request) {
 
@@ -115,7 +115,7 @@ public class MemberController {
     }
 
     // 이메일 찾기
-    @PostMapping("/public/show-email")
+    @PostMapping("/api/show-email")
     public BaseResponse<EmailRes> findEmail(
             @RequestBody FindEmailReq request) {
         String findEmail = memberService.findByEmailWithPhonNumber(request.getPhoneNumber());
@@ -124,8 +124,8 @@ public class MemberController {
     }
 
     // Access 토큰 만료 시 새로운 토큰을 발급
-    @GetMapping("/api/refresh")
-    public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response) {
+    @GetMapping("/user/refresh")
+    public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response, @CurrentMember Member member) {
         Cookie[] cookies = request.getCookies();
         String name = null;
         String value = null;
@@ -133,31 +133,20 @@ public class MemberController {
             name = cookie.getName();
             value = cookie.getValue();
         }
-        System.out.println(name);
-        System.out.println(value);
         String refreshToken = value;
 
         Map<String, String> tokens = memberService.refresh(refreshToken, response);
         return new BaseResponse<>(tokens);
     }
 
-    @GetMapping("/public/test4")
+    @GetMapping("/api/test4")
     public String test4() {
-        Long memberId = jwtService.getMemberId();
-        if(memberId == null) {
-            System.out.println("비회원");
-        }
-        else System.out.println("회원");
+
         return "ok";
     }
 
     @GetMapping("/api/test3")
     public String test3(@CurrentMember Member member) {
-        if(member != null)
-            System.out.println("회원");
-
-        else
-            System.out.println("비회원");
         return "test";
     }
 

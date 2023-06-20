@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME) // 런타임 까지 유지
-@Target(ElementType.PARAMETER)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @AuthenticationPrincipal(expression = "#this == 'anonymousUser' ? null : member")
 public @interface CurrentMember {
 }

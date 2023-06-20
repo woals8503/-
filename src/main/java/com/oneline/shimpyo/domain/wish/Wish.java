@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.wish;
 
+import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.member.Member;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "WISH")
-public class Wish {
+public class Wish extends BaseEntity {
 
     @MapsId("member_id")
     @ManyToOne(fetch = LAZY)

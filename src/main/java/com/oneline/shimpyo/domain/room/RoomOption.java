@@ -1,10 +1,12 @@
 package com.oneline.shimpyo.domain.room;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Embeddable;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 @Getter @Setter
 public class RoomOption {

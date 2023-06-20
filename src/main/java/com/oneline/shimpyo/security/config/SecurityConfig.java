@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.security.config;
 
+import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.security.filter.CustomAuthenticationFilter;
 import com.oneline.shimpyo.security.filter.CustomAuthorizationFilter;
 import com.oneline.shimpyo.security.handler.CustomLogoutSuccessHandler;
@@ -8,6 +9,7 @@ import com.oneline.shimpyo.security.oAuth.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -17,10 +19,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -29,6 +33,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.oneline.shimpyo.domain.BaseResponseStatus.BAD_AUTHENTICATION;
 import static org.springframework.security.config.http.SessionCreationPolicy.*;
 
 @Configuration
@@ -63,34 +68,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // login 필터
         CustomAuthenticationFilter filter =
                 new CustomAuthenticationFilter(authenticationManagerBean());
-        filter.setFilterProcessesUrl("/public/login");
+        filter.setFilterProcessesUrl("/api/login");
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
 
         // 일반 설정
         http.csrf()
                 .disable()
-                .formLogin()
-                .disable()
-                .httpBasic()
-                .disable()
+                .formLogin().disable()
+                .httpBasic().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(STATELESS);
-
         // cors 설정
         http.cors().configurationSource(corsConfigurationSource());
 
         // 모두 접근 가능
-        http.authorizeRequests().antMatchers("/public/**").permitAll();
         http.authorizeRequests().antMatchers("/oauth2/**").permitAll();
-        
         // 비회원 회원 둘다 접근 가능
         http.authorizeRequests().antMatchers("/api/**").hasAnyAuthority("ROLE_ANONYMOUS", "CLIENT");
         // 회원만 접근 가능
         http.authorizeRequests().antMatchers("/user/**").hasAnyAuthority("CLIENT");
         // 그 외에 인증 필요
         http.authorizeRequests().anyRequest().authenticated();
-
 
         // 로그아웃 설정
         http.logout()
@@ -99,7 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessHandler(logoutSuccessHandler)
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true);
-        
+
         // OAuth2 설정
         http.oauth2Login()
                 .successHandler(successHandler)
@@ -114,6 +113,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 권한 체크 후 엑세스할 수 없는 요청 시 동작 ( ex : 일반유저가 admin 권한이 필요한 url 요청 시 동작 [권한 없을 시])
         // 나중에 권한 필요한 설정 시 Custom 클래스 만들어서 제작 예정
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+
+        http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         /** 참고 : AuthenticationEntryPoint는 Security 인증이 되지 않은 유저가 요청했을 때 동작된다. [인증 불가 시] **/
     }
 

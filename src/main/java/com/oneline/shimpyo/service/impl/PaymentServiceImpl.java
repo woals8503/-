@@ -2,8 +2,6 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.coupon.Coupon;
-import com.oneline.shimpyo.domain.house.House;
-import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.pay.PayStatus;
 import com.oneline.shimpyo.domain.reservation.Reservation;
@@ -91,7 +89,7 @@ public class PaymentServiceImpl implements PaymentService {
     private static void validateCancel(long memberId, PatchReservationReq patchReservationReq,
                                        Reservation reservation, PayMent payMent) {
         if(memberId != reservation.getMember().getId()){
-            throw new BaseException(INVALID_USER);
+            throw new BaseException(INVALID_MEMBER);
         }
 
         if (reservation.getReservationStatus() == ReservationStatus.CANCEL) {

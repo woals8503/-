@@ -11,6 +11,8 @@ import static javax.persistence.CascadeType.*;
 import static javax.persistence.EnumType.*;
 import static lombok.AccessLevel.PROTECTED;
 
+@Builder
+@AllArgsConstructor
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)

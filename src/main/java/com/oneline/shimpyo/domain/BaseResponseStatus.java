@@ -1,7 +1,6 @@
 package com.oneline.shimpyo.domain;
 
 import lombok.Getter;
-import org.springframework.security.authentication.BadCredentialsException;
 
 /**
  * 에러 코드 관리
@@ -17,7 +16,8 @@ public enum BaseResponseStatus {
      * 2000 : Request 오류
      */
     //common 2000
-    INVALID_USER(false,2003,"권한이 없는 유저의 접근입니다."),
+    NON_MEMBER(false,2002,"비회원입니다"),
+    INVALID_MEMBER(false,2003,"권한이 없는 유저의 접근입니다."),
 
     //member 2020
 
@@ -85,6 +85,7 @@ public enum BaseResponseStatus {
     JWT_REFRESH_WRONG(false, 4023, "유효하지 않은 Refresh Token 입니다."),
     //auth
     BAD_CREDENTIALS_EXCEPTION(false, 4040, "Provider - authenticate() : 비밀번호가 일치하지 않습니다."),
+    BAD_AUTHENTICATION(false, 4041, "인증이 정상적으로 처리되지 않았습니다."),
 
     // AWS S3
     AWS_S3_EXCEPTION(false, 4060, "AWS 연결 또는 서버에 오류가 발생했습니다.");

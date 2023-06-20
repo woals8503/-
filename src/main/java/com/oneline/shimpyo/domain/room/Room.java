@@ -1,12 +1,10 @@
 package com.oneline.shimpyo.domain.room;
 
+import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.reservation.NonMemberReservation;
 import com.oneline.shimpyo.domain.reservation.Reservation;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -18,11 +16,12 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
+@Builder
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "ROOM")
-public class Room {
+public class Room extends BaseEntity {
 
     @Id @GeneratedValue
     private Long id;

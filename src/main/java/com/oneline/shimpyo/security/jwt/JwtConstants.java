@@ -8,8 +8,8 @@ public class JwtConstants {
     public static final long MONTH = 30 * DAY;
 
     public static final long AT_EXP_TIME_NONE = 10 * MINUTE;
-    public static final long AT_EXP_TIME =  1 * MINUTE;
-    public static final long RT_EXP_TIME =  10 * MINUTE;
+    public static final long AT_EXP_TIME =  100 * MINUTE;
+    public static final long RT_EXP_TIME =  1000 * MINUTE;
     public static final long NON_MEMBER_EXP_TIME = MINUTE;
 
     // Secret

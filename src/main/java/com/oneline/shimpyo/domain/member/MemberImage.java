@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.member;
 
+import com.oneline.shimpyo.domain.base.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +15,7 @@ import static lombok.AccessLevel.*;
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "MEMBER_IMAGE")
-public class MemberImage {
+public class MemberImage extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "member_image_id")

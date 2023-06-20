@@ -37,6 +37,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     @Autowired
     private MemberRepository memberRepository;
 
+    // 코드를 보내서 엑세스토큰으로 소셜쪽에 요청해서 유저 정보를 받아온 상태
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
@@ -66,15 +67,17 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
             em.persist(memberGrade);
             em.flush();
 
+            // join
             member = member.builder()
                     .email(username)
-                    .password(bCryptPasswordEncoder.encode("비밀번호"))
+                    .password("쉼표")
                     .point(0)
                     .nickname(oAuth2UserInfo.getName())
                     .provider(provider)
                     .providerId(providerId)
                     .memberGrade(memberGrade)
                     .role(CLIENT).build();
+
             memberRepository.save(member);
         }
         else {

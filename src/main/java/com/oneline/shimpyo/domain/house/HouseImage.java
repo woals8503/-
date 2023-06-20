@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.domain.house;
 
+import com.oneline.shimpyo.domain.base.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import static javax.persistence.FetchType.LAZY;
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "HOUSE_IMAGE")
-public class HouseImage {
+public class HouseImage extends BaseEntity {
     @Id @GeneratedValue
     private Long id;
 
