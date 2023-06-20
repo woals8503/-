@@ -81,6 +81,9 @@ public class PaymentServiceImpl implements PaymentService {
         CancelData cancelData = createCancelData(response, patchReservationReq.getRefundAmount());
         iamportClient.cancelPaymentByImpUid(cancelData);
 
+        if(patchReservationReq.getRefundAmount() != FULL_REFUND){
+            payMent.setRemainPrice(payMent.getPrice() - patchReservationReq.getRefundAmount());
+        }
         payMent.setPayStatus(PayStatus.CANCEL);
 
         return reservation;
@@ -102,15 +105,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
-        CancelData cancelData;
-
         if (refundAmount == FULL_REFUND) {
-            cancelData = new CancelData(response.getResponse().getImpUid(), true);
-        } else {
-            cancelData = new CancelData(response.getResponse().getImpUid(), true, new BigDecimal(refundAmount));
+            return new CancelData(response.getResponse().getImpUid(), true);
         }
+        return new CancelData(response.getResponse().getImpUid(), true, new BigDecimal(refundAmount));
 
-        return cancelData;
     }
 
     private void checkDuplicatePayment(PostReservationReq postReservationReq) throws BaseException {
