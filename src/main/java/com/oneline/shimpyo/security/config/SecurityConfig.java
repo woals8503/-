@@ -79,13 +79,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(STATELESS);
-
         // cors 설정
         http.cors().configurationSource(corsConfigurationSource());
 
         // 모두 접근 가능
         http.authorizeRequests().antMatchers("/oauth2/**").permitAll();
-        
         // 비회원 회원 둘다 접근 가능
         http.authorizeRequests().antMatchers("/api/**").hasAnyAuthority("ROLE_ANONYMOUS", "CLIENT");
         // 회원만 접근 가능
@@ -116,7 +114,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 나중에 권한 필요한 설정 시 Custom 클래스 만들어서 제작 예정
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
 
-        http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+//        http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         /** 참고 : AuthenticationEntryPoint는 Security 인증이 되지 않은 유저가 요청했을 때 동작된다. [인증 불가 시] **/
     }
 

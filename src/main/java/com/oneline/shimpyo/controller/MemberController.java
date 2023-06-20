@@ -8,6 +8,14 @@ import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.OAuth2AuthorizationContext;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -131,23 +139,14 @@ public class MemberController {
         return new BaseResponse<>(tokens);
     }
 
-    @GetMapping("/public/test4")
+    @GetMapping("/api/test4")
     public String test4() {
-        Long memberId = jwtService.getMemberId();
-        if(memberId == null) {
-            System.out.println("비회원");
-        }
-        else System.out.println("회원");
+
         return "ok";
     }
 
     @GetMapping("/api/test3")
     public String test3(@CurrentMember Member member) {
-        if(member != null)
-            System.out.println("회원");
-
-        else
-            System.out.println("비회원");
         return "test";
     }
 
