@@ -114,7 +114,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 나중에 권한 필요한 설정 시 Custom 클래스 만들어서 제작 예정
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
 
-//        http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+        http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         /** 참고 : AuthenticationEntryPoint는 Security 인증이 되지 않은 유저가 요청했을 때 동작된다. [인증 불가 시] **/
     }
 
