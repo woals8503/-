@@ -46,7 +46,6 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-
     //이메일 중복 검사
     @PostMapping("/api/check-email")
     public BaseResponse<Void> duplicateEmail(@RequestBody EmailReq request) {
