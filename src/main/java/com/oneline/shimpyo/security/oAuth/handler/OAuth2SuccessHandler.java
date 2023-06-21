@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -38,54 +39,26 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-
-        Member member = memberRepository.findByEmail(principal.getMember().getEmail());
-
+        Member member = principal.getMember();
         // 이미 가입한 유저라면
-        if(member != null) {
-            String accessToken = generateToken(principal, true, AT_EXP_TIME);
-            String refreshToken = generateToken(principal, true, RT_EXP_TIME);
-
-            memberService.updateRefreshToken(principal.getMember().getEmail(), refreshToken);
-            response.setContentType(APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("utf-8");
-            response.addCookie(createCookie(refreshToken));
-
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put(AT_HEADER, accessToken);
-//            BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
-//            new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
-
+        if(member.getSocial()) {
             // 리다이렉트 타겟 url 생성 ( 로그인 성공 시 리다이렉트 URL )
             String targetUrl;
-            targetUrl = UriComponentsBuilder.fromUriString("/api/test4").build().toUriString();
+            targetUrl = UriComponentsBuilder.fromUriString("/api/test5")
+                    .build().toUriString();
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
         }
-
-        // 회원가입이 필요한 사용자라면
         else {
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put("email", principal.getUsername());
-            responseMap.put("nickname", principal.getMember().getNickname());
-            responseMap.put("provider", principal.getMember().getProvider());
-            responseMap.put("providerId", principal.getMember().getProviderId());
-//            BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
-//            new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
-            
-            // 메인페이지로 이동
+            log.info("추가정보를 입력받아야합니다.");
+
+            // 리다이렉트 url 생성
             String targetUrl;
-            targetUrl = UriComponentsBuilder.fromUriString("/api/test5").build().toUriString();
+            targetUrl = UriComponentsBuilder.fromUriString("/api/test4")
+                    .queryParam("memberId", member.getId())
+                    .build().toUriString();
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
         }
 
     }
 
-    private Cookie createCookie(String refreshToken) {
-        Cookie cookie = new Cookie(RT_HEADER, refreshToken);
-        cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24);
-        return cookie;
-    }
 }

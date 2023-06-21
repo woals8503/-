@@ -76,12 +76,14 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
                     .provider(provider)
                     .providerId(providerId)
                     .memberGrade(memberGrade)
-                    .role(CLIENT).build();
-
+                    .role(CLIENT)
+                    .social(false)
+                    .build();
+            // 일단 회원 DB 저장
             memberRepository.save(member);
         }
         else {
-            log.info("이미 로그인 되있습니다.");
+            log.info("이미 등록된 유저.");
         }
 
         return new PrincipalDetails(member, oAuth2User.getAttributes());

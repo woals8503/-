@@ -91,6 +91,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 new ObjectMapper().writeValue(response.getWriter(), errorResponse);
             }
         }
+
         else if(isEmpty(token)
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             Authentication authentication = createAnonymousAuthentication();
@@ -107,6 +108,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
         return new AnonymousAuthenticationToken(key, principal, authorities);
     }
+
     private String extractRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         String value = null;

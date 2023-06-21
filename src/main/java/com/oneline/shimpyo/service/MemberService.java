@@ -2,6 +2,7 @@ package com.oneline.shimpyo.service;
 
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
+import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 
 import javax.servlet.http.HttpServletResponse;
@@ -33,4 +34,6 @@ public interface MemberService {
     boolean duplicatePhoneNumber(String phoneNumber);
 
     void removeRefreshToken(Long id);
+
+    void oauthJoin(OAuthInfoReq oAuthInfoReq);
 }

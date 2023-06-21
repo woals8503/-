@@ -1,15 +1,20 @@
 package com.oneline.shimpyo.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oneline.shimpyo.domain.BaseResponse;
+import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.*;
+import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.auth.CurrentMember;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.OAuth2AuthorizationContext;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -21,11 +26,20 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
+import static com.oneline.shimpyo.domain.house.HouseType.*;
+import static com.oneline.shimpyo.domain.house.HouseType.MOTEL;
 import static com.oneline.shimpyo.modules.RegexValidator.*;
+import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
+import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
+import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.generateOAuth2Token;
+import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.generateToken;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
@@ -33,6 +47,7 @@ import static com.oneline.shimpyo.modules.RegexValidator.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final JwtService jwtService;
 
     @PostMapping("/api/join")
@@ -43,6 +58,18 @@ public class MemberController {
             return new BaseResponse<>(MEMBER_REGEX_WRONG);
 
         memberService.join(memberReq);
+        return new BaseResponse<>();
+    }
+
+    @PostMapping("/api/oauth-join")
+    public BaseResponse<Void> oauthJoin(@RequestBody OAuthInfoReq oAuthInfoReq) {
+
+        boolean isValid = validateOAuthRequest(oAuthInfoReq);
+
+        if(!isValid)
+            return new BaseResponse<>(MEMBER_REGEX_WRONG);
+
+        memberService.oauthJoin(oAuthInfoReq);
         return new BaseResponse<>();
     }
 
@@ -139,10 +166,28 @@ public class MemberController {
         return new BaseResponse<>(tokens);
     }
 
+    // 추가 회원가입 창 리다이렉트`
     @GetMapping("/api/test4")
-    public String test4() {
+    public BaseResponse<Map<String, String>> test4 (
+            @RequestParam("memberId") Long memberId,
+            HttpServletResponse response) {
+        Member member = memberRepository.findById(memberId).get();
 
-        return "ok";
+        // 토큰 생성
+        String accessToken = generateOAuth2Token(member, true, AT_EXP_TIME);
+        String refreshToken = generateOAuth2Token(member, true, RT_EXP_TIME);
+
+        // 토큰 저장
+        memberService.updateRefreshToken(member.getEmail(), refreshToken);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("utf-8");
+        response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
+
+        // 헤더 생성
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put(AT_HEADER, accessToken);
+
+        return new BaseResponse<>(responseMap);
     }
 
     @GetMapping("/api/test3")
@@ -150,9 +195,8 @@ public class MemberController {
         return "test";
     }
 
-    @GetMapping("/mypage/test")
+    @GetMapping("/api/test5")
     public String test5() {
-
         return "test";
     }
 
