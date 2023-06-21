@@ -1,16 +1,14 @@
 package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
-import com.oneline.shimpyo.domain.house.House;
-import com.oneline.shimpyo.domain.house.HouseAddress;
-import com.oneline.shimpyo.domain.house.HouseImage;
-import com.oneline.shimpyo.domain.house.HouseOptions;
+import com.oneline.shimpyo.domain.house.*;
 import com.oneline.shimpyo.domain.house.dto.FileReq;
-import com.oneline.shimpyo.domain.house.dto.HouseReq;
+import com.oneline.shimpyo.domain.house.dto.PatchHouseReq;
+import com.oneline.shimpyo.domain.house.dto.PostHouseReq;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.domain.room.RoomImage;
-import com.oneline.shimpyo.modules.FileUpload;
+import com.oneline.shimpyo.modules.S3FileHandler;
 import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.service.HouseService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.oneline.shimpyo.domain.BaseResponseStatus.AWS_S3_EXCEPTION;
+import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,15 +33,15 @@ public class HouseServiceImpl implements HouseService {
     private final HouseAddressRepository houseAddressRepository;
     private final HouseImageRepository houseImageRepository;
     private final RoomImageRepository roomImageRepository;
-    private final FileUpload fileUpload;
+    private final S3FileHandler s3FileHandler;
 
     @Override
     @Transactional
-    public long createHouse(Member member, HouseReq houseReq, List<MultipartFile> houseImages, List<MultipartFile> roomImages) throws BaseException {
+    public long createHouse(Member member, PostHouseReq houseReq, List<MultipartFile> houseImages, List<MultipartFile> roomImages) throws BaseException {
         // 1-1. 숙소 이미지 S3 버킷 저장
         List<FileReq> savedHouseImages = new ArrayList<>();
         for (MultipartFile houseImage : houseImages) {
-            Optional<FileReq> uploadedFile = fileUpload.s3Upload(houseImage);
+            Optional<FileReq> uploadedFile = s3FileHandler.uploadFile(houseImage);
             if (uploadedFile.isPresent()) {
                 savedHouseImages.add(uploadedFile.get());
             } else {
@@ -56,7 +54,7 @@ public class HouseServiceImpl implements HouseService {
         // 2-1. 객실 이미지 S3 버킷 저장
         List<FileReq> savedRoomImages = new ArrayList<>();
         for (MultipartFile roomImage : roomImages) {
-            Optional<FileReq> uploadedFile = fileUpload.s3Upload(roomImage);
+            Optional<FileReq> uploadedFile = s3FileHandler.uploadFile(roomImage);
             if (uploadedFile.isPresent()) {
                 savedRoomImages.add(uploadedFile.get());
             } else {
@@ -82,7 +80,7 @@ public class HouseServiceImpl implements HouseService {
                 .build();
         House savedHouse = houseRepository.save(toSaveHouse);
 
-        
+
         // 2. 숙소 옵션 저장
         List<HouseOptions> toSaveOptions = new ArrayList<>();
         if (houseReq.getOption().isWifi()) {
@@ -165,4 +163,96 @@ public class HouseServiceImpl implements HouseService {
         }
         return savedHouse.getId();
     }
+
+    @Override
+    @Transactional
+    public void updateHouse(Member member, long houseId, PatchHouseReq patchHouseReq, List<MultipartFile> houseImages) {
+        House foundHouse = houseRepository.findById(houseId)
+                .orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
+        if (foundHouse.getMember().getId() != member.getId()) throw new BaseException(HOUSE_MEMBER_WRONG);
+
+        // 숙소 기본 정보 수정
+        foundHouse.setName(patchHouseReq.getName());
+        foundHouse.setType(patchHouseReq.getType());
+        foundHouse.setContents(patchHouseReq.getContents());
+
+        // 숙소 옵션 수정 (삭제 후 재추가)
+        houseOptionRepository.deleteAllByHouseId(foundHouse.getId());
+        List<HouseOptions> toSaveOptions = new ArrayList<>();
+        if (patchHouseReq.getOption().isWifi()) {
+            toSaveOptions.add(HouseOptions.builder()
+                    .name("wifi")
+                    .house(foundHouse)
+                    .build());
+        }
+        if (patchHouseReq.getOption().isPc()) {
+            toSaveOptions.add(HouseOptions.builder()
+                    .name("pc")
+                    .house(foundHouse)
+                    .build());
+        }
+        if (patchHouseReq.getOption().isParking()) {
+            toSaveOptions.add(HouseOptions.builder()
+                    .name("parking")
+                    .house(foundHouse)
+                    .build());
+        }
+        if (patchHouseReq.getOption().isBbq()) {
+            toSaveOptions.add(HouseOptions.builder()
+                    .name("bbq")
+                    .house(foundHouse)
+                    .build());
+        }
+        houseOptionRepository.saveAll(toSaveOptions);
+
+        // 숙소 주소 수정
+        HouseAddress foundAddress = houseAddressRepository.findByHouseId(foundHouse.getId())
+                .orElseThrow(() -> new BaseException(ADDRESS_NONEXISTENT));
+        foundAddress.setSido(patchHouseReq.getAddress().getSido());
+        foundAddress.setPostCode(patchHouseReq.getAddress().getPostCode());
+        foundAddress.setSigungu(patchHouseReq.getAddress().getSigungu());
+        foundAddress.setFullAddress(patchHouseReq.getAddress().getFullAddress());
+        foundAddress.setLat(patchHouseReq.getAddress().getLat());
+        foundAddress.setLng(patchHouseReq.getAddress().getLng());
+
+        // 파일 업로드 수정
+        if (patchHouseReq.getPatchImageReqs() != null) {
+            List<HouseImage> foundImages = houseImageRepository.findAllByHouseId(foundHouse.getId());
+            int houseImageIdx = 0;
+            for (int i = 0; i < patchHouseReq.getPatchImageReqs().size(); i++) {
+                int imageCount = patchHouseReq.getPatchImageReqs().get(i).getImageCount();
+                ImageStatus imageStatus = patchHouseReq.getPatchImageReqs().get(i).getImageStatus();
+                if (imageStatus.equals(ImageStatus.ADD)){
+                    if (foundImages.size() == 5) throw new BaseException(IMAGE_STATUS_FULL);
+                    Optional<FileReq> uploadedFile = s3FileHandler.uploadFile(houseImages.get(houseImageIdx));
+                    if (uploadedFile.isPresent()) {
+                        HouseImage toSaveHouseImage = HouseImage.builder()
+                                .house(foundHouse)
+                                .originalFileName(uploadedFile.get().getOriginalFileName())
+                                .savedURL(uploadedFile.get().getSavedURL())
+                                .build();
+                        houseImageRepository.save(toSaveHouseImage);
+                        houseImageIdx++;
+                    }
+                }
+                else if (imageStatus.equals(ImageStatus.MODIFY)) {
+                    Optional<FileReq> uploadedFile = s3FileHandler.uploadFile(houseImages.get(houseImageIdx));
+                    if (uploadedFile.isPresent()) {
+                        // S3 버킷에 존재하는 기존 파일 삭제
+                        s3FileHandler.removeFile(foundImages.get(imageCount).getSavedURL());
+                        // 새로 저장한 파일 정보로 업데이트
+                        foundImages.get(imageCount).setOriginalFileName(uploadedFile.get().getOriginalFileName());
+                        foundImages.get(imageCount).setSavedURL(uploadedFile.get().getSavedURL());
+                        houseImageIdx++;
+                    }
+                } else {
+                    // S3 버킷에 존재하는 기존 파일 삭제
+                    s3FileHandler.removeFile(foundImages.get(imageCount).getSavedURL());
+                    // DB에 파일 정보 삭제
+                    houseImageRepository.deleteById(foundImages.get(imageCount).getId());
+                }
+            }
+        }
+    }
+
 }
