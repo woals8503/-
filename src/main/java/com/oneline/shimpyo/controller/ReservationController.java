@@ -49,10 +49,28 @@ public class ReservationController {
     public BaseResponse<GetPageRes<GetReservationListRes>> readReservationList(
             @CurrentMember Member member,
             @PathVariable long memberId,
-            @PageableDefault Pageable pageable){
+            @PageableDefault Pageable pageable) {
 
         checkMember.checkCurrentMember(member, memberId);
         return new BaseResponse<>(reservationService.readReservationList(memberId, pageable));
+    }
+
+    @GetMapping("/{reservationId}")
+    public BaseResponse<GetReservationRes> readReservation(@PathVariable long reservationId,
+                                                           @CurrentMember Member member) {
+        long memberId = checkMember.getMemberId(member, true);
+        GetReservationRes getReservationRes = reservationService.readReservation(memberId, reservationId);
+
+        return new BaseResponse<>(getReservationRes);
+    }
+
+    @PatchMapping("/{reservationId}/people-count")
+    public BaseResponse<Void> updateReservationPeopleCount(@PathVariable long reservationId,
+                                                           @RequestBody PatchReservationPeopleReq patchReservationPeopleReq,
+                                                           @CurrentMember Member member){
+        long memberId = checkMember.getMemberId(member, true);
+        reservationService.updateReservationPeopleCount(memberId, reservationId, patchReservationPeopleReq.getPeopleCount());
+        return new BaseResponse<>();
     }
 
     @PatchMapping("/{reservationId}")

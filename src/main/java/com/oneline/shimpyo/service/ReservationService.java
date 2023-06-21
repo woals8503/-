@@ -2,10 +2,7 @@ package com.oneline.shimpyo.service;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.GetPageRes;
-import com.oneline.shimpyo.domain.reservation.dto.GetPrepareReservationRes;
-import com.oneline.shimpyo.domain.reservation.dto.GetReservationListRes;
-import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
-import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
+import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import org.springframework.data.domain.Pageable;
 
@@ -17,6 +14,8 @@ public interface ReservationService {
     long createReservation(long memberId, PostReservationReq postReservationReq)
             throws BaseException, IamportResponseException, IOException;
     GetPageRes<GetReservationListRes> readReservationList(long memberId, Pageable pageable);
+    GetReservationRes readReservation(long memberId, long reservationId);
+    void updateReservationPeopleCount(long memberId, long reservationId, int peopleCount);
     void cancelReservation(long memberId, long reservationId, PatchReservationReq patchReservationReq)
             throws BaseException, IamportResponseException, IOException;
 

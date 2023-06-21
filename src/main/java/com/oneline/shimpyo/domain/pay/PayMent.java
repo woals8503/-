@@ -39,6 +39,7 @@ public class PayMent extends BaseEntity {
     @NotNull
     private int price;
 
+    private int remainPrice;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "coupon_id")
