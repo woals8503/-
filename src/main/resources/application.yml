@@ -12,10 +12,10 @@ cloud:
     region.static: ap-northeast-2
 
 spring:
-  profiles:
-    include: db
-#  config:
-#    import: db-config.yml
+#  profiles:
+#    include: db
+  config:
+    import: db-config.yml
 
   #    config import 지정해줘야 데이터 저장됨
   jwt:
@@ -49,7 +49,7 @@ spring:
           google:
             client-id: 479304112287-brdp845tmalh8o7obogv81hi1387pso8.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: http://shimpyo-api.p-e.kr:8081/login/oauth2/code/google # 이 uri에 코드 값을 넘겨준다
+            redirect-uri: http://localhost:8081/login/oauth2/code/google # 이 uri에 코드 값을 넘겨준다
             scope:
               - email
               - profile

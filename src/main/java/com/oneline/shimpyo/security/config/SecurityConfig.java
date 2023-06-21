@@ -1,6 +1,5 @@
 package com.oneline.shimpyo.security.config;
 
-import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.security.filter.CustomAuthenticationFilter;
 import com.oneline.shimpyo.security.filter.CustomAuthorizationFilter;
 import com.oneline.shimpyo.security.handler.CustomLogoutSuccessHandler;
@@ -19,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -108,7 +106,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 필터
         http.addFilterBefore(anonymousAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(customAuthorizationFilter, AnonymousAuthenticationFilter.class);
-        http.addFilter(filter); // 로그인 필터
+        // 로그인 필터
+        http.addFilter(filter);
 
         // 권한 체크 후 엑세스할 수 없는 요청 시 동작 ( ex : 일반유저가 admin 권한이 필요한 url 요청 시 동작 [권한 없을 시])
         // 나중에 권한 필요한 설정 시 Custom 클래스 만들어서 제작 예정

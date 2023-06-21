@@ -38,6 +38,17 @@ public class JwtTokenUtil {
                 .sign(HMAC256(JWT_SECRET));
     }
 
+    public static String generateOAuth2Token(Member member, boolean isMember, long EXP_TIME) {
+        return JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXP_TIME))
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withClaim("isMember", isMember)
+                .withClaim("username", member.getEmail())
+                .withClaim("id", member.getId())
+                .sign(HMAC256(JWT_SECRET));
+    }
+
 
     // 재발급 토큰
     public static String reissuanceAccessToken(Member member, boolean isMember, long EXP_TIME, long now) {

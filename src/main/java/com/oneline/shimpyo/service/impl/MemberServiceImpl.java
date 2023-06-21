@@ -10,6 +10,7 @@ import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
+import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
@@ -162,6 +163,11 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void removeRefreshToken(Long id) {
         memberRepository.removeRefreshToken(id);
+    }
+
+    @Override
+    public void oauthJoin(OAuthInfoReq oAuthInfoReq) {
+
     }
 
 }

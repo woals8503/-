@@ -49,6 +49,7 @@ public class Member extends BaseEntity {
 
     private String provider;
     private String providerId;
+    private Boolean social;
 
     @Lob
     private String refreshToken;
@@ -79,7 +80,7 @@ public class Member extends BaseEntity {
     private List<House> houseList = new ArrayList<>();
 
     @Builder
-    public Member(String email, String password, String phoneNumber, int point, String nickname, String provider, String providerId, MemberGrade memberGrade, MemberRole role) {
+    public Member(String email, String password, String phoneNumber, int point, String nickname, String provider, String providerId, MemberGrade memberGrade, MemberRole role, boolean social) {
         this.email = email;
         this.password = password;
         this.point = point;
@@ -88,6 +89,7 @@ public class Member extends BaseEntity {
         this.providerId = providerId;
         this.memberGrade = memberGrade;
         this.role = role;
+        this.social = social;
     }
 
     public Member(MemberReq request, CustomBCryptPasswordEncoder bCryptPasswordEncoder,  MemberGrade memberGrade) {
@@ -98,6 +100,7 @@ public class Member extends BaseEntity {
         this.point = 0;
         this.memberGrade = memberGrade;
         this.role = CLIENT;
+        this.social = false;
         memberGrade.getMembers().add(this);
     }
 
