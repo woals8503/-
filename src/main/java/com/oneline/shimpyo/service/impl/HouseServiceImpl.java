@@ -217,12 +217,12 @@ public class HouseServiceImpl implements HouseService {
 
         // 파일 업로드 수정
         if (patchHouseReq.getPatchImageReqs() != null) {
-            List<HouseImage> foundImages = houseImageRepository.findAllByHouseId(foundHouse.getId());
             int houseImageIdx = 0;
             for (int i = 0; i < patchHouseReq.getPatchImageReqs().size(); i++) {
                 int imageCount = patchHouseReq.getPatchImageReqs().get(i).getImageCount();
                 ImageStatus imageStatus = patchHouseReq.getPatchImageReqs().get(i).getImageStatus();
                 if (imageStatus.equals(ImageStatus.ADD)){
+                    List<HouseImage> foundImages = houseImageRepository.findAllByHouseId(foundHouse.getId());
                     if (foundImages.size() == 5) throw new BaseException(IMAGE_STATUS_FULL);
                     Optional<FileReq> uploadedFile = s3FileHandler.uploadFile(houseImages.get(houseImageIdx));
                     if (uploadedFile.isPresent()) {
@@ -238,6 +238,7 @@ public class HouseServiceImpl implements HouseService {
                 else if (imageStatus.equals(ImageStatus.MODIFY)) {
                     Optional<FileReq> uploadedFile = s3FileHandler.uploadFile(houseImages.get(houseImageIdx));
                     if (uploadedFile.isPresent()) {
+                        List<HouseImage> foundImages = houseImageRepository.findAllByHouseId(foundHouse.getId());
                         // S3 버킷에 존재하는 기존 파일 삭제
                         s3FileHandler.removeFile(foundImages.get(imageCount).getSavedURL());
                         // 새로 저장한 파일 정보로 업데이트
@@ -246,6 +247,7 @@ public class HouseServiceImpl implements HouseService {
                         houseImageIdx++;
                     }
                 } else {
+                    List<HouseImage> foundImages = houseImageRepository.findAllByHouseId(foundHouse.getId());
                     // S3 버킷에 존재하는 기존 파일 삭제
                     s3FileHandler.removeFile(foundImages.get(imageCount).getSavedURL());
                     // DB에 파일 정보 삭제

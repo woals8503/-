@@ -55,12 +55,13 @@ public enum BaseResponseStatus {
     //house 3040
     HOUSE_NONEXISTENT(false, 3040,"존재하지 않는 숙소입니다."),
     IMAGE_STATUS_NONEXISTENT(false, 3041, "이미지 상태가 올바르지 않습니다."),
-    IMAGE_STATUS_FULL(false, 3042, "이미 첨부된 이미지 개수가 최대입니다."),
+    IMAGE_STATUS_FULL(false, 3042, "이미지는 최대 5장까지 등록할 수 있습니다."),
     ADDRESS_NONEXISTENT(false, 3043, "해당 숙소의 주소정보가 존재하지 않습니다."),
     HOUSE_MEMBER_WRONG(false, 3044, "요청한 회원과 숙소 등록자가 일치하지 않습니다."),
 
     //room 3060
     ROOM_NONEXISTENT(false, 3060,"존재하지 않는 방입니다."),
+    ROOM_MEMBER_WRONG(false, 3061, "요청한 회원과 객실 등록자가 일치하지 않습니다."),
 
     //review 3080
     REVIEW_NONEXISTENT(false, 3080,"존재하지 않는 리뷰입니다."),

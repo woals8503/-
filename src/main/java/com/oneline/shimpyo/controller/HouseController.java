@@ -21,7 +21,6 @@ import java.util.List;
 public class HouseController {
 
     private final HouseService houseService;
-    private final CheckMember checkMember;
 
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<HouseRegisterRes> createHouse(@RequestPart(value = "houseReq") PostHouseReq houseReq, @RequestPart(value = "houseImages") List<MultipartFile> houseImages
