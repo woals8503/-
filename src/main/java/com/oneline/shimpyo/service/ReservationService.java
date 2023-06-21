@@ -15,6 +15,7 @@ public interface ReservationService {
             throws BaseException, IamportResponseException, IOException;
     GetPageRes<GetReservationListRes> readReservationList(long memberId, Pageable pageable);
     GetReservationRes readReservation(long memberId, long reservationId);
+    void updateReservationPeopleCount(long memberId, long reservationId, int peopleCount);
     void cancelReservation(long memberId, long reservationId, PatchReservationReq patchReservationReq)
             throws BaseException, IamportResponseException, IOException;
 

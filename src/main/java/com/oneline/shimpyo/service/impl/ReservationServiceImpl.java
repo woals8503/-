@@ -61,6 +61,11 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.findById(postReservationReq.getRoomId())
                 .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
 
+        if(room.getMaxPeople() < postReservationReq.getPeopleCount() ||
+                room.getMinPeople() > postReservationReq.getPeopleCount()){
+            throw new BaseException(RESERVATION_WRONG_PEOPLE_COUNT);
+        }
+
         Reservation reservation = Reservation.builder().room(room).member(member).payMent(payment)
                 .peopleCount(postReservationReq.getPeopleCount()).phoneNumber(postReservationReq.getPhoneNumber())
                 .reservationStatus(ReservationStatus.COMPLETE)
@@ -81,14 +86,38 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public GetReservationRes readReservation(long memberId, long reservationId) {
-        memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
-        reservationRepository.findById(reservationId).orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
+
+        validateMember(memberId, reservation.getMember().getId());
 
         GetReservationRes getReservationRes = reservationQuerydsl.readReservation(reservationId);
         List<HouseImage> houseImageList = houseImageRepository.findByHouseId(getReservationRes.getHouseId());
         getReservationRes.setHouseImageUrl(houseImageList.stream().map(HouseImage::getSavedURL).collect(Collectors.toList()));
 
         return getReservationRes;
+    }
+
+    @Transactional
+    @Override
+    public void updateReservationPeopleCount(long memberId, long reservationId,
+                                             int peopleCount) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
+        Room room = roomRepository.findById(reservation.getRoom().getId())
+                .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
+
+        validateMember(memberId, reservation.getMember().getId());
+
+        if (reservation.getReservationStatus() != ReservationStatus.COMPLETE) {
+            throw new BaseException(RESERVATION_CANCEL_OR_FINISHED);
+        }
+
+        if(room.getMaxPeople() < peopleCount || room.getMinPeople() > peopleCount){
+            throw new BaseException(RESERVATION_WRONG_PEOPLE_COUNT);
+        }
+
+        reservation.setPeopleCount(peopleCount);
     }
 
     @Transactional
@@ -100,4 +129,9 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setReservationStatus(ReservationStatus.CANCEL);
     }
 
+    private void validateMember(long requestMemberId, long dbMemberId) {
+        if(requestMemberId != dbMemberId){
+            throw new BaseException(INVALID_MEMBER);
+        }
+    }
 }

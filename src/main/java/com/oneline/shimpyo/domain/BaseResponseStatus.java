@@ -66,10 +66,11 @@ public enum BaseResponseStatus {
 
     //reservation 3100
     RESERVATION_NONEXISTENT(false, 3100,"존재하지 않는 예약입니다."),
-    RESERVATION_CANCEL(false, 3101,"취소된 예약입니다."),
+    RESERVATION_CANCEL_OR_FINISHED(false, 3101,"취소되거나 이용완료된 예약입니다."),
     PAYMENT_DUPLICATE(false, 3102, "중복된 결제입니다."),
     PAYMENT_WRONG(false, 3103,"올바른 결제가 아닙니다."),
     REFUND_WRONG(false, 3104, "환불 가능 금액보다 환불 요구 금액이 더 큽니다."),
+    RESERVATION_WRONG_PEOPLE_COUNT(false, 3105, "인원수가 잘못되었습니다."),
 
     //coupon 3120
     COUPON_NONEXISTENT(false, 3120,"존재하지 않는 쿠폰입니다."),
