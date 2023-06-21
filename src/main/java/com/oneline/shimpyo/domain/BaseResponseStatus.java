@@ -30,6 +30,7 @@ public enum BaseResponseStatus {
     REVIEW_RATING_WRONG(false, 2080,"잘못된 리뷰 별점입니다."),
 
     //reservation 2100
+    RESERVATION_STATUS_WRONG(false, 2100,"잘못된 예약 상태입니다."),
     PAYMENT_METHOD_WRONG(false, 2110,"잘못된 결제 수단입니다."),
 
     //coupon 2120
@@ -71,6 +72,7 @@ public enum BaseResponseStatus {
     PAYMENT_WRONG(false, 3103,"올바른 결제가 아닙니다."),
     REFUND_WRONG(false, 3104, "환불 가능 금액보다 환불 요구 금액이 더 큽니다."),
     RESERVATION_WRONG_PEOPLE_COUNT(false, 3105, "인원수가 잘못되었습니다."),
+    RESERVATION_HOST_HOUSE_EMPTY(false, 3106, "호스트하는 숙소가 없습니다"),
 
     //coupon 3120
     COUPON_NONEXISTENT(false, 3120,"존재하지 않는 쿠폰입니다."),

@@ -6,6 +6,7 @@ import com.oneline.shimpyo.domain.GetPageRes;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.house.HouseImage;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.modules.CheckMember;
 import com.oneline.shimpyo.repository.HouseImageRepository;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,6 +64,20 @@ public class ReservationController {
         GetReservationRes getReservationRes = reservationService.readReservation(memberId, reservationId);
 
         return new BaseResponse<>(getReservationRes);
+    }
+
+    @GetMapping("/houses/{houseId}")
+    public BaseResponse<GetHouseReservationRes> readHouseReservationList(@PathVariable(required = false) Optional<Long> houseId,
+                                                                         @RequestParam(required = false, defaultValue = "USING")
+                                                                         String reservationStatus,
+                                                                         @PageableDefault Pageable pageable,
+                                                                         @CurrentMember Member member){
+        long memberId = checkMember.getMemberId(member, true);
+
+        GetHouseReservationRes getHouseReservationRes = reservationService
+                .readHouseReservationList(memberId, houseId.orElse(0L),
+                        ReservationStatus.of(reservationStatus), pageable);
+        return new BaseResponse<>(getHouseReservationRes);
     }
 
     @PatchMapping("/{reservationId}/people-count")
