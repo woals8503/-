@@ -40,23 +40,30 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throws IOException, ServletException {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = principal.getMember();
+
         // 이미 가입한 유저라면
         if(member.getSocial()) {
             // 리다이렉트 타겟 url 생성 ( 로그인 성공 시 리다이렉트 URL )
             String targetUrl;
-            targetUrl = UriComponentsBuilder.fromUriString("/api/test5")
+            targetUrl = UriComponentsBuilder.fromUriString("/api/test5")    // -> 메인페이지
                     .build().toUriString();
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
         }
+        // 회원 x
         else {
             log.info("추가정보를 입력받아야합니다.");
 
-            // 리다이렉트 url 생성
-            String targetUrl;
-            targetUrl = UriComponentsBuilder.fromUriString("/api/test4")
-                    .queryParam("memberId", member.getId())
-                    .build().toUriString();
-            getRedirectStrategy().sendRedirect(request, response, targetUrl);
+            //
+            //
+            BaseResponse<Void> mapBaseResponse = new BaseResponse<>();
+            new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
+
+            // 리다이렉트 url 생성 ( 메인페이지로 됬으면 좋겠음 )
+//            String targetUrl;
+//            targetUrl = UriComponentsBuilder.fromUriString("/api/test4")    // -> 추가 회원가입 창
+//                    .queryParam("memberId", member.getId())
+//                    .build().toUriString();
+//            getRedirectStrategy().sendRedirect(request, response, targetUrl);
         }
 
     }

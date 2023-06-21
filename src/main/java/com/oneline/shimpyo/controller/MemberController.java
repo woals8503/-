@@ -12,7 +12,11 @@ import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.HttpHead;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.OAuth2AuthorizationContext;
@@ -21,7 +25,10 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -167,7 +174,7 @@ public class MemberController {
     }
 
     // 추가 회원가입 창 리다이렉트`
-    @GetMapping("/api/test4")
+    @GetMapping("/api/")
     public BaseResponse<Map<String, String>> test4 (
             @RequestParam("memberId") Long memberId,
             HttpServletResponse response) {
@@ -189,6 +196,46 @@ public class MemberController {
 
         return new BaseResponse<>(responseMap);
     }
+
+//    @GetMapping("/google")
+//    public String googleOAuthRedirect(@RequestParam String code) {
+//        RestTemplate rt = new RestTemplate();
+//
+//        HttpHead headers = new HttpHead();
+//
+//        headers.addHeader("Content-Type", "application/x-www-form-urlencoded");
+//
+//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+//        params.add("client_id", "479304112287-brdp845tmalh8o7obogv81hi1387pso8.apps.googleusercontent.com");
+//        params.add("client_secret", "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-ZN");
+//        params.add("code", code);
+//        params.add("grant_type", "authorization_code");
+//        params.add("redirect_uri", "http://shimpyo-api.p-e.kr:8081/login/oauth2/code/google");
+//
+//        HttpEntity<MultiValueMap<String, String>> accessTokenRequest = new HttpEntity<>(params, (MultiValueMap<String, String>) headers);
+//
+//        ResponseEntity<String> accessTokenResponse = rt.exchange(
+//                "https://oauth2.googleapis.com/token",
+//                HttpMethod.POST,
+//                accessTokenRequest,
+//                String.class
+//        );
+//
+//        // 여기서부터, 프로필 정보 얻어오는 요청
+//        HttpHeaders headers1 = new HttpHeaders();
+//        headers1.add("Authorization", "Bearer " + googleOauthParams.getAccess_token());
+//
+//        HttpEntity profileRequest = new HttpEntity(headers1);
+//
+//        ResponseEntity<String> profileResponse = rt.exchange(
+//                "https://oauth2.googleapis.com/tokeninfo?id_token=" + googleOauthParams.getId_token(),
+//                HttpMethod.GET,
+//                profileRequest,
+//                String.class
+//        );
+//
+//        return "프로필 정보 : " + profileResponse.getBody();
+//    }
 
     @GetMapping("/api/test3")
     public String test3(@CurrentMember Member member) {

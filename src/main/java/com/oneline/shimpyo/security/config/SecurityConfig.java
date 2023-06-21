@@ -18,6 +18,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -82,12 +92,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // 모두 접근 가능
         http.authorizeRequests().antMatchers("/oauth2/**").permitAll();
+        http.authorizeRequests().antMatchers("/login/**").permitAll();
         // 비회원 회원 둘다 접근 가능
         http.authorizeRequests().antMatchers("/api/**").hasAnyAuthority("ROLE_ANONYMOUS", "CLIENT");
         // 회원만 접근 가능
         http.authorizeRequests().antMatchers("/user/**").hasAnyAuthority("CLIENT");
         // 그 외에 인증 필요
-        http.authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests().anyRequest().permitAll();
 
         // 로그아웃 설정
         http.logout()
@@ -98,14 +109,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .invalidateHttpSession(true);
 
         // OAuth2 설정
-        http.oauth2Login()
-                .successHandler(successHandler)
-                .userInfoEndpoint()
-                .userService(principalOauth2UserService);
+//        http.oauth2Login()
+//                .successHandler(successHandler)
+//                .userInfoEndpoint()
+//                .userService(principalOauth2UserService);
 
         // 필터
         http.addFilterBefore(anonymousAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(customAuthorizationFilter, AnonymousAuthenticationFilter.class);
+
         // 로그인 필터
         http.addFilter(filter);
 
