@@ -2,8 +2,10 @@ package com.oneline.shimpyo.modules;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.house.dto.FileReq;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,14 +18,15 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class FileUpload {
+@Slf4j
+public class S3FileHandler {
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    public Optional<FileReq> s3Upload(MultipartFile file) {
+    public Optional<FileReq> uploadFile(MultipartFile file) {
         try {
             String originalFileName = file.getOriginalFilename();
             String today = new SimpleDateFormat("yyMMdd").format(new Date()) + "/"; // 230615
@@ -51,6 +54,18 @@ public class FileUpload {
         } catch (Exception e) {
             e.printStackTrace();
             return Optional.ofNullable(null);
+        }
+    }
+
+    public void getFile(String fileURL) {
+        String key = fileURL.substring(60);
+    }
+    public void removeFile(String fileURL) {
+        try {
+            String key = fileURL.substring(61);
+            amazonS3Client.deleteObject(bucket, key);
+        } catch (Exception e) {
+            log.info("AWS S3 파일 제거 실패");
         }
     }
 
