@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.controller;
 
+import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.room.dto.PatchRoomReq;
 import com.oneline.shimpyo.security.auth.CurrentMember;
@@ -17,9 +18,9 @@ public class RoomController {
     private final RoomService roomService;
 
     @PatchMapping("/{roomId}")
-    public void updateRoom(@CurrentMember Member member, @PathVariable long roomId, @RequestPart PatchRoomReq patchRoomReq
+    public BaseResponse<Void> updateRoom(@CurrentMember Member member, @PathVariable long roomId, @RequestPart PatchRoomReq patchRoomReq
                             , @RequestPart(value = "roomImages", required = false)List<MultipartFile> roomImages) {
         roomService.updateRoom(member, roomId, patchRoomReq, roomImages);
-
+        return new BaseResponse<>();
     }
 }
