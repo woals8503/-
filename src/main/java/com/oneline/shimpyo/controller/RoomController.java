@@ -23,4 +23,10 @@ public class RoomController {
         roomService.updateRoom(member, roomId, patchRoomReq, roomImages);
         return new BaseResponse<>();
     }
+
+    @DeleteMapping("/{roomId}")
+    public BaseResponse<Void> deleteRoom(@CurrentMember Member member, @PathVariable long roomId) {
+        roomService.deleteRoom(member, roomId);
+        return new BaseResponse<>();
+    }
 }

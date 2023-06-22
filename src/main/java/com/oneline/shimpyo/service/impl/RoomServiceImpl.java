@@ -90,4 +90,17 @@ public class RoomServiceImpl implements RoomService {
             }
         }
     }
+
+    @Override
+    @Transactional
+    public void deleteRoom(Member member, long roomId) {
+        Room foundRoom = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
+        if (member.getId() != foundRoom.getHouse().getMember().getId()) throw new BaseException(ROOM_MEMBER_WRONG);
+        List<RoomImage> roomImages = roomImageRepository.findAllByRoomId(foundRoom.getId());
+        for (int i = 0; i < roomImages.size(); i++) {
+            s3FileHandler.removeFile(roomImages.get(i).getSavedURL());
+        }
+        roomRepository.deleteById(roomId);
+    }
 }

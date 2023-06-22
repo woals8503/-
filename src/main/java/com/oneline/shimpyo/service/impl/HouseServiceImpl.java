@@ -11,6 +11,7 @@ import com.oneline.shimpyo.domain.room.RoomImage;
 import com.oneline.shimpyo.modules.S3FileHandler;
 import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.service.HouseService;
+import com.oneline.shimpyo.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -255,6 +256,28 @@ public class HouseServiceImpl implements HouseService {
                 }
             }
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteHouse(Member member, long houseId) {
+        House foundHouse = houseRepository.findById(houseId)
+                .orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
+        if (member.getId() != foundHouse.getMember().getId()) throw new BaseException(HOUSE_MEMBER_WRONG);
+        // AWS의 숙소 이미지 삭제
+        List<HouseImage> foundHouseImages = houseImageRepository.findAllByHouseId(foundHouse.getId());
+        for (HouseImage houseImage : foundHouseImages) {
+            s3FileHandler.removeFile(houseImage.getSavedURL());
+        }
+        // AWS의 객실 이미지 삭제
+        List<Room> foundRooms = roomRepository.findAllByHouseId(foundHouse.getId());
+        for (Room room : foundRooms) {
+            for (RoomImage roomImage : room.getImages()) {
+                s3FileHandler.removeFile(roomImage.getSavedURL());
+            }
+        }
+        // 숙소 관련 모든 정보 삭제(CASCADE)
+        houseRepository.deleteById(houseId);
     }
 
 }
