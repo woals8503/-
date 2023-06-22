@@ -18,6 +18,10 @@ spring:
 #    import: db-config.yml
 
   #    config import 지정해줘야 데이터 저장됨
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 20GB
   jwt:
     secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
 
@@ -80,8 +84,3 @@ oauth2:
     redirect-uri: http://shimpyo-api.p-e.kr:8081/login/oauth2/code/google
     token-uri: https://oauth2.googleapis.com/token
     resource-uri: https://www.googleapis.com/oauth2/v2/userinfo
-
-  servlet:
-    multipart:
-      max-file-size: 1GB
-      max-request-size: 20GB
