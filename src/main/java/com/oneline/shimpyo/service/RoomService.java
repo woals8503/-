@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface RoomService {
     void updateRoom(Member member, long roomId, PatchRoomReq patchRoomReq, List<MultipartFile> roomImages);
+
+    void deleteRoom(Member member, long roomId);
 }

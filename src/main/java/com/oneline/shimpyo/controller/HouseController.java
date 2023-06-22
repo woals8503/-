@@ -38,4 +38,10 @@ public class HouseController {
         return new BaseResponse<>();
     }
 
+    @DeleteMapping("/{houseId}")
+    public BaseResponse<Void> deleteHouse(@CurrentMember Member member, @PathVariable long houseId) {
+        houseService.deleteHouse(member, houseId);
+        return new BaseResponse<>();
+    }
+
 }
