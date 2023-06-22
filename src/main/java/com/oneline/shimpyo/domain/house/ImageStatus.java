@@ -23,7 +23,7 @@ public enum ImageStatus {
         return label;
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ImageStatus findByMethod(String type) throws BaseException {
         return Stream.of(ImageStatus.values())
                 .filter(c -> c.name().equals(type))
