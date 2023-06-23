@@ -60,7 +60,6 @@ spring:
               - email
               - profile
 
-<<<<<<< HEAD
           naver:
             client-id: _XbZbvXtTn_gNAve4jCD
             client-secret: 6W3UzR_fDG
@@ -86,16 +85,4 @@ spring:
 #    token-uri: https://oauth2.googleapis.com/token
 #    resource-uri: https://www.googleapis.com/oauth2/v2/userinfo
 
-  servlet:
-    multipart:
-      max-file-size: 1GB
-      max-request-size: 20GB
-=======
-oauth2:
-  google:
-    client-id: 479304112287-brdp845tmalh8o7obogv81hi1387pso8.apps.googleusercontent.com
-    client-secret: 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
-    redirect-uri: http://shimpyo-api.p-e.kr:8081/login/oauth2/code/google
-    token-uri: https://oauth2.googleapis.com/token
-    resource-uri: https://www.googleapis.com/oauth2/v2/userinfo
->>>>>>> acaa5608c69eb066f4a7c45d541e887f9385c9ce
+
