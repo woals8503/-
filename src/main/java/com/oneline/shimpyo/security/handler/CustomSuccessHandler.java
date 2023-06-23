@@ -58,12 +58,12 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
         ResponseCookie cookie = ResponseCookie.from(RT_HEADER, refreshToken)
                 .path("/")
-                .sameSite("Lax")
-                .secure(false)
+                .sameSite("None")
+                .secure(true)
                 .httpOnly(true)
                 .maxAge(60 * 60 * 24)
                 .build();
-
+        
         return cookie;
     }
 }
