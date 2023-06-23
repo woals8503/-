@@ -41,7 +41,6 @@ public class Member extends BaseEntity {
     @NotNull
     private int point;
 
-    @NotNull
     private String nickname;
 
     private String phoneNumber;
@@ -79,11 +78,10 @@ public class Member extends BaseEntity {
     private List<House> houseList = new ArrayList<>();
 
     @Builder
-    public Member(String email, String password, String phoneNumber, int point, String nickname, String provider, MemberGrade memberGrade, MemberRole role, boolean social) {
+    public Member(String email, String password, String phoneNumber, int point, String provider, MemberGrade memberGrade, MemberRole role, boolean social) {
         this.email = email;
         this.password = password;
         this.point = point;
-        this.nickname = nickname;
         this.provider = provider;
         this.memberGrade = memberGrade;
         this.role = role;

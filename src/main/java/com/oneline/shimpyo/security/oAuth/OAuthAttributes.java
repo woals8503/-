@@ -16,9 +16,7 @@ public enum OAuthAttributes {
 
     NAVER("naver", (attributes) -> {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-        System.out.println(response);
         MemberProfile memberProfile = new MemberProfile();
-        memberProfile.setName((String) response.get("name"));
         memberProfile.setEmail(((String) response.get("email")));
         return memberProfile;
     }),

@@ -53,13 +53,14 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName(); // OAuth 로그인 시 키(pk)가 되는 값
-
+        System.out.println("userName : " + userNameAttributeName);
         Map<String, Object> attributes = oAuth2User.getAttributes(); // OAuth 서비스의 유저 정보들
 
         MemberProfile memberProfile = OAuthAttributes.extract(registrationId, attributes); // registrationId에 따라 유저 정보를 통해 공통된 UserProfile 객체로 만들어 줌
         memberProfile.setProvider(registrationId);
 
         Member member = saveOrUpdate(memberProfile);
+        System.out.println("email : " + member.getEmail());
 
         Map<String, Object> customAttribute = customAttribute(attributes, userNameAttributeName, memberProfile, registrationId);
 
@@ -70,7 +71,6 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> customAttribute = new LinkedHashMap<>();
         customAttribute.put(userNameAttributeName, attributes.get(userNameAttributeName));
         customAttribute.put("provider", registrationId);
-        customAttribute.put("name", memberProfile.getName());
         customAttribute.put("email", memberProfile.getEmail());
         return customAttribute;
     }

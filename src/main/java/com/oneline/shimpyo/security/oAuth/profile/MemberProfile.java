@@ -29,8 +29,8 @@ public class MemberProfile {
                 .email(email)   // -> email
                 .password(CustomBCryptPasswordEncoder.encode("shimpyo"))
                 .provider(provider) // -> google
-                .nickname(name) // -> 성명
                 .memberGrade(memberGrade)
+                .nickname("임시 닉네임")
                 .social(false)
                 .role(CLIENT)
                 .point(0)
