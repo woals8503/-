@@ -26,6 +26,9 @@ public class CheckMember {
     }
 
     public void checkCurrentMember(Member member, long id) {
+        if (member == null) {
+            throw new BaseException(NON_MEMBER);
+        }
         if (member.getId() != id) {
             throw new BaseException(INVALID_MEMBER);
         }

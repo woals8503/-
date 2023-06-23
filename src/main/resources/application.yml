@@ -18,13 +18,17 @@ spring:
 #    import: db-config.yml
 
   #    config import 지정해줘야 데이터 저장됨
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 20GB
   jwt:
     secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
@@ -56,6 +60,7 @@ spring:
               - email
               - profile
 
+<<<<<<< HEAD
           naver:
             client-id: _XbZbvXtTn_gNAve4jCD
             client-secret: 6W3UzR_fDG
@@ -85,3 +90,12 @@ spring:
     multipart:
       max-file-size: 1GB
       max-request-size: 20GB
+=======
+oauth2:
+  google:
+    client-id: 479304112287-brdp845tmalh8o7obogv81hi1387pso8.apps.googleusercontent.com
+    client-secret: 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
+    redirect-uri: http://shimpyo-api.p-e.kr:8081/login/oauth2/code/google
+    token-uri: https://oauth2.googleapis.com/token
+    resource-uri: https://www.googleapis.com/oauth2/v2/userinfo
+>>>>>>> acaa5608c69eb066f4a7c45d541e887f9385c9ce

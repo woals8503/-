@@ -6,8 +6,8 @@ import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.pay.PayStatus;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
-import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
 import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
+import com.oneline.shimpyo.domain.reservation.dto.PostReservationReq;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.service.PaymentService;
@@ -81,6 +81,9 @@ public class PaymentServiceImpl implements PaymentService {
         CancelData cancelData = createCancelData(response, patchReservationReq.getRefundAmount());
         iamportClient.cancelPaymentByImpUid(cancelData);
 
+        if (patchReservationReq.getRefundAmount() != FULL_REFUND) {
+            payMent.setRemainPrice(payMent.getPrice() - patchReservationReq.getRefundAmount());
+        }
         payMent.setPayStatus(PayStatus.CANCEL);
 
         return reservation;
@@ -88,12 +91,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     private static void validateCancel(long memberId, PatchReservationReq patchReservationReq,
                                        Reservation reservation, PayMent payMent) {
-        if(memberId != reservation.getMember().getId()){
+        if (memberId != reservation.getMember().getId()) {
             throw new BaseException(INVALID_MEMBER);
         }
 
-        if (reservation.getReservationStatus() == ReservationStatus.CANCEL) {
-            throw new BaseException(RESERVATION_CANCEL);
+        if (reservation.getReservationStatus() != ReservationStatus.COMPLETE) {
+            throw new BaseException(RESERVATION_CANCEL_OR_FINISHED);
         }
 
         if (payMent.getPrice() < patchReservationReq.getRefundAmount()) {
@@ -102,15 +105,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
-        CancelData cancelData;
-
         if (refundAmount == FULL_REFUND) {
-            cancelData = new CancelData(response.getResponse().getImpUid(), true);
-        } else {
-            cancelData = new CancelData(response.getResponse().getImpUid(), true, new BigDecimal(refundAmount));
+            return new CancelData(response.getResponse().getImpUid(), true);
         }
+        return new CancelData(response.getResponse().getImpUid(), true, new BigDecimal(refundAmount));
 
-        return cancelData;
     }
 
     private void checkDuplicatePayment(PostReservationReq postReservationReq) throws BaseException {

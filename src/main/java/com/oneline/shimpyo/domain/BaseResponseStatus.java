@@ -54,9 +54,14 @@ public enum BaseResponseStatus {
 
     //house 3040
     HOUSE_NONEXISTENT(false, 3040,"존재하지 않는 숙소입니다."),
+    IMAGE_STATUS_NONEXISTENT(false, 3041, "이미지 상태가 올바르지 않습니다."),
+    IMAGE_STATUS_FULL(false, 3042, "이미지는 최대 5장까지 등록할 수 있습니다."),
+    ADDRESS_NONEXISTENT(false, 3043, "해당 숙소의 주소정보가 존재하지 않습니다."),
+    HOUSE_MEMBER_WRONG(false, 3044, "요청한 회원과 숙소 등록자가 일치하지 않습니다."),
 
     //room 3060
     ROOM_NONEXISTENT(false, 3060,"존재하지 않는 방입니다."),
+    ROOM_MEMBER_WRONG(false, 3061, "요청한 회원과 객실 등록자가 일치하지 않습니다."),
 
     //review 3080
     REVIEW_NONEXISTENT(false, 3080,"존재하지 않는 리뷰입니다."),
@@ -66,10 +71,11 @@ public enum BaseResponseStatus {
 
     //reservation 3100
     RESERVATION_NONEXISTENT(false, 3100,"존재하지 않는 예약입니다."),
-    RESERVATION_CANCEL(false, 3101,"취소된 예약입니다."),
+    RESERVATION_CANCEL_OR_FINISHED(false, 3101,"취소되거나 이용완료된 예약입니다."),
     PAYMENT_DUPLICATE(false, 3102, "중복된 결제입니다."),
     PAYMENT_WRONG(false, 3103,"올바른 결제가 아닙니다."),
     REFUND_WRONG(false, 3104, "환불 가능 금액보다 환불 요구 금액이 더 큽니다."),
+    RESERVATION_WRONG_PEOPLE_COUNT(false, 3105, "인원수가 잘못되었습니다."),
 
     //coupon 3120
     COUPON_NONEXISTENT(false, 3120,"존재하지 않는 쿠폰입니다."),

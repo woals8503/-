@@ -18,7 +18,7 @@ public enum HouseType {
         this.type = type;
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static HouseType findByMethod(String type) throws BaseException {
         return Stream.of(HouseType.values())
                 .filter(c -> c.name().equals(type))

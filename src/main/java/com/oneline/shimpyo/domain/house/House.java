@@ -36,7 +36,7 @@ public class House extends BaseEntity {
     @Enumerated(value = STRING)
     private HouseType type;
     private String contents;    // 사장님 한마디
-    @OneToOne(mappedBy = "house")
+    @OneToOne(mappedBy = "house", cascade = ALL)
     private HouseAddress houseAddress;
     @OneToMany(mappedBy = "house", cascade = ALL)
     private List<HouseOptions> houseOptions = new ArrayList<>();
