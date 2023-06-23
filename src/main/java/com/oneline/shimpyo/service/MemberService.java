@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.service;
 
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.member.UpdateMemberReq;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
@@ -36,4 +37,9 @@ public interface MemberService {
     void removeRefreshToken(Long id);
 
     void oauthJoin(OAuthInfoReq oAuthInfoReq);
+
+    void updateMember(Member member, UpdateMemberReq memberReq);
+
+    void removeMember(Member member);
+
 }

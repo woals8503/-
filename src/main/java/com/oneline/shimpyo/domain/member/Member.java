@@ -8,7 +8,6 @@ import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.wish.Wish;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import lombok.*;
 
 import javax.persistence.*;
@@ -80,13 +79,12 @@ public class Member extends BaseEntity {
     private List<House> houseList = new ArrayList<>();
 
     @Builder
-    public Member(String email, String password, String phoneNumber, int point, String nickname, String provider, String providerId, MemberGrade memberGrade, MemberRole role, boolean social) {
+    public Member(String email, String password, String phoneNumber, int point, String nickname, String provider, MemberGrade memberGrade, MemberRole role, boolean social) {
         this.email = email;
         this.password = password;
         this.point = point;
         this.nickname = nickname;
         this.provider = provider;
-        this.providerId = providerId;
         this.memberGrade = memberGrade;
         this.role = role;
         this.social = social;
@@ -109,6 +107,18 @@ public class Member extends BaseEntity {
         this.password = password;
     }
 
+    @Builder
+    public Member(String email, String provider, String nickname) {
+        this.email = email;
+        this.provider = provider;
+        this.nickname = nickname;
+    }
+
+    public Member update(String email) {
+        this.email = email;
+        return this;
+    }
+
     public void resetPassword(String password, CustomBCryptPasswordEncoder bCryptPasswordEncoder) {
         this.password = bCryptPasswordEncoder.encode(password);
     }
@@ -116,5 +126,9 @@ public class Member extends BaseEntity {
     public void updateRefreshToken(String newToken) {
         this.refreshToken = newToken;
     }
+    
+    // 회원 정보 수정
+    public void updateMember(UpdateMemberReq memberReq) {
 
+    }
 }

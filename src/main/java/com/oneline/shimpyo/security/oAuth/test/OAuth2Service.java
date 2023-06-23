@@ -1,7 +1,6 @@
-package com.oneline.shimpyo.security.oAuth.service;
+package com.oneline.shimpyo.security.oAuth.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.oneline.shimpyo.security.oAuth.model.UserResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -10,6 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpMethod.*;
+import static org.springframework.http.MediaType.*;
 
 @Service
 @Slf4j
@@ -50,6 +53,7 @@ public class OAuth2Service {
                 throw new RuntimeException("UNSUPPORTED SOCIAL TYPE");
             }
         }
+
         log.info("id = {}", userResource.getId());
         log.info("email = {}", userResource.getEmail());
         log.info("nickname {}", userResource.getNickname());
@@ -62,11 +66,6 @@ public class OAuth2Service {
         String redirectUri = env.getProperty("oauth2." + registrationId + ".redirect-uri");
         String tokenUri = env.getProperty("oauth2." + registrationId + ".token-uri");
 
-        System.out.println("clientId : " + clientId);
-        System.out.println("clientSecret : " + clientSecret);
-        System.out.println("redirectUri : " + redirectUri);
-        System.out.println("tokenUri : " + tokenUri);
-
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("code", authorizationCode);
         params.add("client_id", clientId);
@@ -75,12 +74,13 @@ public class OAuth2Service {
         params.add("grant_type", "authorization_code");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setContentType(APPLICATION_FORM_URLENCODED);
 
         HttpEntity entity = new HttpEntity(params, headers);
 
-        ResponseEntity<JsonNode> responseNode = restTemplate.exchange(tokenUri, HttpMethod.POST, entity, JsonNode.class);
+        ResponseEntity<JsonNode> responseNode = restTemplate.exchange(tokenUri, POST, entity, JsonNode.class);
         JsonNode accessTokenNode = responseNode.getBody();
+        System.out.println(accessTokenNode);
         return accessTokenNode.get("access_token").asText();
     }
 
@@ -88,8 +88,12 @@ public class OAuth2Service {
         String resourceUri = env.getProperty("oauth2."+registrationId+".resource-uri");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+
+        headers.set(AUTHORIZATION, "Bearer " + accessToken);
+
         HttpEntity entity = new HttpEntity(headers);
-        return restTemplate.exchange(resourceUri, HttpMethod.GET, entity, JsonNode.class).getBody();
+
+        JsonNode body = restTemplate.exchange(resourceUri, GET, entity, JsonNode.class).getBody();
+        return body;
     }
 }

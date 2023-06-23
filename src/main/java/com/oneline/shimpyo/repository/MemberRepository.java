@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.stream.LongStream;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
@@ -28,4 +29,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select m from Member m where m.refreshToken = :refreshToken")
     Optional<Member> findByRefreshToken(@Param("refreshToken") String refreshToken);
+
+    Optional<Member> findByEmailAndProvider(String email, String provider);
 }

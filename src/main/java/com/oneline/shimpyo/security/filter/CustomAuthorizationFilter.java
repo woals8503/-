@@ -51,17 +51,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         String servletPath = request.getServletPath();
         String token = null;
 
-        if(servletPath.equals("/user/refresh")) {
+        if(servletPath.equals("/user/refresh"))
             token = extractRefreshToken(request);
-            System.out.println(token);
-        }
         else
             token = extractToken(request);
 
         if(!isEmpty(token)) {
             try {
                 if(validateToken(token)) {
-                    System.out.println("진입 성공");
                     String username = getUsernameFromToken(token);
                     Member member = memberRepository.findByEmail(username);
                     PrincipalDetails principalDetails = new PrincipalDetails(member);

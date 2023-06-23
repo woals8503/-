@@ -1,4 +1,4 @@
-package com.oneline.shimpyo.security.oAuth.model;
+package com.oneline.shimpyo.security.oAuth.test;
 
 import lombok.Getter;
 import lombok.Setter;
