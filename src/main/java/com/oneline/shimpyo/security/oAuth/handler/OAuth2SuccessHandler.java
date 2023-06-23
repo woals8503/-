@@ -10,6 +10,7 @@ import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,13 +20,16 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REDIRECT_URI;
 
 @Slf4j
 @Component
@@ -41,31 +45,29 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = principal.getMember();
 
-        // 이미 가입한 유저라면
+        // 회원이라면 메인페이지 이동
         if(member.getSocial()) {
-            // 리다이렉트 타겟 url 생성 ( 로그인 성공 시 리다이렉트 URL )
-            String targetUrl;
-            targetUrl = UriComponentsBuilder.fromUriString("/api/test5")    // -> 메인페이지
-                    .build().toUriString();
-            getRedirectStrategy().sendRedirect(request, response, targetUrl);
+
+            String accessToken = generateToken(principal, true, AT_EXP_TIME);
+            String refreshToken = generateRefreshToken(principal, true, RT_EXP_TIME);
+
+            response.sendRedirect(UriComponentsBuilder.fromUriString("/api/test5")
+                    .queryParam("accessToken", accessToken)
+                    .queryParam("refreshToken", refreshToken)
+                    .queryParam("email", member.getEmail())
+                    .queryParam("additional_info", true)
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString());
         }
-        // 회원 x
+
+        // 최초 로그인이라면 회원가입 창 redirect
         else {
-            log.info("추가정보를 입력받아야합니다.");
-
-            //
-            //
-            BaseResponse<Void> mapBaseResponse = new BaseResponse<>();
-            new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
-
-            // 리다이렉트 url 생성 ( 메인페이지로 됬으면 좋겠음 )
-//            String targetUrl;
-//            targetUrl = UriComponentsBuilder.fromUriString("/api/test4")    // -> 추가 회원가입 창
-//                    .queryParam("memberId", member.getId())
-//                    .build().toUriString();
-//            getRedirectStrategy().sendRedirect(request, response, targetUrl);
+            response.sendRedirect(UriComponentsBuilder.fromUriString("/api/test3")
+                    .queryParam("additional_info", false)
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString());
         }
-
     }
-
 }

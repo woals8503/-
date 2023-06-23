@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.member.UpdateMemberReq;
 import com.oneline.shimpyo.domain.member.dto.*;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.auth.CurrentMember;
@@ -51,6 +52,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(allowCredentials = "true", originPatterns = "*")
 public class MemberController {
 
     private final MemberService memberService;
@@ -158,6 +160,7 @@ public class MemberController {
     }
 
     // Access 토큰 만료 시 새로운 토큰을 발급
+
     @GetMapping("/user/refresh")
     public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response, @CurrentMember Member member) {
         Cookie[] cookies = request.getCookies();
@@ -197,54 +200,39 @@ public class MemberController {
         return new BaseResponse<>(responseMap);
     }
 
-//    @GetMapping("/google")
-//    public String googleOAuthRedirect(@RequestParam String code) {
-//        RestTemplate rt = new RestTemplate();
-//
-//        HttpHead headers = new HttpHead();
-//
-//        headers.addHeader("Content-Type", "application/x-www-form-urlencoded");
-//
-//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-//        params.add("client_id", "479304112287-brdp845tmalh8o7obogv81hi1387pso8.apps.googleusercontent.com");
-//        params.add("client_secret", "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-ZN");
-//        params.add("code", code);
-//        params.add("grant_type", "authorization_code");
-//        params.add("redirect_uri", "http://shimpyo-api.p-e.kr:8081/login/oauth2/code/google");
-//
-//        HttpEntity<MultiValueMap<String, String>> accessTokenRequest = new HttpEntity<>(params, (MultiValueMap<String, String>) headers);
-//
-//        ResponseEntity<String> accessTokenResponse = rt.exchange(
-//                "https://oauth2.googleapis.com/token",
-//                HttpMethod.POST,
-//                accessTokenRequest,
-//                String.class
-//        );
-//
-//        // 여기서부터, 프로필 정보 얻어오는 요청
-//        HttpHeaders headers1 = new HttpHeaders();
-//        headers1.add("Authorization", "Bearer " + googleOauthParams.getAccess_token());
-//
-//        HttpEntity profileRequest = new HttpEntity(headers1);
-//
-//        ResponseEntity<String> profileResponse = rt.exchange(
-//                "https://oauth2.googleapis.com/tokeninfo?id_token=" + googleOauthParams.getId_token(),
-//                HttpMethod.GET,
-//                profileRequest,
-//                String.class
-//        );
-//
-//        return "프로필 정보 : " + profileResponse.getBody();
-//    }
-
-    @GetMapping("/api/test3")
+    @GetMapping("/user/test3")
     public String test3(@CurrentMember Member member) {
-        return "test";
+        System.out.println(member.getEmail());
+        return "ok";
     }
 
     @GetMapping("/api/test5")
-    public String test5() {
-        return "test";
+    public BaseResponse<Map<String, String>> test5(@RequestParam("accessToken") String accessToken,
+                        @RequestParam("refreshToken") String refreshToken,
+                        @RequestParam("email") String email,
+                        HttpServletResponse response) throws IOException {
+        Member member = memberRepository.findByEmail(email);
+        // Refresh Token DB에 저장
+        memberService.updateRefreshToken(member.getEmail(), refreshToken);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("utf-8");
+        response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
+
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put(AT_HEADER, accessToken);
+        return new BaseResponse<>(responseMap);
+    }
+
+    @PatchMapping("/user/update")
+    public BaseResponse<Void> updateMember(@CurrentMember Member member, UpdateMemberReq memberReq) {
+        memberService.updateMember(member, memberReq);
+        return new BaseResponse<>();
+    }
+
+    @PostMapping("/user/remove")
+    public BaseResponse<Void> removeMember(@CurrentMember Member member) {
+        memberService.removeMember(member);
+        return new BaseResponse<>();
     }
 
 }
