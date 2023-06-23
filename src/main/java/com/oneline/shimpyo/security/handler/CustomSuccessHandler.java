@@ -61,7 +61,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
                 .sameSite("Lax")
                 .secure(false)
                 .httpOnly(true)
-                .maxAge(60 * 60 * 24).build();
+                .maxAge(60 * 60 * 24)
+                .build();
 
         return cookie;
     }

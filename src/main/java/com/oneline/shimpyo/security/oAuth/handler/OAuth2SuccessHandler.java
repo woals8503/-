@@ -44,7 +44,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throws IOException, ServletException {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = principal.getMember();
-
         // 회원이라면 메인페이지 이동
         if(member.getSocial()) {
 
@@ -63,7 +62,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 최초 로그인이라면 회원가입 창 redirect
         else {
-            response.sendRedirect(UriComponentsBuilder.fromUriString("/api/test3")
+            response.sendRedirect(UriComponentsBuilder.fromUriString("http://shimpyo.o-r.kr/")
                     .queryParam("additional_info", false)
                     .build()
                     .encode(StandardCharsets.UTF_8)
