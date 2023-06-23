@@ -168,7 +168,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void oauthJoin(OAuthInfoReq oAuthInfoReq) {
-
+//        memberRepository
     }
 
     @Override

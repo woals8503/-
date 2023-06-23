@@ -13,9 +13,7 @@ cloud:
 
 spring:
   profiles:
-    include: db
-#  config:
-#    import: db-config.yml
+    include: db, oauth
 
   #    config import 지정해줘야 데이터 저장됨
   servlet:
@@ -48,8 +46,8 @@ spring:
 
 #oauth2:
 #  google:
-#    client-id: 479304112287-brdp845tmalh8o7obogv81hi1387pso8.apps.googleusercontent.com
-#    client-secret: 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
+#    client-id:
+#    client-secret:
 #    redirect-uri: http://localhost:8081/login/oauth2/code/google
 #    token-uri: https://oauth2.googleapis.com/token
 #    resource-uri: https://www.googleapis.com/oauth2/v2/userinfo
