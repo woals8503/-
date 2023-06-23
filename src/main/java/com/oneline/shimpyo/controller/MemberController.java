@@ -70,6 +70,7 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
+    /** access, refresh토큰 발급 **/
     @PostMapping("/api/oauth-join")
     public BaseResponse<Void> oauthJoin(@RequestBody OAuthInfoReq oAuthInfoReq) {
 

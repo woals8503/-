@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class OAuthInfoReq {
-
+    private String phoneNumber;
+    private String nickname;
 }
