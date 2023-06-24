@@ -47,6 +47,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("진입");
         String servletPath = request.getServletPath();
         String token = null;
 
@@ -90,6 +91,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 new ObjectMapper().writeValue(response.getWriter(), errorResponse);
             }
         }
+
         else if(isEmpty(token)
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             Authentication authentication = createAnonymousAuthentication();
@@ -106,6 +108,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
         return new AnonymousAuthenticationToken(key, principal, authorities);
     }
+
     private String extractRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         String value = null;

@@ -6,6 +6,7 @@ import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.objectweb.asm.TypeReference;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.JWT_TOKEN_WRONG;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @Component
@@ -30,7 +32,10 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         Long memberId = jwtService.getMemberId();
         memberService.removeRefreshToken(memberId);
         log.info("refresh 토큰 삭제 완료");
+        response.setContentType(APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("utf-8");
         BaseResponse<Void> baseResponse = new BaseResponse<>();
+        
         new ObjectMapper().writeValue(response.getWriter(), baseResponse);
     }
 }

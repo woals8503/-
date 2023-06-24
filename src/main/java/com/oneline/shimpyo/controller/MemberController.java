@@ -1,30 +1,62 @@
 package com.oneline.shimpyo.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oneline.shimpyo.domain.BaseResponse;
+import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.member.UpdateMemberReq;
 import com.oneline.shimpyo.domain.member.dto.*;
+import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.auth.CurrentMember;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.security.jwt.JwtService;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.HttpHead;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.OAuth2AuthorizationContext;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
+import static com.oneline.shimpyo.domain.house.HouseType.*;
+import static com.oneline.shimpyo.domain.house.HouseType.MOTEL;
 import static com.oneline.shimpyo.modules.RegexValidator.*;
+import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
+import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
+import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.generateOAuth2Token;
+import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.generateToken;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(allowCredentials = "true", originPatterns = "*")
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final JwtService jwtService;
 
     @PostMapping("/api/join")
@@ -35,6 +67,18 @@ public class MemberController {
             return new BaseResponse<>(MEMBER_REGEX_WRONG);
 
         memberService.join(memberReq);
+        return new BaseResponse<>();
+    }
+
+    @PostMapping("/api/oauth-join")
+    public BaseResponse<Void> oauthJoin(@RequestBody OAuthInfoReq oAuthInfoReq) {
+
+        boolean isValid = validateOAuthRequest(oAuthInfoReq);
+
+        if(!isValid)
+            return new BaseResponse<>(MEMBER_REGEX_WRONG);
+
+        memberService.oauthJoin(oAuthInfoReq);
         return new BaseResponse<>();
     }
 
@@ -116,6 +160,7 @@ public class MemberController {
     }
 
     // Access 토큰 만료 시 새로운 토큰을 발급
+
     @GetMapping("/user/refresh")
     public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response, @CurrentMember Member member) {
         Cookie[] cookies = request.getCookies();
@@ -131,30 +176,63 @@ public class MemberController {
         return new BaseResponse<>(tokens);
     }
 
-    @GetMapping("/public/test4")
-    public String test4() {
-        Long memberId = jwtService.getMemberId();
-        if(memberId == null) {
-            System.out.println("비회원");
-        }
-        else System.out.println("회원");
+    // 추가 회원가입 창 리다이렉트`
+    @GetMapping("/api/")
+    public BaseResponse<Map<String, String>> test4 (
+            @RequestParam("memberId") Long memberId,
+            HttpServletResponse response) {
+        Member member = memberRepository.findById(memberId).get();
+
+        // 토큰 생성
+        String accessToken = generateOAuth2Token(member, true, AT_EXP_TIME);
+        String refreshToken = generateOAuth2Token(member, true, RT_EXP_TIME);
+
+        // 토큰 저장
+        memberService.updateRefreshToken(member.getEmail(), refreshToken);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("utf-8");
+        response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
+
+        // 헤더 생성
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put(AT_HEADER, accessToken);
+
+        return new BaseResponse<>(responseMap);
+    }
+
+    @GetMapping("/user/test3")
+    public String test3(@CurrentMember Member member) {
+        System.out.println(member.getEmail());
         return "ok";
     }
 
-    @GetMapping("/api/test3")
-    public String test3(@CurrentMember Member member) {
-        if(member != null)
-            System.out.println("회원");
+    @GetMapping("/api/test5")
+    public BaseResponse<Map<String, String>> test5(@RequestParam("accessToken") String accessToken,
+                        @RequestParam("refreshToken") String refreshToken,
+                        @RequestParam("email") String email,
+                        HttpServletResponse response) throws IOException {
+        Member member = memberRepository.findByEmail(email);
+        // Refresh Token DB에 저장
+        memberService.updateRefreshToken(member.getEmail(), refreshToken);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("utf-8");
+        response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
 
-        else
-            System.out.println("비회원");
-        return "test";
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put(AT_HEADER, accessToken);
+        return new BaseResponse<>(responseMap);
     }
 
-    @GetMapping("/mypage/test")
-    public String test5() {
+    @PatchMapping("/user/update")
+    public BaseResponse<Void> updateMember(@CurrentMember Member member, UpdateMemberReq memberReq) {
+        memberService.updateMember(member, memberReq);
+        return new BaseResponse<>();
+    }
 
-        return "test";
+    @PostMapping("/user/remove")
+    public BaseResponse<Void> removeMember(@CurrentMember Member member) {
+        memberService.removeMember(member);
+        return new BaseResponse<>();
     }
 
 }

@@ -9,7 +9,9 @@ import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
+import com.oneline.shimpyo.domain.member.UpdateMemberReq;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
+import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
@@ -162,6 +164,24 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void removeRefreshToken(Long id) {
         memberRepository.removeRefreshToken(id);
+    }
+
+    @Override
+    public void oauthJoin(OAuthInfoReq oAuthInfoReq) {
+
+    }
+
+    @Override
+    public void updateMember(Member member, UpdateMemberReq memberReq) {
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
+        findMember.updateMember(memberReq);
+
+    }
+
+    @Override
+    public void removeMember(Member member) {
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
+        memberRepository.delete(findMember);
     }
 
 }

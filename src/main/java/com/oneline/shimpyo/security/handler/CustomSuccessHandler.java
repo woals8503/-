@@ -32,7 +32,10 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     private final MemberService memberService;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication) throws IOException {
         PrincipalDetails member = (PrincipalDetails) authentication.getPrincipal();
 
         String accessToken = generateToken(member, true, AT_EXP_TIME);
@@ -46,25 +49,21 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
+
         BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
         new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
-
     }
 
     public static ResponseCookie createCookie(String refreshToken) {
 
         ResponseCookie cookie = ResponseCookie.from(RT_HEADER, refreshToken)
                 .path("/")
-                .sameSite("Lax")
-                .secure(false)
+                .sameSite("None")
+                .secure(true)
                 .httpOnly(true)
-                .maxAge(60 * 60 * 24).build();
-
-//        Cookie cookie = new Cookie(RT_HEADER, refreshToken);
-//        cookie.setHttpOnly(true);
-////        cookie.setSecure(true);
-//        cookie.setPath("/");
-//        cookie.setMaxAge(60 * 60 * 24);
+                .maxAge(60 * 60 * 24)
+                .build();
+        
         return cookie;
     }
 }

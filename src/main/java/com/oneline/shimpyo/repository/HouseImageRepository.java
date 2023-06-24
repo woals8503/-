@@ -8,4 +8,5 @@ import java.util.List;
 public interface HouseImageRepository extends JpaRepository<HouseImage, Long> {
 
     List<HouseImage> findByHouseId(Long house_id);
+    List<HouseImage> findAllByHouseId(Long id);
 }

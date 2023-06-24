@@ -6,13 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Setter
 @Builder
 @ToString
-public class HouseReq {
+public class PostHouseReq {
     private String name;
     private HouseType type;
     private OptionReq option;

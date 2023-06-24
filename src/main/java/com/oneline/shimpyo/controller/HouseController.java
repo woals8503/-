@@ -1,7 +1,8 @@
 package com.oneline.shimpyo.controller;
 
 import com.oneline.shimpyo.domain.BaseResponse;
-import com.oneline.shimpyo.domain.house.dto.HouseReq;
+import com.oneline.shimpyo.domain.house.dto.PatchHouseReq;
+import com.oneline.shimpyo.domain.house.dto.PostHouseReq;
 import com.oneline.shimpyo.domain.house.dto.HouseRegisterRes;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.modules.CheckMember;
@@ -20,10 +21,9 @@ import java.util.List;
 public class HouseController {
 
     private final HouseService houseService;
-    private final CheckMember checkMember;
 
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public BaseResponse<HouseRegisterRes> createHouse(@RequestPart(value = "houseReq") HouseReq houseReq, @RequestPart(value = "houseImages") List<MultipartFile> houseImages
+    public BaseResponse<HouseRegisterRes> createHouse(@RequestPart(value = "houseReq") PostHouseReq houseReq, @RequestPart(value = "houseImages") List<MultipartFile> houseImages
                                 , @RequestPart(value = "roomImages") List<MultipartFile> roomImages, @CurrentMember Member member) {
 
         long houseId = houseService.createHouse(member, houseReq, houseImages, roomImages);
@@ -32,8 +32,16 @@ public class HouseController {
     }
 
     @PatchMapping("/{houseId}")
-    public void updateHouse(@PathVariable long houseId) {
+    public BaseResponse<Void> updateHouse(@CurrentMember Member member, @PathVariable long houseId, @RequestPart PatchHouseReq patchHouseReq
+                            , @RequestPart(value = "houseImages", required = false) List<MultipartFile> houseImages) {
+        houseService.updateHouse(member, houseId, patchHouseReq, houseImages);
+        return new BaseResponse<>();
+    }
 
+    @DeleteMapping("/{houseId}")
+    public BaseResponse<Void> deleteHouse(@CurrentMember Member member, @PathVariable long houseId) {
+        houseService.deleteHouse(member, houseId);
+        return new BaseResponse<>();
     }
 
 }

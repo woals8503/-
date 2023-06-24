@@ -2,11 +2,13 @@ package com.oneline.shimpyo.domain.house;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.oneline.shimpyo.domain.BaseException;
+import lombok.Getter;
 
 import java.util.stream.Stream;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.HOUSE_TYPE_WRONG;
 
+@Getter
 public enum HouseType {
     MOTEL("모텔"), HOTEL("호텔"), PENSION("펜션"), GUEST("게스트 하우스");
 
@@ -16,7 +18,7 @@ public enum HouseType {
         this.type = type;
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static HouseType findByMethod(String type) throws BaseException {
         return Stream.of(HouseType.values())
                 .filter(c -> c.name().equals(type))

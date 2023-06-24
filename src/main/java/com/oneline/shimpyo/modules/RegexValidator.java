@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.modules;
 
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
+import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 
 import java.util.regex.Pattern;
 
@@ -20,6 +21,10 @@ public class RegexValidator {
         if(!a || !b || !d || !e) {
             return false;
         }
+        return true;
+    }
+
+    public static boolean validateOAuthRequest(OAuthInfoReq oAuthInfoReq) {
         return true;
     }
 
