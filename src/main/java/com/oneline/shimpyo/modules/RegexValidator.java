@@ -24,10 +24,6 @@ public class RegexValidator {
         return true;
     }
 
-    public static boolean validateOAuthRequest(OAuthInfoReq oAuthInfoReq) {
-        return true;
-    }
-
     public static boolean validatePassword(String password) {
         if(validateFirstPassword(password))
             return false;

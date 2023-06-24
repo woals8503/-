@@ -2,11 +2,13 @@ package com.oneline.shimpyo.service;
 
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.UpdateMemberReq;
+import com.oneline.shimpyo.domain.member.dto.EmailRes;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 public interface MemberService {

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.LongStream;
 
@@ -18,7 +19,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Member findByNickname(@Param("nickname") String nickname);
 
     @Query("select m.phoneNumber from Member m where m.phoneNumber = :phoneNumber")
-    String findByEmailWithPhonNumber(@Param("phoneNumber") String phoneNumber);
+    List<Member> findByEmailWithPhonNumber(@Param("phoneNumber") String phoneNumber);
 
     @Query("select m from Member m where m.phoneNumber = :phoneNumber")
     Member findByMemberWithPhoneNumber(@Param("phoneNumber") String phoneNumber);

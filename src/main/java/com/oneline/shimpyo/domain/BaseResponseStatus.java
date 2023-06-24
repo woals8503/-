@@ -52,7 +52,6 @@ public enum BaseResponseStatus {
     PASSWORD_REGEX_WRONG(false, 3031, "비밀번호를 다시 확인해주세요."),
 
 
-
     //house 3040
     HOUSE_NONEXISTENT(false, 3040,"존재하지 않는 숙소입니다."),
     IMAGE_STATUS_NONEXISTENT(false, 3041, "이미지 상태가 올바르지 않습니다."),

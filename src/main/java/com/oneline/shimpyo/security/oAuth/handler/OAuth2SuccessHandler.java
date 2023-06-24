@@ -44,17 +44,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throws IOException, ServletException {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = principal.getMember();
-        // 회원이라면 메인페이지 이동
+        // 회원이라면
         if(member.getSocial()) {
-
             String accessToken = generateToken(principal, true, AT_EXP_TIME);
             String refreshToken = generateRefreshToken(principal, true, RT_EXP_TIME);
-
+            // 엑세스토큰 Authorization Bearer accesstoken
             response.sendRedirect(UriComponentsBuilder.fromUriString("/api/test5")
                     .queryParam("accessToken", accessToken)
                     .queryParam("refreshToken", refreshToken)
-                    .queryParam("email", member.getEmail())
-                    .queryParam("additional_info", true)
+                    .queryParam("id", member.getId())
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString());
@@ -64,6 +62,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         else {
             response.sendRedirect(UriComponentsBuilder.fromUriString("http://shimpyo.o-r.kr/")
                     .queryParam("additional_info", false)
+                    .queryParam("id", member.getId())
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString());

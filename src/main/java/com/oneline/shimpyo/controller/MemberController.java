@@ -30,12 +30,15 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -70,13 +73,13 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
+    /** access, refresh토큰 발급 **/
     @PostMapping("/api/oauth-join")
     public BaseResponse<Void> oauthJoin(@RequestBody OAuthInfoReq oAuthInfoReq) {
+        boolean checkNickname = memberService.duplicateNickname(oAuthInfoReq.getNickname());
 
-        boolean isValid = validateOAuthRequest(oAuthInfoReq);
-
-        if(!isValid)
-            return new BaseResponse<>(MEMBER_REGEX_WRONG);
+        if(!checkNickname)
+            return new BaseResponse<>(NICKNAME_DUPLICATE);
 
         memberService.oauthJoin(oAuthInfoReq);
         return new BaseResponse<>();
@@ -207,20 +210,22 @@ public class MemberController {
     }
 
     @GetMapping("/api/test5")
-    public BaseResponse<Map<String, String>> test5(@RequestParam("accessToken") String accessToken,
+    public void test5(@RequestParam("accessToken") String accessToken,
                         @RequestParam("refreshToken") String refreshToken,
                         @RequestParam("email") String email,
                         HttpServletResponse response) throws IOException {
-        Member member = memberRepository.findByEmail(email);
-        // Refresh Token DB에 저장
-        memberService.updateRefreshToken(member.getEmail(), refreshToken);
-        response.setContentType(APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("utf-8");
-        response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
-
-        Map<String, String> responseMap = new HashMap<>();
-        responseMap.put(AT_HEADER, accessToken);
-        return new BaseResponse<>(responseMap);
+//        Member member = memberRepository.findByEmail(email);
+//        // Refresh Token DB에 저장
+//        memberService.updateRefreshToken(member.getEmail(), refreshToken);
+//        response.setContentType(APPLICATION_JSON_VALUE);
+//        response.setCharacterEncoding("utf-8");
+//        response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
+//        Map<String, String> responseMap = new HashMap<>();
+//        responseMap.put(AT_HEADER, accessToken);
+        response.sendRedirect(UriComponentsBuilder.fromUriString("http://shimpyo.o-r.kr/")
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUriString());
     }
 
     @PatchMapping("/user/update")
