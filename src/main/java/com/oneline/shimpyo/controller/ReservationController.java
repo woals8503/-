@@ -67,15 +67,16 @@ public class ReservationController {
     }
 
     @GetMapping("/houses/{houseId}")
-    public BaseResponse<GetHouseReservationRes> readHouseReservationList(@PathVariable(required = false) Optional<Long> houseId,
-                                                                         @RequestParam(required = false, defaultValue = "USING")
+    public BaseResponse<GetHouseReservationRes> readHouseReservationList(@PathVariable long houseId,
+                                                                         @RequestParam(required = false,
+                                                                                 defaultValue = "USING")
                                                                          String reservationStatus,
                                                                          @PageableDefault Pageable pageable,
                                                                          @CurrentMember Member member){
         long memberId = checkMember.getMemberId(member, true);
 
         GetHouseReservationRes getHouseReservationRes = reservationService
-                .readHouseReservationList(memberId, houseId.orElse(0L),
+                .readHouseReservationList(memberId, houseId,
                         ReservationStatus.of(reservationStatus), pageable);
         return new BaseResponse<>(getHouseReservationRes);
     }

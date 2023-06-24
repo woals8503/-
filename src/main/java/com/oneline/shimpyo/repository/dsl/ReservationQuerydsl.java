@@ -2,14 +2,12 @@ package com.oneline.shimpyo.repository.dsl;
 
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -48,11 +46,11 @@ public class ReservationQuerydsl {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        JPAQuery<Long> where = jqf.select(reservation.count())
+        JPAQuery<Long> countQuery = jqf.select(reservation.count())
                 .from(reservation)
                 .where(reservation.member.id.eq(memberId));
 
-        return PageableExecutionUtils.getPage(reservationList, pageable, where::fetchOne);
+        return PageableExecutionUtils.getPage(reservationList, pageable, countQuery::fetchOne);
     }
 
     public GetReservationRes readReservation(long reservationId) {
@@ -66,12 +64,13 @@ public class ReservationQuerydsl {
                 .join(reservation.payMent, payMent)
                 .where(reservation.id.eq(reservationId))
                 .fetchFirst();
+
     }
 
-    public List<HostReservationReq> readHouseReservationList(long houseId,
+    public Page<HostReservationReq> readHouseReservationList(long houseId,
                                                              ReservationStatus reservationStatus, Pageable pageable) {
 
-        return jqf.select(new QHostReservationReq(reservation.id, reservation.reservationStatus, roomImage.savedURL, room.name,
+        List<HostReservationReq> reservationList = jqf.select(new QHostReservationReq(reservation.id, reservation.reservationStatus, roomImage.savedURL, room.name,
                         reservation.checkInDate, reservation.checkOutDate, room.checkIn, room.checkOut,
                         member.nickname, reservation.peopleCount, reservation.phoneNumber))
                 .from(reservation)
@@ -85,9 +84,16 @@ public class ReservationQuerydsl {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        JPAQuery<Long> countQuery = jqf.select(reservation.count())
+                .from(reservation)
+                .innerJoin(reservation.room.house, house).on(house.id.eq(houseId))
+                .where(reservation.reservationStatus.eq(reservationStatus));
+
+        return PageableExecutionUtils.getPage(reservationList, pageable, countQuery::fetchOne);
+
     }
 
-    public List<ReservationStatusCount> readHouseReservationCount(long finalHouseId) {
+    public List<ReservationStatusCount> readHouseReservationStatusCount(long finalHouseId) {
         return jqf.select(new QReservationStatusCount(reservation.reservationStatus, reservation.count()))
                 .from(reservation)
                 .join(reservation.room, room)

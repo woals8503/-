@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -12,21 +13,18 @@ import java.util.List;
 @NoArgsConstructor
 public class GetHouseReservationRes {
 
-    private List<HostHouseReq> houseList;
     private List<HostReservationReq> reservationList;
     private long completeCount;
     private long usingCount;
     private long finishedCount;
+    private int totalPage;
+    private long totalElements;
+    private int pageSize;
+    private int numberOfElements;
 
-    public GetHouseReservationRes(List<HostHouseReq> houseList, List<HostReservationReq> reservationList) {
-        this.houseList = houseList;
-        this.reservationList = reservationList;
-    }
-
-    public GetHouseReservationRes(List<HostHouseReq> houseList, List<HostReservationReq> reservationList,
+    public GetHouseReservationRes(Page<HostReservationReq> reservationList,
                                   List<ReservationStatusCount> statusCountList) {
-        this.houseList = houseList;
-        this.reservationList = reservationList;
+        this.reservationList = reservationList.getContent();
 
         for (ReservationStatusCount one : statusCountList) {
             if(one.getReservationStatus().equals(ReservationStatus.COMPLETE)){
@@ -39,8 +37,11 @@ public class GetHouseReservationRes {
                 finishedCount = one.getCount();
             }
         }
+
+        this.totalPage = reservationList.getTotalPages();
+        this.totalElements = reservationList.getTotalElements();
+        this.pageSize = reservationList.getSize();
+        this.numberOfElements = reservationList.getNumberOfElements();
     }
-
-
 
 }

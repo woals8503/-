@@ -2,7 +2,6 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.GetPageRes;
-import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.house.HouseImage;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
@@ -18,6 +17,7 @@ import com.oneline.shimpyo.service.PaymentService;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,21 +104,12 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public GetHouseReservationRes readHouseReservationList(long memberId, long houseId,
                                                            ReservationStatus reservationStatus, Pageable pageable) {
-        long finalHouseId = houseId;
-        if(houseId == FIRST_REQUEST){
-            House house = houseRepository.findTopByMemberId(memberId)
-                    .orElseThrow(() -> new BaseException(RESERVATION_HOST_HOUSE_EMPTY));
-            finalHouseId = house.getId();
-        }
+        Page<HostReservationReq> hostReservationReqs = reservationQuerydsl
+                .readHouseReservationList(houseId, reservationStatus, pageable);
 
-        List<HostHouseReq> hostHouseReqs = houseRepository.findAllByMemberId(memberId);
+        List<ReservationStatusCount> statusCountList = reservationQuerydsl.readHouseReservationStatusCount(houseId);
 
-        List<HostReservationReq> hostReservationReqs = reservationQuerydsl
-                .readHouseReservationList(finalHouseId, reservationStatus, pageable);
-
-        List<ReservationStatusCount> statusCountList = reservationQuerydsl.readHouseReservationCount(finalHouseId);
-
-        return new GetHouseReservationRes(hostHouseReqs, hostReservationReqs, statusCountList);
+        return new GetHouseReservationRes(hostReservationReqs, statusCountList);
     }
 
     @Transactional
