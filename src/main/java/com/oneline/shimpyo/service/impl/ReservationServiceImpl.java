@@ -17,6 +17,7 @@ import com.oneline.shimpyo.service.PaymentService;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,10 +34,12 @@ import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 @Transactional(readOnly = true)
 public class ReservationServiceImpl implements ReservationService {
 
+    private final static long FIRST_REQUEST = 0L;
     private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationQuerydsl reservationQuerydsl;
     private final MemberRepository memberRepository;
+    private final HouseRepository houseRepository;
     private final HouseImageRepository houseImageRepository;
     private final RoomRepository roomRepository;
     private final MyCouponQuerydsl myCouponQuerydsl;
@@ -96,6 +99,17 @@ public class ReservationServiceImpl implements ReservationService {
         getReservationRes.setHouseImageUrl(houseImageList.stream().map(HouseImage::getSavedURL).collect(Collectors.toList()));
 
         return getReservationRes;
+    }
+
+    @Override
+    public GetHouseReservationRes readHouseReservationList(long memberId, long houseId,
+                                                           ReservationStatus reservationStatus, Pageable pageable) {
+        Page<HostReservationReq> hostReservationReqs = reservationQuerydsl
+                .readHouseReservationList(houseId, reservationStatus, pageable);
+
+        List<ReservationStatusCount> statusCountList = reservationQuerydsl.readHouseReservationStatusCount(houseId);
+
+        return new GetHouseReservationRes(hostReservationReqs, statusCountList);
     }
 
     @Transactional
