@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         Long memberId = jwtService.getMemberId();
         memberService.removeRefreshToken(memberId);
         log.info("refresh 토큰 삭제 완료");
+
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
         BaseResponse<Void> baseResponse = new BaseResponse<>();

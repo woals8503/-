@@ -93,7 +93,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/user/logout") // [POST]
                 .logoutSuccessUrl("/")  // 로그아웃 성공 시
                 .logoutSuccessHandler(logoutSuccessHandler)
-                .deleteCookies("JSESSIONID")
+                .deleteCookies("Set-Cookie")
                 .invalidateHttpSession(true);
 
         // OAuth2 설정

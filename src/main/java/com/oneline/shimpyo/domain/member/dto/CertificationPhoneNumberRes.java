@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CertificationPhoneNumberRes {
     private String codeNumber;
-
 }

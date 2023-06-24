@@ -10,10 +10,12 @@ import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.member.UpdateMemberReq;
+import com.oneline.shimpyo.domain.member.dto.EmailRes;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.repository.MemberRepository;
+import com.oneline.shimpyo.repository.dsl.MemberQuerydsl;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +30,16 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 import static com.oneline.shimpyo.domain.member.GradeName.*;
 import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
+import static java.util.stream.Collectors.*;
 
 @Slf4j
 @Service
@@ -43,6 +48,7 @@ import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberQuerydsl memberQuerydsl;
     private final EntityManager em;
     private final CustomBCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -71,14 +77,14 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean duplicateNickname(String nickname) {
         Member findNickname = memberRepository.findByNickname(nickname);
-        if(findNickname == null) return true;
-        return false;
+        if(findNickname == null) return true;   // 없으면
+        return false;   // 있으면
     }
 
     @Override
     @Transactional(readOnly = false)
     public void changePassword(ResetPasswordReq request) {
-        Member findMember = memberRepository.findByMemberWithPhoneNumber(request.getPhoneNumber());
+        Member findMember = memberQuerydsl.findByMemberWithPhoneNumber(request.getPhoneNumber());
         // 더티 체킹
         findMember.resetPassword(request.getPassword(), bCryptPasswordEncoder);
     }
@@ -109,7 +115,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public String findByEmailWithPhonNumber(String phoneNumber) {
-        return memberRepository.findByEmailWithPhonNumber(phoneNumber);
+        return memberQuerydsl.findByEmailListWithPhoneNumber(phoneNumber)
+                .stream().filter(o -> o.getSocial() == false)
+                .findFirst()
+                .orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT)).getEmail();
     }
 
     @Override
@@ -168,7 +177,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void oauthJoin(OAuthInfoReq oAuthInfoReq) {
-//        memberRepository
+        Member member = memberRepository.findByEmail("");
+        member.oAuthJoin(oAuthInfoReq.getPhoneNumber(), oAuthInfoReq.getNickname());
     }
 
     @Override
