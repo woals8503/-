@@ -29,6 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(allowCredentials = "true", originPatterns = "*")
 public class OAuthController {
 
     private final MemberService memberService;
