@@ -27,6 +27,7 @@ import java.util.Map;
 import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
+import static java.nio.charset.StandardCharsets.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REDIRECT_URI;
@@ -44,27 +45,23 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throws IOException, ServletException {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = principal.getMember();
-        // 회원이라면
+
+        // 이미 회원
         if(member.getSocial()) {
-            String accessToken = generateToken(principal, true, AT_EXP_TIME);
-            String refreshToken = generateRefreshToken(principal, true, RT_EXP_TIME);
-            // 엑세스토큰 Authorization Bearer accesstoken
-            response.sendRedirect(UriComponentsBuilder.fromUriString("/api/test5")
-                    .queryParam("accessToken", accessToken)
-                    .queryParam("refreshToken", refreshToken)
-                    .queryParam("id", member.getId())
+
+            response.sendRedirect(UriComponentsBuilder.fromUriString("http://shimpyo.o-r.kr/social/login")
+                    .queryParam("user_id", member.getId())
                     .build()
-                    .encode(StandardCharsets.UTF_8)
+                    .encode(UTF_8)
                     .toUriString());
         }
 
         // 최초 로그인이라면 회원가입 창 redirect
         else {
-            response.sendRedirect(UriComponentsBuilder.fromUriString("http://shimpyo.o-r.kr/")
-                    .queryParam("additional_info", false)
-                    .queryParam("id", member.getId())
+            response.sendRedirect(UriComponentsBuilder.fromUriString("http://shimpyo.o-r.kr/add_info")
+                    .queryParam("user_id", member.getId())
                     .build()
-                    .encode(StandardCharsets.UTF_8)
+                    .encode(UTF_8)
                     .toUriString());
         }
     }
