@@ -126,7 +126,7 @@ public class MemberServiceImpl implements MemberService {
     public void updateRefreshToken(String username, String refreshToken) {
         Member findMember = memberRepository.findByEmail(username);
         if(findMember == null)
-            new RuntimeException("사용자를 찾을 수 없습니다.");
+           throw new RuntimeException("사용자를 찾을 수 없습니다.");
 
         findMember.updateRefreshToken(refreshToken);
     }
@@ -198,8 +198,9 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void findByMemberWithPhoneNumber(String phoneNumber) {
         Member member = memberRepository.findByMemberWithPhoneNumber(phoneNumber);
-        if(member == null) {
-            new BaseException(MEMBER_NONEXISTENT);
+
+        if(member == null || member.getSocial()) {
+            throw new BaseException(MEMBER_NONEXISTENT);
         }
     }
 
