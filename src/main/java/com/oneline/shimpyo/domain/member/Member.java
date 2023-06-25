@@ -115,6 +115,7 @@ public class Member extends BaseEntity {
     public void oAuthJoin(String phoneNumber, String nickname) {
         this.phoneNumber = phoneNumber;
         this.nickname = nickname;
+        this.social = true;
     }
 
     public Member update(String email) {
