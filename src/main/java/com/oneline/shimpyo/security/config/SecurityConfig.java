@@ -142,6 +142,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
     CorsConfigurationSource corsConfigurationSourceServer() {
         CorsConfiguration configuration = new CorsConfiguration();
