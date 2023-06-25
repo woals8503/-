@@ -90,7 +90,7 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-    @GetMapping("/api/certification")
+    @PostMapping("/api/certification")
     public BaseResponse<CertificationPhoneNumberRes> CertificationPhone(
             @RequestBody CertificationPhoneNumberReq request) {
 
@@ -108,7 +108,7 @@ public class MemberController {
         return new BaseResponse<>(new CertificationPhoneNumberRes(numStr));
     }
 
-    @GetMapping("/api/certification-onlyuser")
+    @PostMapping("/api/certification-onlyuser")
     public BaseResponse<CertificationPhoneNumberRes> CertificationUserPhone(
             @RequestBody CertificationPhoneNumberReq request) {
 
