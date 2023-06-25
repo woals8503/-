@@ -46,6 +46,7 @@ public class OAuthController {
         return new BaseResponse<>();
     }
 
+
     @GetMapping("/api/oauth2-access")
     public BaseResponse<Map<String, String>> oauthToken(@RequestBody OAuth2IdReq request,
                                                         HttpServletResponse response) {
