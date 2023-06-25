@@ -177,7 +177,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void oauthJoin(OAuthInfoReq oAuthInfoReq) {
-        Member member = memberRepository.findByEmail("");
+        Member member = memberRepository.findById(oAuthInfoReq.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
+
         member.oAuthJoin(oAuthInfoReq.getPhoneNumber(), oAuthInfoReq.getNickname());
     }
 
@@ -192,6 +193,14 @@ public class MemberServiceImpl implements MemberService {
     public void removeMember(Member member) {
         Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
         memberRepository.delete(findMember);
+    }
+
+    @Override
+    public void findByMemberWithPhoneNumber(String phoneNumber) {
+        Member member = memberRepository.findByMemberWithPhoneNumber(phoneNumber);
+        if(member == null) {
+            new BaseException(MEMBER_NONEXISTENT);
+        }
     }
 
 }

@@ -1,23 +1,70 @@
 package com.oneline.shimpyo.security.oAuth.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oneline.shimpyo.domain.BaseException;
+import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
+import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.auth.CurrentMember;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.oneline.shimpyo.security.oAuth.dto.OAuth2IdReq;
+import com.oneline.shimpyo.service.MemberService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.oneline.shimpyo.domain.BaseResponseStatus.MEMBER_NONEXISTENT;
+import static com.oneline.shimpyo.domain.BaseResponseStatus.NICKNAME_DUPLICATE;
+import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
+import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
+import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping("/oauth")
+@RequiredArgsConstructor
 public class OAuthController {
-    @GetMapping("/loginInfo")
-    public String oauthLoginInfo(@CurrentMember Member member){
-        System.out.println(member.getEmail());
-        //oAuth2User.toString() 예시 : Name: [2346930276], Granted Authorities: [[USER]], User Attributes: [{id=2346930276, provider=kakao, name=김준우, email=bababoll@naver.com}]
-//        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        //attributes.toString() 예시 : {id=2346930276, provider=kakao, name=김준우, email=bababoll@naver.com}
-//        Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        return "ok";
+    private final MemberService memberService;
+    private final MemberRepository memberRepository;
+
+    @PostMapping("/api/oauth2-join")
+    public BaseResponse<Void> oauthJoin(@RequestBody OAuthInfoReq oAuthInfoReq) {
+        boolean checkNickname = memberService.duplicateNickname(oAuthInfoReq.getNickname());
+
+        if(!checkNickname)
+            return new BaseResponse<>(NICKNAME_DUPLICATE);
+
+        memberService.oauthJoin(oAuthInfoReq);
+        // 엑세스, 리프레시 쿠키 담아서 반환
+        return new BaseResponse<>();
     }
+
+
+    @GetMapping("/api/oauth2-access")
+    public BaseResponse<Map<String, String>> oauthToken(@RequestBody OAuth2IdReq request,
+                                                        HttpServletResponse response) {
+        Member member = memberRepository.findById(request.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
+
+        String accessToken = generateOAuth2Token(member, true, AT_EXP_TIME);
+        String refreshToken = generateOAuth2Token(member, true, RT_EXP_TIME);
+
+        // Refresh Token DB에 저장
+        memberService.updateRefreshToken(member.getEmail(), refreshToken);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("utf-8");
+        response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
+
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put(AT_HEADER, accessToken);
+
+        return new BaseResponse<>(responseMap);
+    }
+
 }

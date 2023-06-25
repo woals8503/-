@@ -44,4 +44,5 @@ public interface MemberService {
 
     void removeMember(Member member);
 
+    void findByMemberWithPhoneNumber(String phoneNumber);
 }
