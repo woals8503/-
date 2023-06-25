@@ -48,7 +48,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 이미 회원
         if(member.getSocial()) {
-
             response.sendRedirect(UriComponentsBuilder.fromUriString("http://shimpyo.o-r.kr/social/login")
                     .queryParam("user_id", member.getId())
                     .build()
