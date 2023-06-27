@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reviews")
+@RequestMapping("/user/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -31,11 +31,11 @@ public class ReviewController {
         return new BaseResponse<>();
     }
 
-    @GetMapping("/members/{memberId}")
+    @GetMapping("")
     public BaseResponse<GetPageRes<GetReviewRes>> readReviewList(
             @CurrentMember Member member,
-            @PathVariable long memberId,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+        long memberId = checkMember.getMemberId(member, true);
         checkMember.checkCurrentMember(member, memberId);
 
         return new BaseResponse<>(reviewService.readReviewList(memberId, pageable));

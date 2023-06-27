@@ -14,7 +14,7 @@ public interface ReservationService {
     GetPrepareReservationRes prepareReservation(long memberId) throws BaseException;
     long createReservation(long memberId, PostReservationReq postReservationReq)
             throws BaseException, IamportResponseException, IOException;
-    GetPageRes<GetReservationListRes> readReservationList(long memberId, Pageable pageable);
+    GetPageRes<GetReservationListRes> readReservationList(long memberId, ReservationStatus reservationStatus, Pageable pageable);
     GetReservationRes readReservation(long memberId, long reservationId);
     GetHouseReservationRes readHouseReservationList(long memberId, long houseId,
                                                     ReservationStatus reservationStatus, Pageable pageable);

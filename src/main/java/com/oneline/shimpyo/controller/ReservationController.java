@@ -3,14 +3,10 @@ package com.oneline.shimpyo.controller;
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.GetPageRes;
-import com.oneline.shimpyo.domain.house.House;
-import com.oneline.shimpyo.domain.house.HouseImage;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.modules.CheckMember;
-import com.oneline.shimpyo.repository.HouseImageRepository;
-import com.oneline.shimpyo.repository.HouseRepository;
 import com.oneline.shimpyo.security.auth.CurrentMember;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -19,19 +15,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reservations")
+@RequestMapping("/user/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
     private final CheckMember checkMember;
 
-    @GetMapping("")
+    @GetMapping("/prepare")
     public BaseResponse<GetPrepareReservationRes> prepareReservation(@CurrentMember Member member) throws BaseException {
         long memberId = checkMember.getMemberId(member, true);
 
@@ -47,14 +41,16 @@ public class ReservationController {
         return new BaseResponse<>(new PostReservationRes(reservationId));
     }
 
-    @GetMapping("/members/{memberId}")
-    public BaseResponse<GetPageRes<GetReservationListRes>> readReservationList(
-            @CurrentMember Member member,
-            @PathVariable long memberId,
-            @PageableDefault Pageable pageable) {
-
+    @GetMapping("")
+    public BaseResponse<GetPageRes<GetReservationListRes>> readReservationList(@CurrentMember Member member,
+                                                                               @RequestParam(required = false,
+                                                                                       defaultValue = "COMPLETE")
+                                                                               String reservationStatus,
+                                                                               @PageableDefault Pageable pageable) {
+        long memberId = checkMember.getMemberId(member, true);
         checkMember.checkCurrentMember(member, memberId);
-        return new BaseResponse<>(reservationService.readReservationList(memberId, pageable));
+        return new BaseResponse<>(reservationService.readReservationList(memberId,
+                ReservationStatus.of(reservationStatus),pageable));
     }
 
     @GetMapping("/{reservationId}")
