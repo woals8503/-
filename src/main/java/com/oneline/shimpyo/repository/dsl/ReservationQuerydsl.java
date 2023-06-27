@@ -2,6 +2,7 @@ package com.oneline.shimpyo.repository.dsl;
 
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
@@ -13,34 +14,39 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.oneline.shimpyo.domain.house.QHouse.house;
+import static com.oneline.shimpyo.domain.house.QHouseAddress.houseAddress;
 import static com.oneline.shimpyo.domain.house.QHouseImage.houseImage;
 import static com.oneline.shimpyo.domain.member.QMember.member;
 import static com.oneline.shimpyo.domain.pay.QPayMent.payMent;
 import static com.oneline.shimpyo.domain.reservation.QReservation.reservation;
+import static com.oneline.shimpyo.domain.review.QReview.review;
 import static com.oneline.shimpyo.domain.room.QRoom.room;
-import static com.oneline.shimpyo.domain.room.QRoomImage.*;
+import static com.oneline.shimpyo.domain.room.QRoomImage.roomImage;
 
 @Repository
 public class ReservationQuerydsl {
     private final JPAQueryFactory jqf;
-    private final static int FULL_REFUND = 0;
 
     public ReservationQuerydsl(EntityManager em) {
         this.jqf = new JPAQueryFactory(em);
     }
 
-    public Page<GetReservationListRes> readReservationList(long memberId, Pageable pageable) {
+    public Page<GetReservationListRes> readReservationList(long memberId, ReservationStatus reservationStatus, Pageable pageable) {
         List<GetReservationListRes> reservationList = jqf.select(new QGetReservationListRes(reservation.id,
-                        houseImage.savedURL,
-                        house.name, house.member.nickname, house.type, reservation.checkInDate,
-                        reservation.checkOutDate, house.name, reservation.reservationStatus))
+                        houseImage.savedURL, house.name, member.nickname, house.type,
+                        reservation.checkInDate, reservation.checkOutDate, room.checkIn, room.checkOut,
+                        houseAddress.lat, houseAddress.lng, houseAddress.fullAddress,
+                        reservation.reservationStatus, review.id))
                 .from(reservation)
-                .join(reservation.room.house, house)
+                .join(reservation.room, room)
+                .join(room.house, house)
+                .join(house.member, member)
                 .join(house.images, houseImage)
+                .join(house.houseAddress, houseAddress)
+                .leftJoin(reservation.review, review)
                 .groupBy(reservation)
                 .where(reservation.member.id.eq(memberId))
-                .where(reservation.reservationStatus.ne(ReservationStatus.CANCEL)
-                        .or(reservation.payMent.remainPrice.ne(FULL_REFUND)))
+                .where(reservationEq(reservationStatus))
                 .orderBy(reservation.createdDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -56,12 +62,15 @@ public class ReservationQuerydsl {
     public GetReservationRes readReservation(long reservationId) {
         return jqf.select(new QGetReservationRes(house.id, reservation.id, reservation.reservationStatus, house.name,
                         house.member.nickname, reservation.checkInDate, reservation.checkOutDate,
-                        room.checkIn, room.checkOut, room.id, room.name,
-                        reservation.peopleCount, house.name, payMent.price, payMent.remainPrice))
+                        room.checkIn, room.checkOut, room.id, room.name, reservation.peopleCount,
+                        houseAddress.lat, houseAddress.lng, houseAddress.fullAddress,
+                        payMent.price, payMent.remainPrice, review.id))
                 .from(reservation)
                 .join(reservation.room, room)
-                .join(reservation.room.house, house)
+                .join(room.house, house)
+                .join(house.houseAddress, houseAddress)
                 .join(reservation.payMent, payMent)
+                .leftJoin(reservation.review, review)
                 .where(reservation.id.eq(reservationId))
                 .fetchFirst();
 
@@ -101,5 +110,13 @@ public class ReservationQuerydsl {
                 .where(house.id.eq(finalHouseId))
                 .groupBy(reservation.reservationStatus)
                 .fetch();
+    }
+
+    private BooleanExpression reservationEq(ReservationStatus reservationStatus){
+        if(reservationStatus.equals(ReservationStatus.COMPLETE)){
+            return reservation.reservationStatus.eq(reservationStatus)
+                    .or(reservation.reservationStatus.eq(ReservationStatus.USING));
+        }
+        return reservation.reservationStatus.eq(reservationStatus);
     }
 }

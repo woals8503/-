@@ -10,7 +10,10 @@ import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.domain.room.Room;
-import com.oneline.shimpyo.repository.*;
+import com.oneline.shimpyo.repository.HouseImageRepository;
+import com.oneline.shimpyo.repository.MemberRepository;
+import com.oneline.shimpyo.repository.ReservationRepository;
+import com.oneline.shimpyo.repository.RoomRepository;
 import com.oneline.shimpyo.repository.dsl.MyCouponQuerydsl;
 import com.oneline.shimpyo.repository.dsl.ReservationQuerydsl;
 import com.oneline.shimpyo.service.PaymentService;
@@ -34,12 +37,10 @@ import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 @Transactional(readOnly = true)
 public class ReservationServiceImpl implements ReservationService {
 
-    private final static long FIRST_REQUEST = 0L;
     private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationQuerydsl reservationQuerydsl;
     private final MemberRepository memberRepository;
-    private final HouseRepository houseRepository;
     private final HouseImageRepository houseImageRepository;
     private final RoomRepository roomRepository;
     private final MyCouponQuerydsl myCouponQuerydsl;
@@ -81,10 +82,11 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public GetPageRes<GetReservationListRes> readReservationList(long memberId, Pageable pageable) {
+    public GetPageRes<GetReservationListRes> readReservationList(long memberId, ReservationStatus reservationStatus,
+                                                                 Pageable pageable) {
         memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
 
-        return new GetPageRes<>(reservationQuerydsl.readReservationList(memberId, pageable));
+        return new GetPageRes<>(reservationQuerydsl.readReservationList(memberId, reservationStatus, pageable));
     }
 
     @Override
