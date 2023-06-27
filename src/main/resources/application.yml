@@ -12,10 +12,10 @@ cloud:
     region.static: ap-northeast-2
 
 spring:
-#  profiles:
-#    include: db, oauth
-  config:
-    import: db-config.yml, application-oauth.yml
+  profiles:
+    include: db, oauth
+#  config:
+#    import: db-config.yml, application-oauth.yml
 
   #    config import 지정해줘야 데이터 저장됨
   servlet:
