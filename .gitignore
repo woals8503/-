@@ -16,3 +16,4 @@ out/
 
 src/main/resources/db-config.yml
 src/main/resources/db-configlocal.yml
+src/main/resources/application-oauth.yml
