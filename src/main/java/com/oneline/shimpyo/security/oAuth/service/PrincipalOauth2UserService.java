@@ -1,24 +1,17 @@
 package com.oneline.shimpyo.security.oAuth.service;
 
 import com.oneline.shimpyo.domain.member.Member;
-import com.oneline.shimpyo.domain.member.MemberGrade;
-import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
 import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.security.oAuth.OAuthAttributes;
 import com.oneline.shimpyo.security.oAuth.profile.MemberProfile;
-import com.oneline.shimpyo.security.oAuth.provider.GoogleUserInfo;
-import com.oneline.shimpyo.security.oAuth.provider.NaverUserInfo;
-import com.oneline.shimpyo.security.oAuth.provider.OAuth2UserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

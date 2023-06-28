@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.LongStream;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 

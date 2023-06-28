@@ -10,7 +10,6 @@ import com.oneline.shimpyo.domain.review.Review;
 import com.oneline.shimpyo.domain.review.dto.GetReviewRes;
 import com.oneline.shimpyo.domain.review.dto.PatchReviewReq;
 import com.oneline.shimpyo.domain.review.dto.PostReviewReq;
-import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.ReservationRepository;
 import com.oneline.shimpyo.repository.ReviewRepository;
 import com.oneline.shimpyo.service.ReviewService;

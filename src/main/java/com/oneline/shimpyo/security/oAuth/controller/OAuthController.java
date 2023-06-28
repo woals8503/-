@@ -1,22 +1,15 @@
 package com.oneline.shimpyo.security.oAuth.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
-import com.oneline.shimpyo.repository.MemberRepository;
-import com.oneline.shimpyo.security.auth.CurrentMember;
 import com.oneline.shimpyo.security.oAuth.dto.OAuth2IdReq;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +38,7 @@ public class OAuthController {
         // 엑세스, 리프레시 쿠키 담아서 반환
         return new BaseResponse<>();
     }
+
 
     @GetMapping("/api/oauth2-access")
     public BaseResponse<Map<String, String>> oauthToken(@RequestBody OAuth2IdReq request,

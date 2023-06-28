@@ -11,7 +11,6 @@ import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.repository.HouseImageRepository;
-import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.ReservationRepository;
 import com.oneline.shimpyo.repository.RoomRepository;
 import com.oneline.shimpyo.repository.dsl.MyCouponQuerydsl;

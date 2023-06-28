@@ -12,10 +12,10 @@ cloud:
     region.static: ap-northeast-2
 
 spring:
-  profiles:
-    include: db, oauth
-#  config:
-#    import: db-config.yml, application-oauth.yml
+#  profiles:
+#    include: db, oauth
+  config:
+    import: db-config.yml, application-oauth.yml
 
   #    config import 지정해줘야 데이터 저장됨
   servlet:
@@ -54,7 +54,7 @@ spring:
             client-id: temp
             client-secret: temp
             #            token-uri: https://oauth2.googleapis.com/token
-            redirect-uri: http://shimpyo-api.p-e.kr:8081/login/oauth2/code/google # 이 uri에 코드 값을 넘겨준다
+            redirect-uri: http://localhost:8081/login/oauth2/code/google # 이 uri에 코드 값을 넘겨준다
             #            resource-uri: https://www.googleapis.com/oauth2/v2/userinfo
             scope:
               - email

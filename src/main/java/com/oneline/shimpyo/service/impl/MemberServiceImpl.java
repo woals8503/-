@@ -1,16 +1,10 @@
 package com.oneline.shimpyo.service.impl;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.member.UpdateMemberReq;
-import com.oneline.shimpyo.domain.member.dto.EmailRes;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
@@ -23,23 +17,19 @@ import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 import static com.oneline.shimpyo.domain.member.GradeName.*;
 import static com.oneline.shimpyo.security.handler.CustomSuccessHandler.createCookie;
 import static com.oneline.shimpyo.security.jwt.JwtConstants.*;
 import static com.oneline.shimpyo.security.jwt.JwtTokenUtil.*;
-import static java.util.stream.Collectors.*;
 
 @Slf4j
 @Service
