@@ -77,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(STATELESS);
         // cors 설정
-//        http.cors().configurationSource(corsConfigurationSource());
+        http.cors().configurationSource(configurationSource());
 
         // 모두 접근 가능
         http.authorizeRequests().antMatchers("/oauth2/**").permitAll();
