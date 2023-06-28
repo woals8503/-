@@ -24,7 +24,6 @@ import static com.oneline.shimpyo.modules.RegexValidator.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(allowCredentials = "true", originPatterns = "*")
 public class MemberController {
 
     private final MemberService memberService;
