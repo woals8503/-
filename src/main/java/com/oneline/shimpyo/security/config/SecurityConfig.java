@@ -75,9 +75,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .sessionManagement()
-                .sessionCreationPolicy(STATELESS);
-        // cors 설정
-        http.cors().configurationSource(configurationSource());
+                .sessionCreationPolicy(STATELESS)
+                .and()
+                .cors().configurationSource(configurationSource());
 
         // 모두 접근 가능
         http.authorizeRequests().antMatchers("/oauth2/**").permitAll();
@@ -133,16 +133,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public CorsConfigurationSource configurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("http://localhost:3000");
-        corsConfiguration.addAllowedOrigin("http://shimpyo-api.p-e.kr:8081");
-        corsConfiguration.addAllowedOrigin("http://shimpyo-api.o-r.kr:8081");
-        corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setMaxAge(3600L); //preflight 결과를 1시간동안 캐시에 저장
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
