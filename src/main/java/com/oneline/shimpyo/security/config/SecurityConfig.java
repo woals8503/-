@@ -136,7 +136,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://localhost:3000");
         corsConfiguration.addAllowedOrigin("http://shimpyo-api.p-e.kr:8081");
-        corsConfiguration.addAllowedOrigin("http://shimpyo-api.o-e.kr:8081");
+        corsConfiguration.addAllowedOrigin("http://shimpyo-api.o-r.kr:8081");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);
