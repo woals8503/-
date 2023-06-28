@@ -4,6 +4,7 @@ import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.UpdateMemberReq;
 import com.oneline.shimpyo.domain.member.dto.*;
+import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.auth.CurrentMember;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
