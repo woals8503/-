@@ -1,12 +1,10 @@
 package com.oneline.shimpyo.domain.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,15 +27,19 @@ public class GetReservationRes {
     private long roomId;
     private String roomName;
     private int peopleCount;
+    private double lat;
+    private double lng;
     private String address;
     private int price;
     private int remainPrice;
+    private boolean existReview;
 
     @QueryProjection
     public GetReservationRes(long houseId, long reservationId, ReservationStatus reservationStatus,
                              String houseName, String houseOwnerName, LocalDateTime checkInDate,
                              LocalDateTime checkOutDate, LocalTime checkInTime, LocalTime checkoutTime,
-                             long roomId, String roomName, int peopleCount, String address, int price, int remainPrice) {
+                             long roomId, String roomName, int peopleCount, double lat, double lng,
+                             String address, int price, int remainPrice, long reviewId) {
         this.houseId = houseId;
         this.reservationId = reservationId;
         this.reservationStatus = reservationStatus;
@@ -50,9 +52,12 @@ public class GetReservationRes {
         this.roomId = roomId;
         this.roomName = roomName;
         this.peopleCount = peopleCount;
+        this.lat = lat;
+        this.lng = lng;
         this.address = address;
         this.price = price;
         this.remainPrice = remainPrice;
+        this.existReview = reviewId != 0L;
     }
 
     public void setHouseImageUrl(List<String> houseImageUrl) {

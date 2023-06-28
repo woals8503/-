@@ -10,13 +10,17 @@ import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.domain.room.Room;
-import com.oneline.shimpyo.repository.*;
+import com.oneline.shimpyo.repository.HouseImageRepository;
+import com.oneline.shimpyo.repository.MemberRepository;
+import com.oneline.shimpyo.repository.ReservationRepository;
+import com.oneline.shimpyo.repository.RoomRepository;
 import com.oneline.shimpyo.repository.dsl.MyCouponQuerydsl;
 import com.oneline.shimpyo.repository.dsl.ReservationQuerydsl;
 import com.oneline.shimpyo.service.PaymentService;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,10 +82,11 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public GetPageRes<GetReservationListRes> readReservationList(long memberId, Pageable pageable) {
+    public GetPageRes<GetReservationListRes> readReservationList(long memberId, ReservationStatus reservationStatus,
+                                                                 Pageable pageable) {
         memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
 
-        return new GetPageRes<>(reservationQuerydsl.readReservationList(memberId, pageable));
+        return new GetPageRes<>(reservationQuerydsl.readReservationList(memberId, reservationStatus, pageable));
     }
 
     @Override
@@ -96,6 +101,17 @@ public class ReservationServiceImpl implements ReservationService {
         getReservationRes.setHouseImageUrl(houseImageList.stream().map(HouseImage::getSavedURL).collect(Collectors.toList()));
 
         return getReservationRes;
+    }
+
+    @Override
+    public GetHouseReservationRes readHouseReservationList(long memberId, long houseId,
+                                                           ReservationStatus reservationStatus, Pageable pageable) {
+        Page<HostReservationReq> hostReservationReqs = reservationQuerydsl
+                .readHouseReservationList(houseId, reservationStatus, pageable);
+
+        List<ReservationStatusCount> statusCountList = reservationQuerydsl.readHouseReservationStatusCount(houseId);
+
+        return new GetHouseReservationRes(hostReservationReqs, statusCountList);
     }
 
     @Transactional

@@ -23,10 +23,17 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-    - name: Build with Gradle #step 이름을 정의
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1 #gradle-build-action을 통해 Gradle로 빌드
-      with:
-        arguments: build #Gradle에게 build 명령어를 전달함으로써 프로젝트를 빌드한다.
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+    
+    - name: Build with Gradle
+      run: ./gradlew clean build
+      
+#     - name: Build with Gradle #step 이름을 정의
+#       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1 #gradle-build-action을 통해 Gradle로 빌드
+#       with:
+#         arguments: build #Gradle에게 build 명령어를 전달함으로써 프로젝트를 빌드한다.
         
     # 전송할 파일을 담을 디렉토리 생성
     - name: Make Directory for deliver
