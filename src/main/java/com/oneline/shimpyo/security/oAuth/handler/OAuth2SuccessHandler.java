@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.security.oAuth.handler;
 
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;

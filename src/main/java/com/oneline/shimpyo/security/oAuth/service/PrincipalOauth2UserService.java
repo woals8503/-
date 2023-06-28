@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.security.oAuth.service;
 
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
 import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.security.oAuth.OAuthAttributes;

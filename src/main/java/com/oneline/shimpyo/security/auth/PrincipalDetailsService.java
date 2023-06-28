@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.security.auth;
 
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

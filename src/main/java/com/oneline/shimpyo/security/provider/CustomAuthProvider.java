@@ -3,6 +3,7 @@ package com.oneline.shimpyo.security.provider;
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.security.auth.PrincipalDetailsService;
+import com.oneline.shimpyo.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
