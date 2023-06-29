@@ -18,7 +18,7 @@ public enum ReviewRating {
         this.status = status;
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ReviewRating findByMethod(String method) throws BaseException {
         return Stream.of(ReviewRating.values())
                 .filter(c -> c.name().equals(method))

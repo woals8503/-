@@ -19,7 +19,7 @@ public enum PayMethod {
         this.method = method;
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PayMethod findByMethod(String method) throws BaseException {
         return Stream.of(PayMethod.values())
                 .filter(c -> c.name().equals(method))
