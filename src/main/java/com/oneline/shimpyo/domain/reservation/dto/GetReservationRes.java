@@ -20,6 +20,7 @@ public class GetReservationRes {
     private long houseId;
     private ReservationStatus reservationStatus;
     private List<String> houseImageUrl;
+    private long houseOwnerId;
     private String houseName;
     private String houseOwnerName;
     private String checkInDate;
@@ -35,7 +36,7 @@ public class GetReservationRes {
     private boolean existReview;
 
     @QueryProjection
-    public GetReservationRes(long houseId, long reservationId, ReservationStatus reservationStatus,
+    public GetReservationRes(long houseId, long reservationId, ReservationStatus reservationStatus, long houseOwnerId,
                              String houseName, String houseOwnerName, LocalDateTime checkInDate,
                              LocalDateTime checkOutDate, LocalTime checkInTime, LocalTime checkoutTime,
                              long roomId, String roomName, int peopleCount, double lat, double lng,
@@ -43,6 +44,7 @@ public class GetReservationRes {
         this.houseId = houseId;
         this.reservationId = reservationId;
         this.reservationStatus = reservationStatus;
+        this.houseOwnerId = houseOwnerId;
         this.houseName = houseName;
         this.houseOwnerName = houseOwnerName;
         this.checkInDate = checkInDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "." +

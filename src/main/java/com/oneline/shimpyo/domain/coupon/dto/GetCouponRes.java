@@ -1,4 +1,4 @@
-package com.oneline.shimpyo.domain.reservation.dto;
+package com.oneline.shimpyo.domain.coupon.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 @ToString
 @Getter
 @NoArgsConstructor
-public class CouponReq {
+public class GetCouponRes {
 
     private long couponId;
     private String name;
@@ -20,7 +20,7 @@ public class CouponReq {
     private String expiredDate;
 
     @QueryProjection
-    public CouponReq(long couponId, String name, String description, int discount, LocalDateTime expiredDate) {
+    public GetCouponRes(long couponId, String name, String description, int discount, LocalDateTime expiredDate) {
         this.couponId = couponId;
         this.name = name;
         this.description = description;

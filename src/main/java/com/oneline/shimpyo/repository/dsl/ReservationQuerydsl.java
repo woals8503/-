@@ -60,7 +60,8 @@ public class ReservationQuerydsl {
     }
 
     public GetReservationRes readReservation(long reservationId) {
-        return jqf.select(new QGetReservationRes(house.id, reservation.id, reservation.reservationStatus, house.name,
+        return jqf.select(new QGetReservationRes(house.id, reservation.id, reservation.reservationStatus,
+                        house.member.id, house.name,
                         house.member.nickname, reservation.checkInDate, reservation.checkOutDate,
                         room.checkIn, room.checkOut, room.id, room.name, reservation.peopleCount,
                         houseAddress.lat, houseAddress.lng, houseAddress.fullAddress,

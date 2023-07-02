@@ -2,6 +2,7 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.GetPageRes;
+import com.oneline.shimpyo.domain.coupon.dto.GetCouponRes;
 import com.oneline.shimpyo.domain.house.HouseImage;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
@@ -50,7 +51,7 @@ public class ReservationServiceImpl implements ReservationService {
         String uuid = UUID.randomUUID().toString();
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
         MemberGrade memberGrade = member.getMemberGrade();
-        List<CouponReq> myCouponList = myCouponQuerydsl.getMyCouponList(memberId);
+        List<GetCouponRes> myCouponList = myCouponQuerydsl.getMyCouponList(memberId);
 
         return new GetPrepareReservationRes(uuid, memberGrade.getGrade().getRank(), memberGrade.getDiscount(), myCouponList);
     }

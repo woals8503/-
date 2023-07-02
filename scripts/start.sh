@@ -40,7 +40,6 @@ else
     sleep 2
 fi
 
-
 cd /home/ubuntu/action
 echo "> 새 어플리케이션 배포"
 JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
@@ -57,22 +56,6 @@ IDLE_PROFILE=$(find_idle_profile)
 
 echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다."
 
-#
-#nohup java -jar /home/ubuntu/action/shimpyo-0.0.1-SNAPSHOT.jar
-#nohup java -jar /home/ubuntu/action/shimpyo-0.0.1-SNAPSHOT.jar > $REPOSITORY/nohup.out 2>&1 &
-
 nohup java -jar \
         -Dspring.config.location=classpath:/application.yml,/home/ubuntu/action/application-db.yml \
         /home/ubuntu/action/shimpyo-0.0.1-SNAPSHOT.jar > $REPOSITORY/nohup.out 2>&1 &
-nohup java -jar \
-    -Dspring.config.location=/home/ubuntu/action/application-db.yml \
-    /home/ubuntu/action/shimpyo-0.0.1-SNAPSHOT.jar > $REPOSITORY/nohup.out 2>&1 &
-
-#nohup java -jar /abc/ddd > $REPOSITORY/nohup.out 2>&1 &
-
-
-# nohup 명령어 실행 후 10초 대기
-sleep 10
-
-echo "> nohup.out 파일 내용 확인"
-cat $REPOSITORY/nohup.out

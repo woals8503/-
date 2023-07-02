@@ -2,6 +2,8 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.coupon.Coupon;
+import com.oneline.shimpyo.domain.coupon.CouponId;
+import com.oneline.shimpyo.domain.coupon.MyCoupon;
 import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.pay.PayStatus;
 import com.oneline.shimpyo.domain.reservation.Reservation;
@@ -36,20 +38,18 @@ public class PaymentServiceImpl implements PaymentService {
     private static final String API_KEY = "6354023824364652";
     private static final String API_SECRET = "oCGC7lJGsgCzkJG6i9JyIKwU1MtNE5SBJ7GnkCVqVzxbqaLo3DxIY5CwUQAoq5kqxsCXo2iQS4v2oeu6";
     private final IamportClient iamportClient;
-    private final HouseRepository houseRepository;
     private final RoomRepository roomRepository;
-    private final MemberRepository memberRepository;
+    private final MyCouponRepository myCouponRepository;
     private final CouponRepository couponRepository;
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
 
-    public PaymentServiceImpl(RoomRepository roomRepository, MemberRepository memberRepository,
+    public PaymentServiceImpl(RoomRepository roomRepository, MyCouponRepository myCouponRepository,
                               CouponRepository couponRepository, PaymentRepository paymentRepository,
-                              HouseRepository houseRepository, ReservationRepository reservationRepository) {
+                              ReservationRepository reservationRepository) {
         this.iamportClient = new IamportClient(API_KEY, API_SECRET);
-        this.houseRepository = houseRepository;
         this.roomRepository = roomRepository;
-        this.memberRepository = memberRepository;
+        this.myCouponRepository = myCouponRepository;
         this.couponRepository = couponRepository;
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
@@ -139,9 +139,12 @@ public class PaymentServiceImpl implements PaymentService {
 
         //쿠폰 체크
         if (postReservationReq.getCouponId() != EMPTY_ID) {
-            Coupon coupon = couponRepository.findById(postReservationReq.getCouponId())
+            CouponId couponId = new CouponId(memberId, postReservationReq.getCouponId());
+            MyCoupon myCoupon = myCouponRepository.findByCouponId(couponId)
                     .orElseThrow(() -> new BaseException(COUPON_NONEXISTENT));
-            priceToPay -= priceToPay * coupon.getDiscount();
+
+            priceToPay -= priceToPay * myCoupon.getCoupon().getDiscount();
+            myCoupon.setUsed(true);
         }
 
         //실제 결제 금액, db 금액 비교
