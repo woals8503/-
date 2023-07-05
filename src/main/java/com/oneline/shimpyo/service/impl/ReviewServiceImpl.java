@@ -13,16 +13,14 @@ import com.oneline.shimpyo.domain.review.dto.PostReviewReq;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.ReservationRepository;
 import com.oneline.shimpyo.repository.ReviewRepository;
+import com.oneline.shimpyo.repository.dsl.ReviewQuerydsl;
 import com.oneline.shimpyo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 import static com.oneline.shimpyo.domain.reservation.ReservationStatus.FINISHED;
@@ -35,6 +33,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
+    private final ReviewQuerydsl reviewQuerydsl;
 
     @Transactional
     @Override
@@ -54,11 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public GetPageRes<GetReviewRes> readReviewList(long memberId, Pageable pageable) {
-        Page<Review> reviews = reviewRepository.findByMemberId(memberId, pageable);
-
-        List<GetReviewRes> list = reviews.stream().map(GetReviewRes::new).collect(Collectors.toList());
-        return new GetPageRes<>(reviews.getTotalPages(), reviews.getTotalElements(), reviews.getSize(),
-                reviews.getNumberOfElements(), list);
+        return new GetPageRes<>(reviewQuerydsl.readReviewList(memberId, pageable));
     }
 
     @Transactional

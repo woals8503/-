@@ -63,8 +63,8 @@ public class ReservationQuerydsl {
         return jqf.select(new QGetReservationRes(house.id, reservation.id, reservation.reservationStatus,
                         house.member.id, house.name,
                         house.member.nickname, reservation.checkInDate, reservation.checkOutDate,
-                        room.checkIn, room.checkOut, room.id, room.name, reservation.peopleCount,
-                        houseAddress.lat, houseAddress.lng, houseAddress.fullAddress,
+                        room.checkIn, room.checkOut, room.id, room.name, room.maxPeople, room.minPeople,
+                        reservation.peopleCount, houseAddress.lat, houseAddress.lng, houseAddress.fullAddress,
                         payMent.price, payMent.remainPrice, review.id))
                 .from(reservation)
                 .join(reservation.room, room)

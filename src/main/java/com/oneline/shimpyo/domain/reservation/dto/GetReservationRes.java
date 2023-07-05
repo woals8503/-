@@ -1,6 +1,5 @@
 package com.oneline.shimpyo.domain.reservation.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
@@ -15,7 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class GetReservationRes {
 
-    @JsonIgnore
     private long reservationId;
     private long houseId;
     private ReservationStatus reservationStatus;
@@ -27,6 +25,8 @@ public class GetReservationRes {
     private String checkOutDate;
     private long roomId;
     private String roomName;
+    private int maxPeople;
+    private int minPeople;
     private int peopleCount;
     private double lat;
     private double lng;
@@ -39,8 +39,8 @@ public class GetReservationRes {
     public GetReservationRes(long houseId, long reservationId, ReservationStatus reservationStatus, long houseOwnerId,
                              String houseName, String houseOwnerName, LocalDateTime checkInDate,
                              LocalDateTime checkOutDate, LocalTime checkInTime, LocalTime checkoutTime,
-                             long roomId, String roomName, int peopleCount, double lat, double lng,
-                             String address, int price, int remainPrice, long reviewId) {
+                             long roomId, String roomName, int maxPeople, int minPeople, int peopleCount, double lat,
+                             double lng, String address, int price, int remainPrice, long reviewId) {
         this.houseId = houseId;
         this.reservationId = reservationId;
         this.reservationStatus = reservationStatus;
@@ -53,6 +53,8 @@ public class GetReservationRes {
                 checkoutTime.format(DateTimeFormatter.ofPattern("HH"));
         this.roomId = roomId;
         this.roomName = roomName;
+        this.maxPeople = maxPeople;
+        this.minPeople = minPeople;
         this.peopleCount = peopleCount;
         this.lat = lat;
         this.lng = lng;
