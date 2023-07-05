@@ -2,7 +2,6 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponseStatus;
-import com.oneline.shimpyo.domain.GetPageRes;
 import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.reservation.Reservation;
@@ -16,10 +15,10 @@ import com.oneline.shimpyo.repository.ReviewRepository;
 import com.oneline.shimpyo.repository.dsl.ReviewQuerydsl;
 import com.oneline.shimpyo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
@@ -52,8 +51,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public GetPageRes<GetReviewRes> readReviewList(long memberId, Pageable pageable) {
-        return new GetPageRes<>(reviewQuerydsl.readReviewList(memberId, pageable));
+    public List<GetReviewRes> readReviewList(long memberId) {
+        return reviewQuerydsl.readReviewList(memberId);
     }
 
     @Transactional
