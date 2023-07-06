@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.controller;
 
 import com.oneline.shimpyo.domain.BaseResponse;
+import com.oneline.shimpyo.domain.house.dto.GetHouseListRes;
 import com.oneline.shimpyo.domain.house.dto.PatchHouseReq;
 import com.oneline.shimpyo.domain.house.dto.PostHouseReq;
 import com.oneline.shimpyo.domain.house.dto.HouseRegisterRes;
@@ -21,6 +22,7 @@ import java.util.List;
 public class HouseController {
 
     private final HouseService houseService;
+    private final CheckMember checkMember;
 
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<HouseRegisterRes> createHouse(@RequestPart(value = "houseReq") PostHouseReq houseReq, @RequestPart(value = "houseImages") List<MultipartFile> houseImages
@@ -42,6 +44,12 @@ public class HouseController {
     public BaseResponse<Void> deleteHouse(@CurrentMember Member member, @PathVariable long houseId) {
         houseService.deleteHouse(member, houseId);
         return new BaseResponse<>();
+    }
+
+    @GetMapping("")
+    public BaseResponse<List<GetHouseListRes>> readHouseList(@CurrentMember Member member){
+        long memberId = checkMember.getMemberId(member, true);
+        return new BaseResponse<>(houseService.readHouseList(memberId));
     }
 
 }

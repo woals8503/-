@@ -3,13 +3,16 @@ package com.oneline.shimpyo.service.impl;
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.house.*;
 import com.oneline.shimpyo.domain.house.dto.FileReq;
+import com.oneline.shimpyo.domain.house.dto.GetHouseListRes;
 import com.oneline.shimpyo.domain.house.dto.PatchHouseReq;
 import com.oneline.shimpyo.domain.house.dto.PostHouseReq;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.reservation.dto.HostHouseReq;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.domain.room.RoomImage;
 import com.oneline.shimpyo.modules.S3FileHandler;
 import com.oneline.shimpyo.repository.*;
+import com.oneline.shimpyo.repository.dsl.HouseQuerydsl;
 import com.oneline.shimpyo.service.HouseService;
 import com.oneline.shimpyo.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 public class HouseServiceImpl implements HouseService {
 
     private final HouseRepository houseRepository;
+    private final HouseQuerydsl houseQuerydsl;
     private final RoomRepository roomRepository;
     private final HouseOptionRepository houseOptionRepository;
     private final HouseAddressRepository houseAddressRepository;
@@ -278,6 +282,11 @@ public class HouseServiceImpl implements HouseService {
         }
         // 숙소 관련 모든 정보 삭제(CASCADE)
         houseRepository.deleteById(houseId);
+    }
+
+    @Override
+    public List<GetHouseListRes> readHouseList(long memberId) {
+        return houseQuerydsl.readHouseList(memberId);
     }
 
 }
