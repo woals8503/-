@@ -60,7 +60,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public long createReservation(long memberId, PostReservationReq postReservationReq)
             throws BaseException, IamportResponseException, IOException {
-        PayMent payment = paymentService.createPayment(memberId, postReservationReq);
+        PayMent payment = paymentService.createMemberPayment(memberId, postReservationReq);
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
         Room room = roomRepository.findById(postReservationReq.getRoomId())
@@ -72,7 +72,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         Reservation reservation = Reservation.builder().room(room).member(member).payMent(payment)
-                .peopleCount(postReservationReq.getPeopleCount()).phoneNumber(postReservationReq.getPhoneNumber())
+                .peopleCount(postReservationReq.getPeopleCount()).phoneNumber(member.getPhoneNumber())
                 .reservationStatus(ReservationStatus.COMPLETE)
                 .checkInDate(postReservationReq.stringToLocalDateTime(postReservationReq.getCheckInDate()))
                 .checkOutDate(postReservationReq.stringToLocalDateTime(postReservationReq.getCheckOutDate()))
@@ -121,8 +121,7 @@ public class ReservationServiceImpl implements ReservationService {
                                              int peopleCount) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
-        Room room = roomRepository.findById(reservation.getRoom().getId())
-                .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
+        Room room = reservation.getRoom();
 
         validateMember(memberId, reservation.getMember().getId());
 
@@ -141,7 +140,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public void cancelReservation(long memberId, long reservationId, PatchReservationReq patchReservationReq)
             throws BaseException, IamportResponseException, IOException {
-        Reservation reservation = paymentService.cancelPayment(memberId, reservationId, patchReservationReq);
+        Reservation reservation = paymentService.cancelMemberPayment(memberId, reservationId, patchReservationReq);
 
         reservation.setReservationStatus(ReservationStatus.CANCEL);
     }

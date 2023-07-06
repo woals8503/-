@@ -3,9 +3,7 @@ package com.oneline.shimpyo.domain.reservation;
 import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.room.Room;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 import javax.persistence.*;
@@ -17,7 +15,9 @@ import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
+@Builder
 @Getter @Setter
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "NON_MEMBER_RESERVATION")
 public class NonMemberReservation extends BaseEntity {
@@ -37,14 +37,17 @@ public class NonMemberReservation extends BaseEntity {
     private String phoneNumber;
 
     @NotNull
-    @Enumerated
-    private ReservationStatus status;
+    private int peopleCount;
 
     @NotNull
     private LocalDateTime checkInDate;
 
     @NotNull
     private LocalDateTime checkOutDate;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus reservationStatus;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "room_id")

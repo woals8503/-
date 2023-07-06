@@ -77,7 +77,7 @@ public class ReservationController {
         return new BaseResponse<>(getHouseReservationRes);
     }
 
-    @PatchMapping("/{reservationId}/people-count")
+    @PatchMapping("/{reservationId}")
     public BaseResponse<Void> updateReservationPeopleCount(@PathVariable long reservationId,
                                                            @RequestBody PatchReservationPeopleReq patchReservationPeopleReq,
                                                            @CurrentMember Member member){
@@ -86,7 +86,7 @@ public class ReservationController {
         return new BaseResponse<>();
     }
 
-    @PatchMapping("/{reservationId}")
+    @DeleteMapping("/{reservationId}")
     public BaseResponse<Void> cancelReservation(@PathVariable long reservationId,
                                                 @RequestBody PatchReservationReq patchReservationReq,
                                                 @CurrentMember Member member)

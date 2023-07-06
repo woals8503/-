@@ -17,6 +17,7 @@ public class PostReservationReq {
     private long couponId;
     private String merchantUid;
     private PayMethod payMethod;
+    private String name;
     private int peopleCount;
     private String phoneNumber;
     private String checkInDate;

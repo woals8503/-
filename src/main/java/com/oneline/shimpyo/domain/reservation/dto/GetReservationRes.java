@@ -64,6 +64,34 @@ public class GetReservationRes {
         this.existReview = reviewId != 0L;
     }
 
+    @QueryProjection
+    public GetReservationRes(long houseId, long reservationId, ReservationStatus reservationStatus, long houseOwnerId,
+                             String houseName, String houseOwnerName, LocalDateTime checkInDate,
+                             LocalDateTime checkOutDate, LocalTime checkInTime, LocalTime checkoutTime,
+                             long roomId, String roomName, int maxPeople, int minPeople, int peopleCount, double lat,
+                             double lng, String address, int price, int remainPrice) {
+        this.houseId = houseId;
+        this.reservationId = reservationId;
+        this.reservationStatus = reservationStatus;
+        this.houseOwnerId = houseOwnerId;
+        this.houseName = houseName;
+        this.houseOwnerName = houseOwnerName;
+        this.checkInDate = checkInDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "." +
+                checkInTime.format(DateTimeFormatter.ofPattern("HH"));
+        this.checkOutDate = checkOutDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "." +
+                checkoutTime.format(DateTimeFormatter.ofPattern("HH"));
+        this.roomId = roomId;
+        this.roomName = roomName;
+        this.maxPeople = maxPeople;
+        this.minPeople = minPeople;
+        this.peopleCount = peopleCount;
+        this.lat = lat;
+        this.lng = lng;
+        this.address = address;
+        this.price = price;
+        this.remainPrice = remainPrice;
+    }
+
     public void setHouseImageUrl(List<String> houseImageUrl) {
         this.houseImageUrl = houseImageUrl;
     }

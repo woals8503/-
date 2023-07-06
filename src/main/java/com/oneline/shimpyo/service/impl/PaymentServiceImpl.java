@@ -6,6 +6,7 @@ import com.oneline.shimpyo.domain.coupon.CouponId;
 import com.oneline.shimpyo.domain.coupon.MyCoupon;
 import com.oneline.shimpyo.domain.pay.PayMent;
 import com.oneline.shimpyo.domain.pay.PayStatus;
+import com.oneline.shimpyo.domain.reservation.NonMemberReservation;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.PatchReservationReq;
@@ -56,7 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PayMent createPayment(long memberId, PostReservationReq postReservationReq)
+    public PayMent createMemberPayment(long memberId, PostReservationReq postReservationReq)
             throws IamportResponseException, IOException, BaseException {
         checkDuplicatePayment(postReservationReq);
         int paidPrice = validatePaid(memberId, postReservationReq);
@@ -69,14 +70,58 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Reservation cancelPayment(long memberId, long reservationId, PatchReservationReq patchReservationReq)
+    public Reservation cancelMemberPayment(long memberId, long reservationId, PatchReservationReq patchReservationReq)
             throws IamportResponseException, IOException, BaseException {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
         PayMent payMent = reservation.getPayMent();
 
-        validateCancel(memberId, patchReservationReq, reservation, payMent);
+        if (memberId != reservation.getMember().getId()) {
+            throw new BaseException(INVALID_MEMBER);
+        }
+        if (reservation.getReservationStatus() != ReservationStatus.COMPLETE) {
+            throw new BaseException(RESERVATION_CANCEL_OR_FINISHED);
+        }
+        if (payMent.getPrice() < patchReservationReq.getRefundAmount()) {
+            throw new BaseException(REFUND_WRONG);
+        }
+        cancelPayment(patchReservationReq, payMent);
 
+        return reservation;
+    }
+
+    @Override
+    public PayMent createNonMemberPayment(PostReservationReq postReservationReq)
+            throws IamportResponseException, IOException {
+        checkDuplicatePayment(postReservationReq);
+        int paidPrice = validateNonMemberPaid(postReservationReq);
+
+        PayMent payment = PayMent.builder().impUid(postReservationReq.getImpUid()).UUID(postReservationReq.getMerchantUid())
+                .payMethod(postReservationReq.getPayMethod()).price(paidPrice).payStatus(PayStatus.COMPLETE).build();
+        paymentRepository.save(payment);
+
+        return payment;
+    }
+
+    @Override
+    public NonMemberReservation cancelNonMemberPayment(NonMemberReservation reservation,
+                                                       PatchReservationReq patchReservationReq)
+            throws IamportResponseException, IOException {
+        PayMent payMent = reservation.getPayMent();
+
+        if (reservation.getReservationStatus() != ReservationStatus.COMPLETE) {
+            throw new BaseException(RESERVATION_CANCEL_OR_FINISHED);
+        }
+        if (payMent.getPrice() < patchReservationReq.getRefundAmount()) {
+            throw new BaseException(REFUND_WRONG);
+        }
+
+        cancelPayment(patchReservationReq, payMent);
+        return reservation;
+    }
+
+    private void cancelPayment(PatchReservationReq patchReservationReq, PayMent payMent)
+            throws IamportResponseException, IOException {
         IamportResponse<Payment> response = iamportClient.paymentByImpUid(payMent.getImpUid());
         CancelData cancelData = createCancelData(response, patchReservationReq.getRefundAmount());
         iamportClient.cancelPaymentByImpUid(cancelData);
@@ -85,23 +130,6 @@ public class PaymentServiceImpl implements PaymentService {
             payMent.setRemainPrice(payMent.getPrice() - patchReservationReq.getRefundAmount());
         }
         payMent.setPayStatus(PayStatus.CANCEL);
-
-        return reservation;
-    }
-
-    private static void validateCancel(long memberId, PatchReservationReq patchReservationReq,
-                                       Reservation reservation, PayMent payMent) {
-        if (memberId != reservation.getMember().getId()) {
-            throw new BaseException(INVALID_MEMBER);
-        }
-
-        if (reservation.getReservationStatus() != ReservationStatus.COMPLETE) {
-            throw new BaseException(RESERVATION_CANCEL_OR_FINISHED);
-        }
-
-        if (payMent.getPrice() < patchReservationReq.getRefundAmount()) {
-            throw new BaseException(REFUND_WRONG);
-        }
     }
 
     private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
@@ -125,11 +153,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     private int validatePaid(long memberId, PostReservationReq postReservationReq)
             throws BaseException, IOException, IamportResponseException {
-        int priceToPay;
         Room room = roomRepository.findById(postReservationReq.getRoomId())
                 .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
-        priceToPay = room.getPrice();
-
+        int priceToPay = room.getPrice();
         int paidPrice = getPaidPriceInPortone(postReservationReq.getImpUid());
 
         //회원 등급 체크 todo clear later for test
@@ -148,6 +174,22 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         //실제 결제 금액, db 금액 비교
+        return comparePrice(postReservationReq, priceToPay, paidPrice);
+    }
+
+    private int validateNonMemberPaid(PostReservationReq postReservationReq)
+            throws BaseException, IOException, IamportResponseException{
+        Room room = roomRepository.findById(postReservationReq.getRoomId())
+                .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
+        int priceToPay = room.getPrice();
+        int paidPrice = getPaidPriceInPortone(postReservationReq.getImpUid());
+
+        //실제 결제 금액, db 금액 비교
+        return comparePrice(postReservationReq, priceToPay, paidPrice);
+    }
+
+    private int comparePrice(PostReservationReq postReservationReq, int priceToPay, int paidPrice)
+            throws IamportResponseException, IOException {
         if (paidPrice != priceToPay) {
             log.error("결제 금액이 다릅니다. impUid = " + postReservationReq.getImpUid() +
                     ", paidPrice = " + paidPrice + ", priceToPay = " + priceToPay);
