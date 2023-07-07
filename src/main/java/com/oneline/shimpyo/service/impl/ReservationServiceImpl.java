@@ -11,6 +11,8 @@ import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.domain.room.Room;
+import com.oneline.shimpyo.modules.aop.Retry;
+import com.oneline.shimpyo.modules.aop.RetryAspect;
 import com.oneline.shimpyo.repository.HouseImageRepository;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.ReservationRepository;
@@ -21,6 +23,7 @@ import com.oneline.shimpyo.service.PaymentService;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 
+@Import(RetryAspect.class)
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -56,6 +60,7 @@ public class ReservationServiceImpl implements ReservationService {
         return new GetPrepareReservationRes(uuid, memberGrade.getGrade().getRank(), memberGrade.getDiscount(), myCouponList);
     }
 
+    @Retry
     @Transactional
     @Override
     public long createReservation(long memberId, PostReservationReq postReservationReq)
