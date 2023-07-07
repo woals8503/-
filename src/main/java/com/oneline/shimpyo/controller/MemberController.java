@@ -127,10 +127,10 @@ public class MemberController {
     }
 
     // 이메일 찾기
-    @GetMapping("/api/show-email")
+    @GetMapping("/api/show-email/{phoneNumber}")
     public BaseResponse<EmailRes> findEmail(
-            @RequestBody FindEmailReq request) {
-        String findEmail = memberService.findByEmailWithPhonNumber(request.getPhoneNumber());
+            @PathVariable String phoneNumber) {
+        String findEmail = memberService.findByEmailWithPhonNumber(phoneNumber);
 
         return new BaseResponse<>(new EmailRes(findEmail));
     }
