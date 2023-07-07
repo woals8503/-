@@ -49,7 +49,6 @@ public class JwtTokenUtil {
                 .sign(HMAC256(JWT_SECRET));
     }
 
-
     // 재발급 토큰
     public static String reissuanceAccessToken(Member member, boolean isMember, long EXP_TIME, long now) {
         return JWT.create()

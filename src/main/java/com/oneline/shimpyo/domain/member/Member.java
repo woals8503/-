@@ -48,6 +48,7 @@ public class Member extends BaseEntity {
     private String provider;
     private String providerId;
     private Boolean social;
+    private String comments;
 
     @Lob
     private String refreshToken;

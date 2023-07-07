@@ -49,7 +49,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
-
+        responseMap.put("profileImage", ((PrincipalDetails) authentication.getPrincipal()).getMember().getMemberImage().getSavedPath());
+        responseMap.put("nickname", ((PrincipalDetails) authentication.getPrincipal()).getMember().getNickname());
         BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
         new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
     }
@@ -63,7 +64,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
                 .httpOnly(true)
                 .maxAge(60 * 60 * 24)
                 .build();
-        
+
         return cookie;
     }
 }

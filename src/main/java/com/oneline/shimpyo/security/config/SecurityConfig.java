@@ -105,6 +105,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 필터
         http.addFilterBefore(anonymousAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(customAuthorizationFilter, AnonymousAuthenticationFilter.class);
+
         // 로그인 필터
         http.addFilter(filter);
 
@@ -138,7 +139,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedOriginPattern("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
-        configuration.setAllowCredentials(true);    // -> true이면 * 사용 불가
+        configuration.setAllowCredentials(true);    // -> true이면 addAllowedOrigin 사용 불가. addAllowedOriginPattern 사용 가능
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

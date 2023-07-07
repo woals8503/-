@@ -54,6 +54,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         else
             token = extractToken(request);
 
+        // 회원 전용 인증 절차
         if(!isEmpty(token)) {
             try {
                 if(validateToken(token)) {

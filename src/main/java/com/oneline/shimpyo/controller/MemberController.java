@@ -88,7 +88,8 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-    @GetMapping("/api/certification")
+    // 비회원이 예약하기위해 인증 ->
+    @PostMapping("/api/certification")
     public BaseResponse<CertificationPhoneNumberRes> CertificationPhone(
             @RequestBody CertificationPhoneNumberReq request) {
 
@@ -106,7 +107,7 @@ public class MemberController {
         return new BaseResponse<>(new CertificationPhoneNumberRes(numStr));
     }
 
-    @GetMapping("/api/certification-onlyuser")
+    @PostMapping("/api/certification-onlyuser")
     public BaseResponse<CertificationPhoneNumberRes> CertificationUserPhone(
             @RequestBody CertificationPhoneNumberReq request) {
 
