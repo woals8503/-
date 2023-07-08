@@ -1,7 +1,7 @@
 package com.oneline.shimpyo.repository.dsl;
 
-import com.oneline.shimpyo.domain.house.dto.GetHouseListRes;
-import com.oneline.shimpyo.domain.house.dto.QGetHouseListRes;
+import com.oneline.shimpyo.domain.house.dto.GetHouseListResHoseok;
+import com.oneline.shimpyo.domain.house.dto.QGetHouseListResHoseok;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
@@ -19,8 +19,8 @@ public class HouseQuerydsl {
         this.jqf = new JPAQueryFactory(em);
     }
 
-    public List<GetHouseListRes> readHouseList(long memberId) {
-        return jqf.select(new QGetHouseListRes(house.id, house.name, houseImage.savedURL, house.type))
+    public List<GetHouseListResHoseok> readHouseList(long memberId) {
+        return jqf.select(new QGetHouseListResHoseok(house.id, house.name, houseImage.savedURL, house.type))
                 .from(house)
                 .join(house.images, houseImage)
                 .where(house.member.id.eq(memberId))

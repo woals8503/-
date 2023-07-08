@@ -1,6 +1,6 @@
 package com.oneline.shimpyo.service;
 
-import com.oneline.shimpyo.domain.house.dto.GetHouseListRes;
+import com.oneline.shimpyo.domain.house.dto.GetHouseListResHoseok;
 import com.oneline.shimpyo.domain.house.dto.PatchHouseReq;
 import com.oneline.shimpyo.domain.house.dto.PostHouseReq;
 import com.oneline.shimpyo.domain.member.Member;
@@ -14,5 +14,5 @@ public interface HouseService {
     void updateHouse(Member member, long houseId, PatchHouseReq patchHouseReq, List<MultipartFile> houseImages);
     void deleteHouse(Member member, long houseId);
 
-    List<GetHouseListRes> readHouseList(long memberId);
+    List<GetHouseListResHoseok> readHouseList(long memberId);
 }

@@ -1,7 +1,7 @@
 package com.oneline.shimpyo.controller;
 
 import com.oneline.shimpyo.domain.BaseResponse;
-import com.oneline.shimpyo.domain.house.dto.GetHouseListRes;
+import com.oneline.shimpyo.domain.house.dto.GetHouseListResHoseok;
 import com.oneline.shimpyo.domain.house.dto.PatchHouseReq;
 import com.oneline.shimpyo.domain.house.dto.PostHouseReq;
 import com.oneline.shimpyo.domain.house.dto.HouseRegisterRes;
@@ -47,7 +47,7 @@ public class HouseController {
     }
 
     @GetMapping("")
-    public BaseResponse<List<GetHouseListRes>> readHouseList(@CurrentMember Member member){
+    public BaseResponse<List<GetHouseListResHoseok>> readHouseList(@CurrentMember Member member){
         long memberId = checkMember.getMemberId(member, true);
         return new BaseResponse<>(houseService.readHouseList(memberId));
     }

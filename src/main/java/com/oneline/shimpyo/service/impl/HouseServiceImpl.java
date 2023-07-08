@@ -3,18 +3,16 @@ package com.oneline.shimpyo.service.impl;
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.house.*;
 import com.oneline.shimpyo.domain.house.dto.FileReq;
-import com.oneline.shimpyo.domain.house.dto.GetHouseListRes;
+import com.oneline.shimpyo.domain.house.dto.GetHouseListResHoseok;
 import com.oneline.shimpyo.domain.house.dto.PatchHouseReq;
 import com.oneline.shimpyo.domain.house.dto.PostHouseReq;
 import com.oneline.shimpyo.domain.member.Member;
-import com.oneline.shimpyo.domain.reservation.dto.HostHouseReq;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.domain.room.RoomImage;
 import com.oneline.shimpyo.modules.S3FileHandler;
 import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.repository.dsl.HouseQuerydsl;
 import com.oneline.shimpyo.service.HouseService;
-import com.oneline.shimpyo.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -285,7 +283,7 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public List<GetHouseListRes> readHouseList(long memberId) {
+    public List<GetHouseListResHoseok> readHouseList(long memberId) {
         return houseQuerydsl.readHouseList(memberId);
     }
 
