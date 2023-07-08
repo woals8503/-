@@ -88,7 +88,7 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-    @GetMapping("/api/certification")
+    @PostMapping("/api/certification")
     public BaseResponse<CertificationPhoneNumberRes> CertificationPhone(
             @RequestBody CertificationPhoneNumberReq request) {
 
@@ -106,7 +106,7 @@ public class MemberController {
         return new BaseResponse<>(new CertificationPhoneNumberRes(numStr));
     }
 
-    @GetMapping("/api/certification-onlyuser")
+    @PostMapping("/api/certification-onlyuser")
     public BaseResponse<CertificationPhoneNumberRes> CertificationUserPhone(
             @RequestBody CertificationPhoneNumberReq request) {
 
@@ -127,10 +127,10 @@ public class MemberController {
     }
 
     // 이메일 찾기
-    @GetMapping("/api/show-email")
+    @GetMapping("/api/show-email/{phoneNumber}")
     public BaseResponse<EmailRes> findEmail(
-            @RequestBody FindEmailReq request) {
-        String findEmail = memberService.findByEmailWithPhonNumber(request.getPhoneNumber());
+            @PathVariable String phoneNumber) {
+        String findEmail = memberService.findByEmailWithPhonNumber(phoneNumber);
 
         return new BaseResponse<>(new EmailRes(findEmail));
     }
@@ -162,5 +162,6 @@ public class MemberController {
         memberService.removeMember(member);
         return new BaseResponse<>();
     }
+
 
 }
