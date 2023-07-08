@@ -2,17 +2,17 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.house.*;
-import com.oneline.shimpyo.domain.house.dto.FileReq;
-import com.oneline.shimpyo.domain.house.dto.PatchHouseReq;
-import com.oneline.shimpyo.domain.house.dto.PostHouseReq;
+import com.oneline.shimpyo.domain.house.dto.*;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.domain.room.RoomImage;
+import com.oneline.shimpyo.domain.room.dto.RoomInfo;
 import com.oneline.shimpyo.modules.S3FileHandler;
 import com.oneline.shimpyo.repository.*;
+import com.oneline.shimpyo.repository.dsl.HouseQuerydsl;
 import com.oneline.shimpyo.service.HouseService;
-import com.oneline.shimpyo.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +27,6 @@ import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class HouseServiceImpl implements HouseService {
-
     private final HouseRepository houseRepository;
     private final RoomRepository roomRepository;
     private final HouseOptionRepository houseOptionRepository;
@@ -35,7 +34,7 @@ public class HouseServiceImpl implements HouseService {
     private final HouseImageRepository houseImageRepository;
     private final RoomImageRepository roomImageRepository;
     private final S3FileHandler s3FileHandler;
-
+    private final HouseQuerydsl houseQuerydsl;
     @Override
     @Transactional
     public long createHouse(Member member, PostHouseReq houseReq, List<MultipartFile> houseImages, List<MultipartFile> roomImages) throws BaseException {
@@ -163,6 +162,33 @@ public class HouseServiceImpl implements HouseService {
             roomImageRepository.saveAll(toSaveRoomImages);
         }
         return savedHouse.getId();
+    }
+
+    @Override
+    public GetHouseDetailRes readHouseDetail(long houseId) {
+        // 숙소 관련 정보
+        HouseInfo foundHouse = Optional.ofNullable(houseQuerydsl.findHouseAndAddressByHouseId(houseId))
+                .orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
+        foundHouse.setOptions(houseQuerydsl.findHouseOptionsByHouseId(houseId));
+        foundHouse.setHouseImages(houseQuerydsl.findHouseImagesByHouseId(houseId));
+        // 객실 관련 정보
+        List<RoomInfo> foundRooms = houseQuerydsl.findRoomsByHouseId(houseId);
+        for (int i = 0; i < foundRooms.size(); i++) {
+            List<String> foundRoomImages = houseQuerydsl.findRoomImagesByRoomId(foundRooms.get(i).getRoomId());
+            foundRooms.get(i).setRoomImages(foundRoomImages);
+        }
+
+        // Response DTO에 저장
+        return GetHouseDetailRes.builder()
+                .house(foundHouse)
+                .rooms(foundRooms)
+                .build();
+    }
+
+    @Override
+    public List<GetHouseListRes> readHouseList(Pageable pageable, SearchFilterReq searchFilter) {
+        List<GetHouseListRes> foundHouseList = houseQuerydsl.findAllHouse(pageable, searchFilter);
+        return foundHouseList;
     }
 
     @Override
