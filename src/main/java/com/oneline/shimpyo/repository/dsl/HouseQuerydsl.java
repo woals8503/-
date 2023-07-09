@@ -17,6 +17,8 @@ import javax.persistence.EntityManager;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.oneline.shimpyo.domain.house.QHouse.house;
@@ -128,6 +130,10 @@ public class HouseQuerydsl {
                 }
             }
         }
+
+        Comparator<GetHouseListRes> resOrderByRating = Comparator.comparing(GetHouseListRes::getRatio).reversed();
+        Collections.sort(foundHouseList, resOrderByRating);
+
         return foundHouseList;
     }
 

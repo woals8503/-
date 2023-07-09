@@ -44,6 +44,7 @@ public class HouseController {
         return new BaseResponse<>(foundHouseList);
     }
 
+
     @PatchMapping("/user/houses/{houseId}")
     public BaseResponse<Void> updateHouse(@CurrentMember Member member, @PathVariable long houseId, @RequestPart PatchHouseReq patchHouseReq
                             , @RequestPart(value = "houseImages", required = false) List<MultipartFile> houseImages) {
