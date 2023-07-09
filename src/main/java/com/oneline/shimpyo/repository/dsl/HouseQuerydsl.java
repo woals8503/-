@@ -1,22 +1,20 @@
 package com.oneline.shimpyo.repository.dsl;
 
 import com.oneline.shimpyo.domain.house.dto.*;
-import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.review.ReviewRating;
 import com.oneline.shimpyo.domain.room.Room;
+
 import com.oneline.shimpyo.domain.room.dto.QRoomInfo;
 import com.oneline.shimpyo.domain.room.dto.RoomInfo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +34,15 @@ public class HouseQuerydsl {
 
     public HouseQuerydsl(EntityManager em) {
         this.jqf = new JPAQueryFactory(em);
+    }
+
+    public List<GetMyHouseListRes> readMyHouseList(long memberId) {
+        return jqf.select(new QGetMyHouseListRes(house.id, house.name, houseImage.savedURL, house.type))
+                .from(house)
+                .join(house.images, houseImage)
+                .where(house.member.id.eq(memberId))
+                .groupBy(house)
+                .fetch();
     }
 
     public HouseInfo findHouseAndAddressByHouseId(long houseId) {

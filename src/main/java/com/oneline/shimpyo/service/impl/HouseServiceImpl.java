@@ -306,4 +306,9 @@ public class HouseServiceImpl implements HouseService {
         houseRepository.deleteById(houseId);
     }
 
+    @Override
+    public List<GetMyHouseListRes> readMyHouseList(long memberId) {
+        return houseQuerydsl.readMyHouseList(memberId);
+    }
+
 }

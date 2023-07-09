@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,6 +19,7 @@ import java.util.List;
 public class HouseController {
 
     private final HouseService houseService;
+    private final CheckMember checkMember;
 
     @PostMapping(value = "/user/houses", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<HouseRegisterRes> createHouse(@RequestPart(value = "houseReq") PostHouseReq houseReq, @RequestPart(value = "houseImages") List<MultipartFile> houseImages
@@ -56,6 +56,12 @@ public class HouseController {
     public BaseResponse<Void> deleteHouse(@CurrentMember Member member, @PathVariable long houseId) {
         houseService.deleteHouse(member, houseId);
         return new BaseResponse<>();
+    }
+
+    @GetMapping("/user/houses")
+    public BaseResponse<List<GetMyHouseListRes>> readMyHouseList(@CurrentMember Member member){
+        long memberId = checkMember.getMemberId(member, true);
+        return new BaseResponse<>(houseService.readMyHouseList(memberId));
     }
 
 }

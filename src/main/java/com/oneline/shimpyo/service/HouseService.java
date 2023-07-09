@@ -14,4 +14,6 @@ public interface HouseService {
     List<GetHouseListRes> readHouseList(Pageable pageable, SearchFilterReq searchFilter);
     void updateHouse(Member member, long houseId, PatchHouseReq patchHouseReq, List<MultipartFile> houseImages);
     void deleteHouse(Member member, long houseId);
+
+    List<GetMyHouseListRes> readMyHouseList(long memberId);
 }

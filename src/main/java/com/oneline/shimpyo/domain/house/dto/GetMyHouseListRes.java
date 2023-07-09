@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @Getter @Setter
 @NoArgsConstructor
-public class GetHouseListResHoseok {
+public class GetMyHouseListRes {
 
     private long id;
     private String name;
@@ -18,7 +18,7 @@ public class GetHouseListResHoseok {
     private HouseType houseType;
 
     @QueryProjection
-    public GetHouseListResHoseok(long id, String name, String imageUrl, HouseType houseType) {
+    public GetMyHouseListRes(long id, String name, String imageUrl, HouseType houseType) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
