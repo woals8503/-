@@ -21,6 +21,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @Setter
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "HOUSE")
+@ToString
 public class House extends BaseEntity {
 
     @Id @GeneratedValue
