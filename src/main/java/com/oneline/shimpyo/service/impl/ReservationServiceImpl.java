@@ -71,6 +71,10 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.findById(postReservationReq.getRoomId())
                 .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
 
+        if(room.getHouse().getMember().getId() == memberId){
+            throw new BaseException(RESERVATION_CANT_MY_HOUSE);
+        }
+
         if(room.getMaxPeople() < postReservationReq.getPeopleCount() ||
                 room.getMinPeople() > postReservationReq.getPeopleCount()){
             throw new BaseException(RESERVATION_WRONG_PEOPLE_COUNT);
