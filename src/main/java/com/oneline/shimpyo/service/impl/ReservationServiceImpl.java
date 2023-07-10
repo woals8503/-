@@ -13,10 +13,7 @@ import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.modules.aop.Retry;
 import com.oneline.shimpyo.modules.aop.RetryAspect;
-import com.oneline.shimpyo.repository.HouseImageRepository;
-import com.oneline.shimpyo.repository.MemberRepository;
-import com.oneline.shimpyo.repository.ReservationRepository;
-import com.oneline.shimpyo.repository.RoomRepository;
+import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.repository.dsl.MyCouponQuerydsl;
 import com.oneline.shimpyo.repository.dsl.ReservationQuerydsl;
 import com.oneline.shimpyo.service.PaymentService;
@@ -45,6 +42,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationQuerydsl reservationQuerydsl;
+    private final HouseRepository houseRepository;
     private final MemberRepository memberRepository;
     private final HouseImageRepository houseImageRepository;
     private final RoomRepository roomRepository;
@@ -116,6 +114,8 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public GetHouseReservationRes readHouseReservationList(long memberId, long houseId,
                                                            ReservationStatus reservationStatus, Pageable pageable) {
+        houseRepository.findById(houseId).orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
+
         Page<HostReservationReq> hostReservationReqs = reservationQuerydsl
                 .readHouseReservationList(houseId, reservationStatus, pageable);
 
