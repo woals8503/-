@@ -77,6 +77,7 @@ public enum BaseResponseStatus {
     REFUND_WRONG(false, 3104, "환불 가능 금액보다 환불 요구 금액이 더 큽니다."),
     RESERVATION_WRONG_PEOPLE_COUNT(false, 3105, "인원수가 잘못되었습니다."),
     RESERVATION_HOST_HOUSE_EMPTY(false, 3106, "호스트하는 숙소가 없습니다"),
+    RESERVATION_EXISTENT(false, 3107, "예약이 존재합니다."),
 
     //coupon 3120
     COUPON_NONEXISTENT(false, 3120,"존재하지 않는 쿠폰입니다."),

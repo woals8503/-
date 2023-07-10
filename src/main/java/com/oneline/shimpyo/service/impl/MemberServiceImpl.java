@@ -4,8 +4,8 @@ import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
-import com.oneline.shimpyo.domain.member.UpdateMemberReq;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
+import com.oneline.shimpyo.domain.member.dto.NonMemberReservationInfoReq;
 import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.repository.MemberRepository;
@@ -72,15 +72,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional
     public void changePassword(ResetPasswordReq request) {
         Member findMember = memberQuerydsl.findByMemberWithPhoneNumber(request.getPhoneNumber());
-        // 더티 체킹
+
         findMember.resetPassword(request.getPassword(), bCryptPasswordEncoder);
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional
     public void certifiedPhoneNumber(String phoneNumber, String cerNum) {
         String api_key = "NCSTRVCRRQWQRTLB";    // API 키
         String api_secret = "KCGD2SG3U7E0J3OONGYZYYKXP5SOS3Y3"; // API 시크릿 키
@@ -152,7 +152,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public boolean duplicatePhoneNumber(String phoneNumber) {
-        Member findMember = memberRepository.findByMemberWithPhoneNumber(phoneNumber);
+        Member findMember = memberRepository.findByMemberWithPhoneNumber(phoneNumber, false);
         if(findMember != null)
             return false;
 
@@ -166,6 +166,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void oauthJoin(OAuthInfoReq oAuthInfoReq) {
         Member member = memberRepository.findById(oAuthInfoReq.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
 
@@ -173,25 +174,37 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateMember(Member member, UpdateMemberReq memberReq) {
-        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
-        findMember.updateMember(memberReq);
-
-    }
-
-    @Override
-    public void removeMember(Member member) {
-        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
-        memberRepository.delete(findMember);
-    }
-
-    @Override
     public void findByMemberWithPhoneNumber(String phoneNumber) {
-        Member member = memberRepository.findByMemberWithPhoneNumber(phoneNumber);
+        Member member = memberRepository.findByMemberWithPhoneNumber(phoneNumber, false);
 
-        if(member == null || member.getSocial()) {
+        if(member == null) {
             throw new BaseException(MEMBER_NONEXISTENT);
         }
+    }
+
+    @Override
+    public void updateNickname(String nickname, Long id) {
+        memberRepository.findById(id).get().setNickname(nickname);
+    }
+
+    @Override
+    public void updateEmail(String email, Long id) {
+        memberRepository.findById(id).get().setEmail(email);
+    }
+
+    @Override
+    public void updatePhoneNumber(String phoneNumber, Long id) {
+        memberRepository.findById(id).get().setPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public void updatePassword(String password, Long id) {
+        memberRepository.findById(id).get().setPassword(bCryptPasswordEncoder.encode(password));
+    }
+
+    @Override
+    public void checkNonMemberReservation(NonMemberReservationInfoReq request) {
+        memberQuerydsl.findNonMemberReservationInfo(request).orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
     }
 
 }

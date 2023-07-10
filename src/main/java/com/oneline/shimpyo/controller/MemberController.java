@@ -1,10 +1,12 @@
 package com.oneline.shimpyo.controller;
 
+import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.domain.member.Member;
-import com.oneline.shimpyo.domain.member.UpdateMemberReq;
 import com.oneline.shimpyo.domain.member.dto.*;
+import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.repository.MemberRepository;
+import com.oneline.shimpyo.repository.dsl.MemberQuerydsl;
 import com.oneline.shimpyo.security.auth.CurrentMember;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -27,6 +30,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final MemberQuerydsl memberQuerydsl;
 
     @PostMapping("/api/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
@@ -83,7 +87,7 @@ public class MemberController {
 
         if(isValid)
             memberService.changePassword(request);
-        else new BaseResponse<>(PASSWORD_REGEX_WRONG);
+        else return new BaseResponse<>(PASSWORD_REGEX_WRONG);
 
         return new BaseResponse<>();
     }
@@ -127,11 +131,9 @@ public class MemberController {
     }
 
     // 이메일 찾기
-    @GetMapping("/api/show-email/{phoneNumber}")
-    public BaseResponse<EmailRes> findEmail(
-            @PathVariable String phoneNumber) {
+    @GetMapping("/api/show-email")
+    public BaseResponse<EmailRes> findEmail(@RequestParam(value = "phoneNumber") String phoneNumber) {
         String findEmail = memberService.findByEmailWithPhonNumber(phoneNumber);
-
         return new BaseResponse<>(new EmailRes(findEmail));
     }
 
@@ -151,17 +153,59 @@ public class MemberController {
         return new BaseResponse<>(tokens);
     }
 
-    @PatchMapping("/user/update")
-    public BaseResponse<Void> updateMember(@CurrentMember Member member, UpdateMemberReq memberReq) {
-        memberService.updateMember(member, memberReq);
+    @PatchMapping("/user/nickname")
+    public BaseResponse<Void> updateNickname(@CurrentMember Member member, @RequestBody String nickname) {
+        memberService.updateNickname(nickname, member.getId());
         return new BaseResponse<>();
     }
 
-    @PostMapping("/user/remove")
-    public BaseResponse<Void> removeMember(@CurrentMember Member member) {
-        memberService.removeMember(member);
+    @PatchMapping("/user/email")
+    public BaseResponse<Void> updateEmail(@CurrentMember Member member, @RequestBody String email) {
+        if(!validateEmail(email))
+            return new BaseResponse<>(MEMBER_REGEX_WRONG);
+        memberService.updateEmail(email, member.getId());
         return new BaseResponse<>();
     }
 
+    @PatchMapping("/user/phone")
+    public BaseResponse<Void> updatePhoneNumber(@CurrentMember Member member, @RequestBody String phoneNumber) {
+        if(validatePhoneNumber(phoneNumber))
+            return new BaseResponse<>(MEMBER_REGEX_WRONG);
+        memberService.updatePhoneNumber(phoneNumber, member.getId());
+        return new BaseResponse<>();
+    }
+
+    @PatchMapping("/user/password")
+    public BaseResponse<Void> updatePassword(@CurrentMember Member member, @RequestBody String password) {
+        if(validatePassword(password))
+            return new BaseResponse<>(MEMBER_REGEX_WRONG);
+        memberService.updatePassword(password, member.getId());
+        return new BaseResponse<>();
+    }
+
+    @PostMapping("/api/check/non-member/reservationcode")
+    public BaseResponse<Void> checkNonMemberReservation(@RequestBody NonMemberReservationInfoReq request) {
+        memberService.checkNonMemberReservation(request);
+
+        return new BaseResponse<>();
+    }
+
+    @GetMapping("/user/info")
+    public BaseResponse<MemberInfoRes> getUserInfo(@CurrentMember Member member) {
+        MemberInfoRes memberInfo = memberQuerydsl.findMemberInfo(member);
+
+        return new BaseResponse<>(memberInfo);
+    }
+
+    @DeleteMapping("/user/account")
+    public BaseResponse<Void> removeAccount(@CurrentMember Member member) {
+        List<Reservation> list = memberQuerydsl.findByMemberReservationInfo(member);
+
+        if(!list.isEmpty())
+            return new BaseResponse<>(RESERVATION_EXISTENT);
+
+        memberRepository.delete(member);
+        return new BaseResponse<>();
+    }
 
 }

@@ -130,9 +130,5 @@ public class Member extends BaseEntity {
     public void updateRefreshToken(String newToken) {
         this.refreshToken = newToken;
     }
-    
-    // 회원 정보 수정
-    public void updateMember(UpdateMemberReq memberReq) {
 
-    }
 }

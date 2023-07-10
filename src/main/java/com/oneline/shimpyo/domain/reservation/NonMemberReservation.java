@@ -34,6 +34,9 @@ public class NonMemberReservation extends BaseEntity {
     private String name;
 
     @NotNull
+    private String reservationCode;
+
+    @NotNull
     private String phoneNumber;
 
     @NotNull
