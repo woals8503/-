@@ -186,21 +186,25 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void updateNickname(String nickname, Long id) {
         memberRepository.findById(id).get().setNickname(nickname);
     }
 
     @Override
+    @Transactional
     public void updateEmail(String email, Long id) {
         memberRepository.findById(id).get().setEmail(email);
     }
 
     @Override
+    @Transactional
     public void updatePhoneNumber(String phoneNumber, Long id) {
         memberRepository.findById(id).get().setPhoneNumber(phoneNumber);
     }
 
     @Override
+    @Transactional
     public void updatePassword(String password, Long id) {
         memberRepository.findById(id).get().setPassword(bCryptPasswordEncoder.encode(password));
     }
