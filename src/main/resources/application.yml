@@ -10,7 +10,7 @@ cloud:
       secretKey: temp
     stack.auto: false
     region.static: ap-northeast-2
-
+  
 spring:
   profiles:
     include: db, oauth
