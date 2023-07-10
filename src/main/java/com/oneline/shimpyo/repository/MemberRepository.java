@@ -20,8 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m.phoneNumber from Member m where m.phoneNumber = :phoneNumber")
     List<Member> findByEmailWithPhonNumber(@Param("phoneNumber") String phoneNumber);
 
-    @Query("select m from Member m where m.phoneNumber = :phoneNumber")
-    Member findByMemberWithPhoneNumber(@Param("phoneNumber") String phoneNumber);
+    @Query("select m from Member m where m.phoneNumber = :phoneNumber and m.social = :social")
+    Member findByMemberWithPhoneNumber(@Param("phoneNumber") String phoneNumber, @Param("social") boolean social);
 
     @Modifying
     @Query("update Member m set m.refreshToken = null where m.id = :id")

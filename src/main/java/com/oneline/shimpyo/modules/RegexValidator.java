@@ -25,7 +25,7 @@ public class RegexValidator {
     }
 
     public static boolean validatePassword(String password) {
-        if(validateFirstPassword(password))
+        if(!validateFirstPassword(password))
             return false;
         return true;
     }

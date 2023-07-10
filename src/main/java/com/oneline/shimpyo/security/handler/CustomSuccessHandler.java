@@ -49,7 +49,9 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
-
+        responseMap.put("nickname", member.getMember().getNickname());
+//        responseMap.put("profileImage", member.getMember().getMemberImage().getSavedPath());
+        responseMap.put(AT_HEADER, accessToken);
         BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
         new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
     }

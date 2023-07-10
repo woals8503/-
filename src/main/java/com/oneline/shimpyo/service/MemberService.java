@@ -1,14 +1,12 @@
 package com.oneline.shimpyo.service;
 
 import com.oneline.shimpyo.domain.member.Member;
-import com.oneline.shimpyo.domain.member.UpdateMemberReq;
-import com.oneline.shimpyo.domain.member.dto.EmailRes;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
+import com.oneline.shimpyo.domain.member.dto.NonMemberReservationInfoReq;
 import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
 import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
 
 public interface MemberService {
@@ -40,9 +38,15 @@ public interface MemberService {
 
     void oauthJoin(OAuthInfoReq oAuthInfoReq);
 
-    void updateMember(Member member, UpdateMemberReq memberReq);
-
-    void removeMember(Member member);
-
     void findByMemberWithPhoneNumber(String phoneNumber);
+
+    void updateNickname(String nickname, Long id);
+
+    void updateEmail(String email, Long id);
+
+    void updatePhoneNumber(String phoneNumber, Long id);
+
+    void updatePassword(String password, Long id);
+
+    void checkNonMemberReservation(NonMemberReservationInfoReq request);
 }

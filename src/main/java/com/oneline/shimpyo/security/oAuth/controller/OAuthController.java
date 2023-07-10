@@ -30,16 +30,11 @@ public class OAuthController {
 
     @PostMapping("/api/oauth2-join")
     public BaseResponse<Void> oauthJoin(@RequestBody OAuthInfoReq oAuthInfoReq) {
-        boolean checkNickname = memberService.duplicateNickname(oAuthInfoReq.getNickname());
-
-        if(!checkNickname)
-            return new BaseResponse<>(NICKNAME_DUPLICATE);
 
         memberService.oauthJoin(oAuthInfoReq);
         // 엑세스, 리프레시 쿠키 담아서 반환
         return new BaseResponse<>();
     }
-
 
     @GetMapping("/api/oauth2-access")
     public BaseResponse<Map<String, String>> oauthToken(@RequestBody OAuth2IdReq request,

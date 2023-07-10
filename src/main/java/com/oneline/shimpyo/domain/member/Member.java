@@ -48,6 +48,7 @@ public class Member extends BaseEntity {
     private String provider;
     private String providerId;
     private Boolean social;
+    private String comments;
 
     @Lob
     private String refreshToken;
@@ -130,9 +131,5 @@ public class Member extends BaseEntity {
     public void updateRefreshToken(String newToken) {
         this.refreshToken = newToken;
     }
-    
-    // 회원 정보 수정
-    public void updateMember(UpdateMemberReq memberReq) {
 
-    }
 }
