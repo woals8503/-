@@ -11,6 +11,7 @@ import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.dsl.MemberQuerydsl;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
+import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -147,6 +148,8 @@ public class MemberServiceImpl implements MemberService {
         member.updateRefreshToken(newRefreshToken);
 
         accessTokenResponseMap.put(AT_HEADER, accessToken);
+        accessTokenResponseMap.put("profile", member.getMemberImage().getSavedPath());
+        accessTokenResponseMap.put("nickname", member.getNickname());
         return accessTokenResponseMap;
     }
 

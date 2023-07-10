@@ -50,7 +50,7 @@ public enum BaseResponseStatus {
     VERIFICATION_CODE_SEND_EXCEPTION(false, 3029, "인증번호 전송에 실패하였습니다."),
     PHONE_NUMBER_DUPLICATE(false, 3030, "이미 등록된 휴대폰 번호입니다."),
     PASSWORD_REGEX_WRONG(false, 3031, "비밀번호를 다시 확인해주세요."),
-
+    NON_MEMBER_RESERVATION_CODE_NONEXISTENT(false, 3033, "존재하지 않는 예약번호입니다."),
 
     //house 3040
     HOUSE_NONEXISTENT(false, 3040,"존재하지 않는 숙소입니다."),
@@ -77,7 +77,6 @@ public enum BaseResponseStatus {
     REFUND_WRONG(false, 3104, "환불 가능 금액보다 환불 요구 금액이 더 큽니다."),
     RESERVATION_WRONG_PEOPLE_COUNT(false, 3105, "인원수가 잘못되었습니다."),
     RESERVATION_HOST_HOUSE_EMPTY(false, 3106, "호스트하는 숙소가 없습니다"),
-    RESERVATION_EXISTENT(false, 3107, "예약이 존재합니다."),
 
     //coupon 3120
     COUPON_NONEXISTENT(false, 3120,"존재하지 않는 쿠폰입니다."),
