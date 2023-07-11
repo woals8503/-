@@ -33,7 +33,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
-    
+
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
@@ -50,7 +50,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
         response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
-
+        
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
         responseMap.put("nickname", member.getMember().getNickname());
@@ -74,7 +74,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
                 .httpOnly(true)
                 .maxAge(60 * 60 * 24)
                 .build();
-        
+
         return cookie;
     }
 }
