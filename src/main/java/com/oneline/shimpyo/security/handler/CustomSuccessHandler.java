@@ -2,6 +2,8 @@ package com.oneline.shimpyo.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oneline.shimpyo.domain.BaseResponse;
+import com.oneline.shimpyo.domain.member.MemberImage;
+import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +32,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     private final MemberService memberService;
-
+    private final MemberRepository memberRepository;
+    
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication) throws IOException {
         PrincipalDetails member = (PrincipalDetails) authentication.getPrincipal();
+        MemberImage memberImage = memberRepository.findById(member.getMember().getId()).get().getMemberImage();
 
         String accessToken = generateToken(member, true, AT_EXP_TIME);
         String refreshToken = generateRefreshToken(member, true, RT_EXP_TIME);
@@ -50,7 +54,12 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
         responseMap.put("nickname", member.getMember().getNickname());
-//        responseMap.put("profileImage", member.getMember().getMemberImage().getSavedPath());
+
+        if(memberImage == null)
+            responseMap.put("profileImage", "이미지 없음");
+        else
+            responseMap.put("profileImage", memberImage.getSavedPath());
+
         responseMap.put(AT_HEADER, accessToken);
         BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
         new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
