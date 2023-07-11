@@ -83,6 +83,11 @@ public enum BaseResponseStatus {
     //coupon 3120
     COUPON_NONEXISTENT(false, 3120,"존재하지 않는 쿠폰입니다."),
 
+    //wish 3140
+    WISH_ALREADY_EXIST(false, 3140, "이미 관심 숙소에 추가된 숙소입니다."),
+    WISH_WRONG(false, 3141, "관심 숙소에 등록되지 않은 숙소입니다."),
+    WISH_COUNT_MAX(false, 3142, "관심 숙소 목록이 꽉 찼습니다."),
+
     /**
      * 4000 : 기타 오류
      */
