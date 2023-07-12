@@ -6,15 +6,19 @@ import com.oneline.shimpyo.domain.house.House;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.review.Review;
+import com.oneline.shimpyo.domain.review.dto.GetHouseReviewListRes;
 import com.oneline.shimpyo.domain.review.dto.GetReviewRes;
 import com.oneline.shimpyo.domain.review.dto.PatchReviewReq;
 import com.oneline.shimpyo.domain.review.dto.PostReviewReq;
+import com.oneline.shimpyo.repository.HouseRepository;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.ReservationRepository;
 import com.oneline.shimpyo.repository.ReviewRepository;
 import com.oneline.shimpyo.repository.dsl.ReviewQuerydsl;
 import com.oneline.shimpyo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final ReviewQuerydsl reviewQuerydsl;
+    private final HouseRepository houseRepository;
 
     @Transactional
     @Override
@@ -74,17 +79,24 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.delete(review);
     }
 
+    @Override
+    public GetHouseReviewListRes readHouseReviewList(long houseId, Pageable pageable) {
+        houseRepository.findById(houseId).orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
+        Slice<GetHouseReviewListRes.Review> reviews = reviewQuerydsl.findAllByHouseId(houseId, pageable);
+        return new GetHouseReviewListRes(reviews.hasNext(), reviews.getContent());
+    }
+
+    /**
+     * 이미 있는 리뷰인지 확인
+     */
     private void validateCreateReview(long memberId, Reservation reservation) {
-        //이미 있는 리뷰인지 확인
         Optional<Review> review = reviewRepository.findByReservationId(reservation.getId());
         if(review.isPresent()){
             throw new BaseException(REVIEW_ALREADY_EXIST);
         }
-
         if(reservation.getReservationStatus() != FINISHED){
             throw new BaseException(REVIEW_RESERVATION_WRONG_STATUS);
         }
-
         if(reservation.getMember().getId() != memberId){
             throw new BaseException(INVALID_MEMBER);
         }

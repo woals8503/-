@@ -4,12 +4,14 @@ import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.house.*;
 import com.oneline.shimpyo.domain.house.dto.*;
 import com.oneline.shimpyo.domain.member.Member;
+import com.oneline.shimpyo.domain.review.dto.ReviewStatusCount;
 import com.oneline.shimpyo.domain.room.Room;
 import com.oneline.shimpyo.domain.room.RoomImage;
 import com.oneline.shimpyo.domain.room.dto.RoomInfo;
 import com.oneline.shimpyo.modules.S3FileHandler;
 import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.repository.dsl.HouseQuerydsl;
+import com.oneline.shimpyo.repository.dsl.ReviewQuerydsl;
 import com.oneline.shimpyo.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +37,8 @@ public class HouseServiceImpl implements HouseService {
     private final RoomImageRepository roomImageRepository;
     private final S3FileHandler s3FileHandler;
     private final HouseQuerydsl houseQuerydsl;
+    private final ReviewQuerydsl reviewQuerydsl;
+
     @Override
     @Transactional
     public long createHouse(Member member, PostHouseReq houseReq, List<MultipartFile> houseImages, List<MultipartFile> roomImages) throws BaseException {
@@ -171,6 +175,8 @@ public class HouseServiceImpl implements HouseService {
                 .orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
         foundHouse.setOptions(houseQuerydsl.findHouseOptionsByHouseId(houseId));
         foundHouse.setHouseImages(houseQuerydsl.findHouseImagesByHouseId(houseId));
+        foundHouse.setReviewStatusCount(reviewQuerydsl.findCountByHouseId(houseId));
+
         // 객실 관련 정보
         List<RoomInfo> foundRooms = houseQuerydsl.findRoomsByHouseId(houseId);
         for (int i = 0; i < foundRooms.size(); i++) {
