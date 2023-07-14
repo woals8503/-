@@ -36,7 +36,7 @@ public class HouseController {
         return new BaseResponse<>(getHouseDetailRes);
     }
 
-    @GetMapping("/api/houses")
+    @PostMapping("/api/houses")
     public BaseResponse<List<GetHouseListRes>> readHouseList(@RequestBody SearchFilterReq searchFilter) {
         // city : 시/도,  district : 시/군/구,  checkin : 체크인,  checkout : 체크아웃,  people : 인원수
         PageRequest pageRequest = PageRequest.of(searchFilter.getPage(), 20);
@@ -52,7 +52,7 @@ public class HouseController {
         return new BaseResponse<>();
     }
 
-    @DeleteMapping("/{houseId}")
+    @DeleteMapping("/user/houses/{houseId}")
     public BaseResponse<Void> deleteHouse(@CurrentMember Member member, @PathVariable long houseId) {
         houseService.deleteHouse(member, houseId);
         return new BaseResponse<>();
