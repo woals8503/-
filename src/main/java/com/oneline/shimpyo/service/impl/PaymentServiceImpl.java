@@ -98,7 +98,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         PayMent payment = PayMent.builder().impUid(postReservationReq.getImpUid()).UUID(postReservationReq.getMerchantUid())
                 .payMethod(postReservationReq.getPayMethod()).price(paidPrice).payStatus(PayStatus.COMPLETE).build();
-        paymentRepository.save(payment);
+        paymentRepository.save(payment) ;
 
         return payment;
     }

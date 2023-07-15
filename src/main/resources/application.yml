@@ -60,6 +60,20 @@ spring:
               - email
               - profile
 
+          kakao:
+            client-id: temp
+            redirect-uri: http://shimpyo-api.p-e.kr:8081/login/oauth2/code/kakao
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            scope: profile_nickname, profile_image, account_email
+            client-name: Kakao
+            provider:
+              kakao:
+                authorization_uri: https://kauth.kakao.com/oauth/authorize
+                token_uri: https://kauth.kakao.com/oauth/token
+                user-info-uri: https://kapi.kakao.com/v2/user/me
+                user_name_attribute: id
+
           naver:
             client-id: temp
             client-secret: temp

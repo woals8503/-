@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public interface NonMemberReservationService {
 
-    long createReservation(PostReservationReq postReservationReq) throws IamportResponseException, IOException;
+    String createReservation(PostReservationReq postReservationReq) throws IamportResponseException, IOException;
 
     GetReservationRes readReservation(String merchantUid);
 

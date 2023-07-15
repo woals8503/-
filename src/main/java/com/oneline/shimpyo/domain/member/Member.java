@@ -3,6 +3,7 @@ package com.oneline.shimpyo.domain.member;
 import com.oneline.shimpyo.domain.base.BaseEntity;
 import com.oneline.shimpyo.domain.coupon.MyCoupon;
 import com.oneline.shimpyo.domain.house.House;
+import com.oneline.shimpyo.domain.house.dto.FileReq;
 import com.oneline.shimpyo.domain.member.dto.MemberReq;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.review.Review;
@@ -89,7 +90,7 @@ public class Member extends BaseEntity {
         this.social = social;
     }
 
-    public Member(MemberReq request, CustomBCryptPasswordEncoder bCryptPasswordEncoder,  MemberGrade memberGrade) {
+    public Member(MemberReq request, CustomBCryptPasswordEncoder bCryptPasswordEncoder, MemberGrade memberGrade) {
         this.email = request.getEmail();
         this.password = bCryptPasswordEncoder.encode(request.getPassword());
         this.phoneNumber = request.getPhoneNumber();
@@ -99,6 +100,7 @@ public class Member extends BaseEntity {
         this.role = CLIENT;
         this.social = false;
         memberGrade.getMembers().add(this);
+
     }
 
     public Member(String email, String password) {

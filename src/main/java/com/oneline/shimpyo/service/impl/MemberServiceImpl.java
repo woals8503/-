@@ -2,16 +2,15 @@ package com.oneline.shimpyo.service.impl;
 
 import com.oneline.shimpyo.domain.BaseException;
 import com.oneline.shimpyo.domain.BaseResponse;
+import com.oneline.shimpyo.domain.house.dto.FileReq;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
-import com.oneline.shimpyo.domain.member.dto.MemberReq;
-import com.oneline.shimpyo.domain.member.dto.NonMemberReservationInfoReq;
-import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
-import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
+import com.oneline.shimpyo.domain.member.MemberImage;
+import com.oneline.shimpyo.domain.member.dto.*;
 import com.oneline.shimpyo.repository.MemberRepository;
+import com.oneline.shimpyo.repository.NonMemberReservationRepository;
 import com.oneline.shimpyo.repository.dsl.MemberQuerydsl;
 import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
-import com.oneline.shimpyo.security.auth.PrincipalDetails;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +41,23 @@ public class MemberServiceImpl implements MemberService {
     private final MemberQuerydsl memberQuerydsl;
     private final EntityManager em;
     private final CustomBCryptPasswordEncoder bCryptPasswordEncoder;
+    private final NonMemberReservationRepository nonMemberReservationRepository;
 
     @Override
     @Transactional(readOnly = false)
     public void join(MemberReq request) {
         MemberGrade memberGrade = new MemberGrade(SILVER, 3);
         em.persist(memberGrade);
-        memberRepository.save(new Member(request, bCryptPasswordEncoder, memberGrade));
+
+        Member member = memberRepository.save(new Member(request, bCryptPasswordEncoder, memberGrade));
+//        MemberImage memberImage = MemberImage.builder()
+//                .member(member)
+//                .originalFileName(fileReq.getOriginalFileName())
+//                .savedFileName(fileReq.getOriginalFileName())
+//                .savedPath(fileReq.getSavedURL())
+//                .savedPath(fileReq.getSavedURL()).build();
+//        member.setMemberImage(memberImage);
+
     }
 
     @Override
@@ -211,7 +220,51 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void checkNonMemberReservation(NonMemberReservationInfoReq request) {
-        memberQuerydsl.findNonMemberReservationInfo(request).orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
+        nonMemberReservationRepository.findByMerchantUid(request.getReservationCode())
+                .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
+    }
+
+    @Override
+    public void certifiedNonMemberPhoneNumber(String phoneNumber, String reservationCode) {
+        String api_key = "NCSTRVCRRQWQRTLB";    // API 키
+        String api_secret = "KCGD2SG3U7E0J3OONGYZYYKXP5SOS3Y3"; // API 시크릿 키
+        Message coolsms = new Message(api_key, api_secret);
+
+        // 4 params(to, from, type, text) are mandatory. must be filled
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("to", phoneNumber);    // 수신전화번호
+        params.put("from", "01065991802");    // 발신전화번호. 테스트시에는 발신,수신 둘다 본인 번호로 하면 됨
+        params.put("type", "SMS");
+        params.put("text", "예약번호는" + "["+reservationCode+"]" + "입니다.");
+        params.put("app_version", "test app 1.2");
+
+        try {
+            JSONObject obj = (JSONObject) coolsms.send(params);
+            log.info(obj.toString());
+        } catch (CoolsmsException e) {
+            log.info(e.getMessage());
+            log.info(String.valueOf(e.getCode()));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void changeProfile(Member member, FileReq fileReq, String selfIntroduce) {
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
+
+        MemberImage memberImage = MemberImage.builder()
+                .member(findMember)
+                .originalFileName(fileReq.getOriginalFileName())
+                .savedFileName(fileReq.getOriginalFileName())
+                .savedPath(fileReq.getSavedURL())
+                .savedPath(fileReq.getSavedURL()).build();
+        findMember.setMemberImage(memberImage);
+        findMember.setComments(selfIntroduce);
+    }
+
+    @Override
+    public MemberProfileRes findMemberProfile(Long memberId) {
+        return memberQuerydsl.findMemberProfile(memberId);
     }
 
 }

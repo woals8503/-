@@ -56,7 +56,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         responseMap.put("nickname", member.getMember().getNickname());
 
         if(memberImage == null)
-            responseMap.put("profileImage", "이미지 없음");
+            responseMap.put("profileImage", "");
         else
             responseMap.put("profileImage", memberImage.getSavedPath());
 

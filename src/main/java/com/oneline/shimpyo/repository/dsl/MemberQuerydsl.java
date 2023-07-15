@@ -2,10 +2,8 @@ package com.oneline.shimpyo.repository.dsl;
 
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.QMember;
-import com.oneline.shimpyo.domain.member.dto.MemberInfoRes;
-import com.oneline.shimpyo.domain.member.dto.NonMemberReservationInfoReq;
-import com.oneline.shimpyo.domain.member.dto.QMemberInfoRes;
-import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
+import com.oneline.shimpyo.domain.member.QMemberImage;
+import com.oneline.shimpyo.domain.member.dto.*;
 import com.oneline.shimpyo.domain.reservation.NonMemberReservation;
 import com.oneline.shimpyo.domain.reservation.QNonMemberReservation;
 import com.oneline.shimpyo.domain.reservation.QReservation;
@@ -19,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.oneline.shimpyo.domain.member.QMember.*;
+import static com.oneline.shimpyo.domain.member.QMemberImage.*;
 import static com.oneline.shimpyo.domain.reservation.QNonMemberReservation.*;
 import static com.oneline.shimpyo.domain.reservation.QReservation.*;
 import static com.oneline.shimpyo.domain.reservation.ReservationStatus.FINISHED;
@@ -48,16 +47,6 @@ public class MemberQuerydsl {
                 .fetchOne();
     }
 
-    public Optional<NonMemberReservation> findNonMemberReservationInfo(NonMemberReservationInfoReq request) {
-        NonMemberReservation result = jqf.select(nonMemberReservation)
-                .from(nonMemberReservation)
-                .where(nonMemberReservation.reservationCode.eq(request.getReservationCode())
-                        .and(nonMemberReservation.phoneNumber.eq(request.getPhoneNumber())))
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
     public MemberInfoRes findMemberInfo(Member info) {
         return jqf.select(new QMemberInfoRes(member.nickname, member.email, member.phoneNumber, member.id))
                 .from(member)
@@ -72,5 +61,14 @@ public class MemberQuerydsl {
                 .join(reservation.member, member).fetchJoin()
                 .where(reservation.reservationStatus.eq(USING).and(reservation.reservationStatus.eq(FINISHED)))
                 .fetch();
+    }
+
+    public MemberProfileRes findMemberProfile(Long memberId) {
+        return jqf.select(new QMemberProfileRes(memberImage.savedPath, member.comments))
+                .from(member)
+                .join(member.memberImage, memberImage)
+                .on(member.memberImage.id.eq(memberImage.id))
+                .where(member.id.eq(memberId))
+                .fetchOne();
     }
 }

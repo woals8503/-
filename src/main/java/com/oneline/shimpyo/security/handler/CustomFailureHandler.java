@@ -1,6 +1,7 @@
 package com.oneline.shimpyo.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oneline.shimpyo.domain.BaseResponse;
 import com.oneline.shimpyo.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -12,7 +13,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
+import static com.oneline.shimpyo.domain.BaseResponseStatus.LOGIN_FAIL;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Component
@@ -22,12 +25,11 @@ public class CustomFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        log.info("d");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
-        ErrorResponse errorResponse = new ErrorResponse(401, "ID 또는 비밀번호가 일치하지 않습니다.");
-        new ObjectMapper().writeValue(response.getWriter(), errorResponse);
+        BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(LOGIN_FAIL);
+        new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
     }
 
 }
