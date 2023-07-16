@@ -7,6 +7,7 @@ import com.oneline.shimpyo.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -33,8 +34,9 @@ public class CustomAuthProvider implements AuthenticationProvider {
         PrincipalDetails userDetails = (PrincipalDetails) principalDetailsService.loadUserByUsername(username);
 
         // PW 검사
-        if (!passwordEncoder.matches(password, userDetails.getPassword()))
-            throw new BaseException(BAD_CREDENTIALS_EXCEPTION);
+        if (!passwordEncoder.matches(password, userDetails.getPassword())){
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+        }
 
         // 인증 완료 시 완료된 Authentication 객체를 리턴
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

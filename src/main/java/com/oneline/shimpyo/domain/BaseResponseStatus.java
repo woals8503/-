@@ -51,6 +51,7 @@ public enum BaseResponseStatus {
     PHONE_NUMBER_DUPLICATE(false, 3030, "이미 등록된 휴대폰 번호입니다."),
     PASSWORD_REGEX_WRONG(false, 3031, "비밀번호를 다시 확인해주세요."),
     NON_MEMBER_RESERVATION_CODE_NONEXISTENT(false, 3033, "존재하지 않는 예약번호입니다."),
+    LOGIN_FAIL(false, 3034, "ID 또는 비밀번호가 일치하지 않습니다."),
 
     //house 3040
     HOUSE_NONEXISTENT(false, 3040,"존재하지 않는 숙소입니다."),
@@ -98,7 +99,7 @@ public enum BaseResponseStatus {
     JWT_TOKEN_WRONG(false, 4022, "잘못된 JWT 토큰입니다."),
     JWT_REFRESH_WRONG(false, 4023, "유효하지 않은 Refresh Token 입니다."),
     //auth
-    BAD_CREDENTIALS_EXCEPTION(false, 4040, "Provider - authenticate() : 비밀번호가 일치하지 않습니다."),
+    BAD_CREDENTIALS_EXCEPTION(false, 4040, "비밀번호가 일치하지 않습니다."),
     BAD_AUTHENTICATION(false, 4041, "인증이 정상적으로 처리되지 않았습니다."),
 
     // AWS S3

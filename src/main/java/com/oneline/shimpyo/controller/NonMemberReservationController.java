@@ -18,11 +18,11 @@ public class NonMemberReservationController {
     private final NonMemberReservationService nonMemberReservationService;
 
     @PostMapping("")
-    public BaseResponse<PostReservationRes> createReservation(@RequestBody PostReservationReq postReservationReq)
+    public BaseResponse<PostNonMemberReservationRes> createReservation(@RequestBody PostReservationReq postReservationReq)
             throws IamportResponseException, BaseException, IOException {
 
-        long reservationId = nonMemberReservationService.createReservation(postReservationReq);
-        return new BaseResponse<>(new PostReservationRes(reservationId));
+        String merchantUid = nonMemberReservationService.createReservation(postReservationReq);
+        return new BaseResponse<>(new PostNonMemberReservationRes(merchantUid));
     }
 
     @GetMapping("/{merchantUid}")
@@ -46,4 +46,6 @@ public class NonMemberReservationController {
         nonMemberReservationService.cancelReservation(merchantUid, patchReservationReq);
         return new BaseResponse<>();
     }
+
+
 }

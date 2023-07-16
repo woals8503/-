@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -25,7 +24,7 @@ public class S3FileHandler {
     private String bucket;
     @Value("${cloud.aws.region.static}")
     private String region;
-
+    
     public Optional<FileReq> uploadFile(MultipartFile file) {
         try {
             String originalFileName = file.getOriginalFilename();

@@ -1,22 +1,30 @@
 package com.oneline.shimpyo.controller;
 
 import com.oneline.shimpyo.domain.BaseResponse;
+import com.oneline.shimpyo.domain.house.dto.FileReq;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.dto.*;
 import com.oneline.shimpyo.domain.reservation.Reservation;
+import com.oneline.shimpyo.modules.S3FileHandler;
 import com.oneline.shimpyo.repository.MemberRepository;
 import com.oneline.shimpyo.repository.dsl.MemberQuerydsl;
+import com.oneline.shimpyo.security.CustomBCryptPasswordEncoder;
 import com.oneline.shimpyo.security.auth.CurrentMember;
 import com.oneline.shimpyo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import retrofit2.http.Multipart;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
@@ -30,9 +38,14 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final MemberQuerydsl memberQuerydsl;
+    private final S3FileHandler s3FileHandler;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/api/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
+
+        // 이미지 가져온 후
+//        FileReq fileReq = s3FileHandler.uploadFile(defaultImage).get();
 
         boolean isValid = validateRequest(memberReq);
         if(!isValid)
@@ -129,6 +142,16 @@ public class MemberController {
         return new BaseResponse<>(new CertificationPhoneNumberRes(numStr));
     }
 
+    // 비회원 예약 코드 문자 메세지 전송
+    @PostMapping("/api/certification/non-member")
+    public BaseResponse<CertificationPhoneNumberRes> nonMemberReservation (
+            @RequestBody CertificationPhoneNumberReq request) {
+
+        memberService.certifiedNonMemberPhoneNumber(request.getPhoneNumber(),request.getReservationCode());
+
+        return new BaseResponse<>(new CertificationPhoneNumberRes(request.getReservationCode()));
+    }
+
     // 이메일 찾기
     @GetMapping("/api/show-email")
     public BaseResponse<EmailRes> findEmail(@RequestParam(value = "phoneNumber") String phoneNumber) {
@@ -153,36 +176,44 @@ public class MemberController {
     }
 
     @PatchMapping("/user/nickname")
-    public BaseResponse<Void> updateNickname(@CurrentMember Member member, @RequestBody String nickname) {
-        memberService.updateNickname(nickname, member.getId());
+    public BaseResponse<Void> updateNickname(@CurrentMember Member member, @RequestBody ChangeNicknameReq nickname) {
+        memberService.updateNickname(nickname.getNickname(), member.getId());
         return new BaseResponse<>();
     }
 
     @PatchMapping("/user/email")
-    public BaseResponse<Void> updateEmail(@CurrentMember Member member, @RequestBody String email) {
-        if(!validateEmail(email))
+    public BaseResponse<Void> updateEmail(@CurrentMember Member member, @RequestBody ChangeEmailReq email) {
+        if(!validateEmail(email.getEmail())) {
             return new BaseResponse<>(MEMBER_REGEX_WRONG);
-        memberService.updateEmail(email, member.getId());
+        }
+        memberService.updateEmail(email.getEmail(), member.getId());
         return new BaseResponse<>();
     }
 
     @PatchMapping("/user/phone")
-    public BaseResponse<Void> updatePhoneNumber(@CurrentMember Member member, @RequestBody String phoneNumber) {
-        if(validatePhoneNumber(phoneNumber))
+    public BaseResponse<Void> updatePhoneNumber(@CurrentMember Member member, @RequestBody ChangePhoneReq phoneNumber) {
+        if(!validatePhoneNumber(phoneNumber.getPhoneNumber()))
             return new BaseResponse<>(MEMBER_REGEX_WRONG);
-        memberService.updatePhoneNumber(phoneNumber, member.getId());
+        memberService.updatePhoneNumber(phoneNumber.getPhoneNumber(), member.getId());
         return new BaseResponse<>();
     }
 
     @PatchMapping("/user/password")
-    public BaseResponse<Void> updatePassword(@CurrentMember Member member, @RequestBody String password) {
-        if(validatePassword(password))
+    public BaseResponse<Void> updatePassword(@CurrentMember Member member, @RequestBody ChangePasswordReq password) {
+
+        boolean matches = passwordEncoder.matches(password.getCurrentPassword(), member.getPassword());
+
+        if(matches) {
+            if(!validatePassword(password.getModifiedPassword()))
+                return new BaseResponse<>(MEMBER_REGEX_WRONG);
+            memberService.updatePassword(password.getModifiedPassword(), member.getId());
+        }else
             return new BaseResponse<>(MEMBER_REGEX_WRONG);
-        memberService.updatePassword(password, member.getId());
+
         return new BaseResponse<>();
     }
 
-    @PostMapping("/api/check/non-member/reservationcode")
+    @PostMapping("/api/check/non-member/reservation-code")
     public BaseResponse<Void> checkNonMemberReservation(@RequestBody NonMemberReservationInfoReq request) {
         memberService.checkNonMemberReservation(request);
 
@@ -207,4 +238,19 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
+    @PatchMapping("/user/change-profile")
+    public BaseResponse<Void> changeProfile(@CurrentMember Member member,
+                                            @RequestPart(required = false) MultipartFile multipartFile,
+                                            @RequestPart String selfIntroduce) {
+        FileReq fileReq = s3FileHandler.uploadFile(multipartFile).get();
+        memberService.changeProfile(member, fileReq, selfIntroduce);
+        return new BaseResponse<>();
+    }
+
+    @GetMapping("/api/show-profile")
+    public BaseResponse<MemberProfileRes> showProfile(@RequestParam Long userId) {
+        MemberProfileRes memberProfile = memberService.findMemberProfile(userId);
+
+        return new BaseResponse<>(memberProfile);
+    }
 }

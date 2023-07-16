@@ -38,7 +38,7 @@ public class NonMemberReservationServiceImpl implements NonMemberReservationServ
 
     @Transactional
     @Override
-    public long createReservation(PostReservationReq postReservationReq) throws IamportResponseException, IOException {
+    public String createReservation(PostReservationReq postReservationReq) throws IamportResponseException, IOException {
         PayMent payment = paymentService.createNonMemberPayment(postReservationReq);
 
         Room room = roomRepository.findById(postReservationReq.getRoomId())
@@ -59,7 +59,7 @@ public class NonMemberReservationServiceImpl implements NonMemberReservationServ
                 .build();
         nmrRepository.save(reservation);
 
-        return reservation.getId();
+        return payment.getUUID();
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.oneline.shimpyo.domain.member.dto;
 import lombok.Data;
 
 @Data
-public class CertificationPhoneNumberReq {
+public class ChangePhoneReq {
     private String phoneNumber;
-    private String reservationCode;
 }

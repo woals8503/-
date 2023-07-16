@@ -1,10 +1,8 @@
 package com.oneline.shimpyo.service;
 
+import com.oneline.shimpyo.domain.house.dto.FileReq;
 import com.oneline.shimpyo.domain.member.Member;
-import com.oneline.shimpyo.domain.member.dto.MemberReq;
-import com.oneline.shimpyo.domain.member.dto.NonMemberReservationInfoReq;
-import com.oneline.shimpyo.domain.member.dto.OAuthInfoReq;
-import com.oneline.shimpyo.domain.member.dto.ResetPasswordReq;
+import com.oneline.shimpyo.domain.member.dto.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -49,4 +47,11 @@ public interface MemberService {
     void updatePassword(String password, Long id);
 
     void checkNonMemberReservation(NonMemberReservationInfoReq request);
+
+    void certifiedNonMemberPhoneNumber(String phoneNumber, String reservationCode);
+
+    void changeProfile(Member member, FileReq fileReq, String selfIntroduce);
+
+    MemberProfileRes findMemberProfile(Long userId);
+
 }
