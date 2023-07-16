@@ -183,9 +183,9 @@ public class MemberController {
 
     @PatchMapping("/user/email")
     public BaseResponse<Void> updateEmail(@CurrentMember Member member, @RequestBody ChangeEmailReq email) {
-        if(!validateEmail(email.getEmail())) {
+        if(!validateEmail(email.getEmail()))
             return new BaseResponse<>(MEMBER_REGEX_WRONG);
-        }
+
         memberService.updateEmail(email.getEmail(), member.getId());
         return new BaseResponse<>();
     }
