@@ -47,14 +47,13 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName(); // OAuth 로그인 시 키(pk)가 되는 값
-        System.out.println("userName : " + userNameAttributeName);
+
         Map<String, Object> attributes = oAuth2User.getAttributes(); // OAuth 서비스의 유저 정보들
 
         MemberProfile memberProfile = OAuthAttributes.extract(registrationId, attributes); // registrationId에 따라 유저 정보를 통해 공통된 UserProfile 객체로 만들어 줌
         memberProfile.setProvider(registrationId);
 
         Member member = saveOrUpdate(memberProfile);
-        System.out.println("email : " + member.getEmail());
 
         Map<String, Object> customAttribute = customAttribute(attributes, userNameAttributeName, memberProfile, registrationId);
 
@@ -74,7 +73,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     private Member saveOrUpdate(MemberProfile memberProfile) {
         Member member = memberRepository.findByEmailAndProvider(memberProfile.getEmail(), memberProfile.getProvider())
                 .map(m -> m.update(memberProfile.getEmail())) // OAuth 서비스 사이트에서 유저 정보 변경이 있을 수 있기 때문에 우리 DB에도 update
-                .orElse(memberProfile.toMember(em, bCryptPasswordEncoder));
+                .orElse(memberProfile.toMember(em, bCryptPasswordEncoder)); // 정보가 없다면 신규회원임으로 가입
 
         if(member.getSocial()) {
            log.info("이미 회원가입 되있는 사용자");

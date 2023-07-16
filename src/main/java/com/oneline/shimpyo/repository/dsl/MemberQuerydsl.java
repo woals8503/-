@@ -64,7 +64,7 @@ public class MemberQuerydsl {
     }
 
     public MemberProfileRes findMemberProfile(Long memberId) {
-        return jqf.select(new QMemberProfileRes(memberImage.savedPath, member.comments))
+        return jqf.select(new QMemberProfileRes(memberImage.savedPath, member.comments, member.id))
                 .from(member)
                 .join(member.memberImage, memberImage)
                 .on(member.memberImage.id.eq(memberImage.id))
