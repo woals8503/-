@@ -11,10 +11,12 @@ import lombok.ToString;
 public class MemberProfileRes {
     String profileImage;
     String selfIntroduce;
+    Long id;
 
     @QueryProjection
-    public MemberProfileRes(String profileImage, String selfIntroduce) {
+    public MemberProfileRes(String profileImage, String selfIntroduce, Long id) {
         this.profileImage = profileImage;
         this.selfIntroduce = selfIntroduce;
+        this.id = id;
     }
 }

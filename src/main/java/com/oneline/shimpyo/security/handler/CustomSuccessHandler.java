@@ -50,7 +50,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
         response.addHeader("Set-Cookie", createCookie(refreshToken).toString());
-        
+
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(AT_HEADER, accessToken);
         responseMap.put("nickname", member.getMember().getNickname());
@@ -61,8 +61,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
             responseMap.put("profileImage", memberImage.getSavedPath());
 
         responseMap.put(AT_HEADER, accessToken);
-        BaseResponse<Map<String, String>> mapBaseResponse = new BaseResponse<>(responseMap);
-        new ObjectMapper().writeValue(response.getWriter(), mapBaseResponse);
+        responseMap.put("userId", String.valueOf(member.getMember().getId()));
+        new ObjectMapper().writeValue(response.getWriter(), new BaseResponse<>(responseMap));
     }
 
     public static ResponseCookie createCookie(String refreshToken) {
