@@ -86,7 +86,7 @@ public class HouseQuerydsl {
     }
 
     public List<GetHouseListRes> findAllHouse(Pageable pageable, SearchFilterReq searchFilter) {
-        List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), house.contents, room.id.min()))
+        List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), houseAddress.sido, houseAddress.sigungu, room.id.min()))
                 .from(house)
                 .join(house.houseAddress, houseAddress)
                 .on(house.id.eq(houseAddress.house.id))
@@ -96,7 +96,7 @@ public class HouseQuerydsl {
                         , cityEq(searchFilter.getCity()), districtEq(searchFilter.getDistrict()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .groupBy(house.id)
+                .groupBy(house.id, houseAddress.sido, houseAddress.sigungu)
                 .fetch();
 
 
