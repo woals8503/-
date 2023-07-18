@@ -7,6 +7,7 @@ import com.oneline.shimpyo.domain.house.HouseImage;
 import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.member.MemberGrade;
 import com.oneline.shimpyo.domain.pay.PayMent;
+import com.oneline.shimpyo.domain.pay.PayStatus;
 import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
@@ -132,7 +133,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new BaseException(RESERVATION_CANCEL_OR_FINISHED);
         }
 
-        if(room.getMaxPeople() < peopleCount || room.getMinPeople() > peopleCount){
+        if (room.getMaxPeople() < peopleCount || room.getMinPeople() > peopleCount) {
             throw new BaseException(RESERVATION_WRONG_PEOPLE_COUNT);
         }
 
@@ -148,23 +149,33 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setReservationStatus(ReservationStatus.CANCEL);
     }
 
+    @Transactional
+    @Override
+    public void updateReservationStatus(long memberId, long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
+
+        reservation.getRoom().setTotalCount(reservation.getRoom().getTotalCount() + 1);
+        reservation.setReservationStatus(ReservationStatus.FINISHED);
+    }
+
     private void checkCanReservation(long memberId, PostReservationReq postReservationReq, Room room) {
-        if(room.getHouse().getMember().getId() == memberId){
+        if (room.getHouse().getMember().getId() == memberId) {
             throw new BaseException(RESERVATION_CANT_MY_HOUSE);
         }
 
-        if(room.getMaxPeople() < postReservationReq.getPeopleCount() ||
-                room.getMinPeople() > postReservationReq.getPeopleCount()){
+        if (room.getMaxPeople() < postReservationReq.getPeopleCount() ||
+                room.getMinPeople() > postReservationReq.getPeopleCount()) {
             throw new BaseException(RESERVATION_WRONG_PEOPLE_COUNT);
         }
 
-        if(room.getTotalCount() <= 0){
+        if (room.getTotalCount() <= 0) {
             throw new BaseException(RESERVATION_ROOM_COUNT);
         }
     }
 
     private void validateMember(long requestMemberId, long dbMemberId) {
-        if(requestMemberId != dbMemberId){
+        if (requestMemberId != dbMemberId) {
             throw new BaseException(INVALID_MEMBER);
         }
     }
