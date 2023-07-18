@@ -8,12 +8,12 @@
 - [주요 기능 및 상세](#-주요-기능-및-상세)
 
 # 👋 프로젝트 개요
-### [홈페이지](http://shimpyo.o-r.kr/)
-
-쉼표는 숙소를 직접 등록하거나 예약할 수 있는 통합 숙박예약 서비스입니다.
+#### 쉼표는 숙소를 직접 등록하거나 예약할 수 있는 통합 숙박예약 서비스입니다.
+### [쉼표 바로가기](http://shimpyo.o-r.kr/)
+* 비용 문제로 인하여 xxxx.xx.xx 까지 운영됩니다.
 
 # 📅 프로젝트 기간
-**23.06 ~ 23.07**
+> 2023. 06 ~ 2023. 07
 
 # 👪 멤버 구성
 | 이름  | 역할 | 기능                              |
@@ -23,10 +23,12 @@
 | 한재민 | 팀원 | DB설계, 회원(JWT , SMS 인증, 소셜 로그인)  |
 
 # 💻 개발 환경
-- ![development_map](https://github.com/Project-Shimpyo/backend/assets/47111722/e6904cfb-11dd-4430-a886-2a7ba3dbb9a6)
-
-- ERD : ![KakaoTalk_20230717_170522640](https://github.com/Project-Shimpyo/backend/assets/47111722/610b6480-d23d-496b-9564-8a1a0d3ab376)
-- API : [API](https://docs.google.com/spreadsheets/d/1lcUy45KENA28HkA6w2CRJwkndWbBS591vnjQbwSXX9s/edit?usp=sharing)
+### Architecture
+![development_map](https://github.com/Project-Shimpyo/backend/assets/47111722/e6904cfb-11dd-4430-a886-2a7ba3dbb9a6)
+### ERD
+![KakaoTalk_20230717_170522640](https://github.com/Project-Shimpyo/backend/assets/47111722/610b6480-d23d-496b-9564-8a1a0d3ab376)
+### API
+[API 명세서 바로가기](https://docs.google.com/spreadsheets/d/1lcUy45KENA28HkA6w2CRJwkndWbBS591vnjQbwSXX9s/edit?usp=sharing)
 
 # 🔧 기술 스택
 - Java 11
