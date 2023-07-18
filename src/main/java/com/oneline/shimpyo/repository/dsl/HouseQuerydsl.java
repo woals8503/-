@@ -1,5 +1,6 @@
 package com.oneline.shimpyo.repository.dsl;
 
+import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.house.dto.*;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.review.ReviewRating;
@@ -85,17 +86,17 @@ public class HouseQuerydsl {
     }
 
     public List<GetHouseListRes> findAllHouse(Pageable pageable, SearchFilterReq searchFilter) {
-        List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), house.contents, room.id.min()))
+        List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), houseAddress.sido, houseAddress.sigungu, room.id.min()))
                 .from(house)
                 .join(house.houseAddress, houseAddress)
                 .on(house.id.eq(houseAddress.house.id))
                 .join(house.rooms, room)
                 .on(house.id.eq(room.house.id))
-                .where(minPeopleLoe(searchFilter.getPeople()), maxPeopleGoe(searchFilter.getPeople()), cityEq(searchFilter.getCity()),
-                        districtEq(searchFilter.getDistrict()))
+                .where(minPeopleLoe(searchFilter.getPeople()), maxPeopleGoe(searchFilter.getPeople()), typeEq(searchFilter.getType())
+                        , cityEq(searchFilter.getCity()), districtEq(searchFilter.getDistrict()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .groupBy(house.id)
+                .groupBy(house.id, houseAddress.sido, houseAddress.sigungu)
                 .fetch();
 
 
@@ -150,6 +151,9 @@ public class HouseQuerydsl {
     }
     private BooleanExpression maxPeopleGoe(int maxPeople) {
         return maxPeople != 0 ? room.maxPeople.goe(maxPeople) : null;
+    }
+    private BooleanExpression typeEq(HouseType type) {
+        return type != null ? house.type.eq(type) : null;
     }
     private BooleanExpression cityEq(String city) {
         return city != null ? houseAddress.sido.eq(city) : null;
