@@ -80,6 +80,7 @@ public enum BaseResponseStatus {
     RESERVATION_HOST_HOUSE_EMPTY(false, 3106, "호스트하는 숙소가 없습니다"),
     RESERVATION_CANT_MY_HOUSE(false, 3107, "자기 자신의 숙소는 예약할 수 없습니다"),
     RESERVATION_EXISTENT(false, 3108, "예약이 존재하지 않습니다."),
+    RESERVATION_ROOM_COUNT(false, 3109, "남은 방의 개수가 없습니다."),
 
     //coupon 3120
     COUPON_NONEXISTENT(false, 3120,"존재하지 않는 쿠폰입니다."),

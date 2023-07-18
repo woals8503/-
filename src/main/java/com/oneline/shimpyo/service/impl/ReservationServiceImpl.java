@@ -66,17 +66,10 @@ public class ReservationServiceImpl implements ReservationService {
         PayMent payment = paymentService.createMemberPayment(memberId, postReservationReq);
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
-        Room room = roomRepository.findById(postReservationReq.getRoomId())
+        Room room = roomRepository.findByIdWithLock(postReservationReq.getRoomId())
                 .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
 
-        if(room.getHouse().getMember().getId() == memberId){
-            throw new BaseException(RESERVATION_CANT_MY_HOUSE);
-        }
-
-        if(room.getMaxPeople() < postReservationReq.getPeopleCount() ||
-                room.getMinPeople() > postReservationReq.getPeopleCount()){
-            throw new BaseException(RESERVATION_WRONG_PEOPLE_COUNT);
-        }
+        checkCanReservation(memberId, postReservationReq, room);
 
         Reservation reservation = Reservation.builder().room(room).member(member).payMent(payment)
                 .peopleCount(postReservationReq.getPeopleCount()).phoneNumber(member.getPhoneNumber())
@@ -85,6 +78,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .checkOutDate(postReservationReq.stringToLocalDateTime(postReservationReq.getCheckOutDate()))
                 .build();
         reservationRepository.save(reservation);
+        room.setTotalCount(room.getTotalCount() - 1);
 
         return reservation.getId();
     }
@@ -152,6 +146,21 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = paymentService.cancelMemberPayment(memberId, reservationId, patchReservationReq);
 
         reservation.setReservationStatus(ReservationStatus.CANCEL);
+    }
+
+    private void checkCanReservation(long memberId, PostReservationReq postReservationReq, Room room) {
+        if(room.getHouse().getMember().getId() == memberId){
+            throw new BaseException(RESERVATION_CANT_MY_HOUSE);
+        }
+
+        if(room.getMaxPeople() < postReservationReq.getPeopleCount() ||
+                room.getMinPeople() > postReservationReq.getPeopleCount()){
+            throw new BaseException(RESERVATION_WRONG_PEOPLE_COUNT);
+        }
+
+        if(room.getTotalCount() <= 0){
+            throw new BaseException(RESERVATION_ROOM_COUNT);
+        }
     }
 
     private void validateMember(long requestMemberId, long dbMemberId) {
