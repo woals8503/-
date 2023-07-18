@@ -24,7 +24,7 @@
 
 # 💻 개발 환경
 ### Architecture
-![development_map](https://github.com/Project-Shimpyo/backend/assets/47111722/e6904cfb-11dd-4430-a886-2a7ba3dbb9a6)
+![development_map](https://github.com/Project-Shimpyo/backend/assets/119032680/89dc4c0b-9515-43ee-9250-b0a2c1c2c77c)
 ### ERD
 ![KakaoTalk_20230717_170522640](https://github.com/Project-Shimpyo/backend/assets/47111722/610b6480-d23d-496b-9564-8a1a0d3ab376)
 ### API
