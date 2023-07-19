@@ -165,7 +165,8 @@ public class PaymentServiceImpl implements PaymentService {
         //쿠폰 체크
         LocalDateTime checkIn = postReservationReq.stringToLocalDateTime(postReservationReq.getCheckInDate());
         LocalDateTime checkOut = postReservationReq.stringToLocalDateTime(postReservationReq.getCheckOutDate());
-        priceToPay *= checkOut.getDayOfMonth() - checkIn.getDayOfMonth();
+
+        priceToPay *= checkOut.getDayOfYear() - checkIn.getDayOfYear();
 
         if (postReservationReq.getCouponId() != EMPTY_ID) {
             CouponId couponId = new CouponId(memberId, postReservationReq.getCouponId());
