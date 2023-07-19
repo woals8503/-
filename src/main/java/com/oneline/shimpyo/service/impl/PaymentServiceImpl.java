@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
@@ -162,6 +163,10 @@ public class PaymentServiceImpl implements PaymentService {
         MemberGrade memberGrade = member.getMemberGrade();
         priceToPay -= priceToPay / memberGrade.getDiscount();*/
         //쿠폰 체크
+        LocalDateTime checkIn = postReservationReq.stringToLocalDateTime(postReservationReq.getCheckInDate());
+        LocalDateTime checkOut = postReservationReq.stringToLocalDateTime(postReservationReq.getCheckOutDate());
+        priceToPay *= checkOut.getDayOfMonth() - checkIn.getDayOfMonth();
+
         if (postReservationReq.getCouponId() != EMPTY_ID) {
             CouponId couponId = new CouponId(memberId, postReservationReq.getCouponId());
             MyCoupon myCoupon = myCouponRepository.findByCouponId(couponId)
