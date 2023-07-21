@@ -31,8 +31,7 @@ public class OAuthController {
     @PostMapping("/api/oauth2-join")
     public BaseResponse<Map<String, String>>  oauthJoin(@RequestBody OAuthInfoReq oAuthInfoReq,
                                                         HttpServletResponse response) {
-        memberService.oauthJoin(oAuthInfoReq);
-        Member member = memberRepository.findById(oAuthInfoReq.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
+        Member member = memberService.oauthJoin(oAuthInfoReq);
 
         // 엑세스, 리프레시 쿠키 담아서 반환
         String accessToken = generateOAuth2Token(member, true, AT_EXP_TIME);
@@ -69,6 +68,7 @@ public class OAuthController {
         return new BaseResponse<>(responseMap);
     }
 
+    // 이미 회원일 때
     @GetMapping("/oauth2/oauth2-access")
     public BaseResponse<Map<String, String>> oauthToken(@RequestBody OAuth2IdReq request,
                                                         HttpServletResponse response) {
