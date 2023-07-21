@@ -87,6 +87,12 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.REVIEW_NONEXISTENT));
 
+        House house = review.getHouse();
+        double totalReviewCount = house.getReviews().size();
+        double likeReviewCount = reviewQuerydsl.likeReviewCount(house.getId());
+        double avgRating = (likeReviewCount / totalReviewCount) * 100;
+        house.setAvgRating(avgRating);
+        
         reviewRepository.delete(review);
     }
 
