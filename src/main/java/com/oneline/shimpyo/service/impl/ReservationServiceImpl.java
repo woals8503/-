@@ -11,16 +11,16 @@ import com.oneline.shimpyo.domain.reservation.Reservation;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.reservation.dto.*;
 import com.oneline.shimpyo.domain.room.Room;
-import com.oneline.shimpyo.repository.HouseImageRepository;
-import com.oneline.shimpyo.repository.MemberRepository;
-import com.oneline.shimpyo.repository.ReservationRepository;
-import com.oneline.shimpyo.repository.RoomRepository;
+import com.oneline.shimpyo.modules.aop.Retry;
+import com.oneline.shimpyo.modules.aop.RetryAspect;
+import com.oneline.shimpyo.repository.*;
 import com.oneline.shimpyo.repository.dsl.MyCouponQuerydsl;
 import com.oneline.shimpyo.repository.dsl.ReservationQuerydsl;
 import com.oneline.shimpyo.service.PaymentService;
 import com.oneline.shimpyo.service.ReservationService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static com.oneline.shimpyo.domain.BaseResponseStatus.*;
 
+@Import(RetryAspect.class)
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -41,6 +42,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationQuerydsl reservationQuerydsl;
+    private final HouseRepository houseRepository;
     private final MemberRepository memberRepository;
     private final HouseImageRepository houseImageRepository;
     private final RoomRepository roomRepository;
@@ -56,6 +58,7 @@ public class ReservationServiceImpl implements ReservationService {
         return new GetPrepareReservationRes(uuid, memberGrade.getGrade().getRank(), memberGrade.getDiscount(), myCouponList);
     }
 
+    @Retry
     @Transactional
     @Override
     public long createReservation(long memberId, PostReservationReq postReservationReq)
@@ -65,6 +68,10 @@ public class ReservationServiceImpl implements ReservationService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
         Room room = roomRepository.findById(postReservationReq.getRoomId())
                 .orElseThrow(() -> new BaseException(ROOM_NONEXISTENT));
+
+        if(room.getHouse().getMember().getId() == memberId){
+            throw new BaseException(RESERVATION_CANT_MY_HOUSE);
+        }
 
         if(room.getMaxPeople() < postReservationReq.getPeopleCount() ||
                 room.getMinPeople() > postReservationReq.getPeopleCount()){
@@ -107,6 +114,8 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public GetHouseReservationRes readHouseReservationList(long memberId, long houseId,
                                                            ReservationStatus reservationStatus, Pageable pageable) {
+        houseRepository.findById(houseId).orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
+
         Page<HostReservationReq> hostReservationReqs = reservationQuerydsl
                 .readHouseReservationList(houseId, reservationStatus, pageable);
 

@@ -32,7 +32,9 @@ public class CustomAuthProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
         PrincipalDetails userDetails = (PrincipalDetails) principalDetailsService.loadUserByUsername(username);
-
+        if(userDetails == null) {
+            throw new BadCredentialsException("아이디, 비밀번호를 다시 확인해주세요");
+        }
         // PW 검사
         if (!passwordEncoder.matches(password, userDetails.getPassword())){
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
