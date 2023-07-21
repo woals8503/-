@@ -37,6 +37,7 @@ public class MemberController {
     private final S3FileHandler s3FileHandler;
     private final PasswordEncoder passwordEncoder;
 
+
     @PostMapping("/api/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
 
