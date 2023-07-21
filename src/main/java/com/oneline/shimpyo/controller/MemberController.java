@@ -156,7 +156,7 @@ public class MemberController {
     }
 
     // Access 토큰 만료 시 새로운 토큰을 발급
-    @GetMapping("/user/refresh")
+    @GetMapping("/api/refresh")
     public BaseResponse<Map<String, String>> refresh(HttpServletRequest request, HttpServletResponse response, @CurrentMember Member member) {
         Cookie[] cookies = request.getCookies();
         String name = null;
@@ -237,9 +237,9 @@ public class MemberController {
     @PatchMapping("/user/change-profile")
     public BaseResponse<Void> changeProfile(@CurrentMember Member member,
                                             @RequestPart(required = false) MultipartFile multipartFile,
-                                            @RequestPart String selfIntroduce) {
+                                            @RequestPart SelfIntroduceReq selfIntroduce) {
         FileReq fileReq = s3FileHandler.uploadFile(multipartFile).get();
-        memberService.changeProfile(member, fileReq, selfIntroduce);
+        memberService.changeProfile(member, fileReq, selfIntroduce.getSelfIntroduce());
         return new BaseResponse<>();
     }
 

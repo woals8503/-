@@ -28,7 +28,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
 #        show_sql: true
@@ -52,7 +52,7 @@ spring:
         registration:
           kakao:
             client-id: temp
-            redirect-uri: "http://shimpyo-api.p-e.kr:8081/login/oauth2/code/kakao"
+            redirect-uri: http://shimpyo-api.p-e.kr:8081/login/oauth2/code/kakao
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             scope: profile_nickname, account_email #동의 항목
