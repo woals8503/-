@@ -4,6 +4,7 @@ import com.oneline.shimpyo.domain.house.QHouse;
 import com.oneline.shimpyo.domain.member.QMember;
 import com.oneline.shimpyo.domain.member.QMemberImage;
 import com.oneline.shimpyo.domain.review.Review;
+import com.oneline.shimpyo.domain.review.ReviewRating;
 import com.oneline.shimpyo.domain.review.dto.*;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -65,5 +66,14 @@ public class ReviewQuerydsl {
                 .where(review.house.id.eq(houseId))
                 .groupBy(review.reviewRating)
                 .fetch();
+    }
+
+
+    public long likeReviewCount(long houseId){
+        return jqf.select(review.count())
+                .from(review)
+                .where(review.house.id.eq(houseId))
+                .where(review.reviewRating.eq(ReviewRating.GOOD))
+                .fetchFirst();
     }
 }
