@@ -24,7 +24,7 @@ public class GetHouseListRes {
     private List<String> houseImages;
 
     @QueryProjection
-    public GetHouseListRes(long houseId, String name, HouseType type, int price, String sido, String sigungu, long roomId) {
+    public GetHouseListRes(long houseId, String name, HouseType type, int price, String sido, String sigungu, long roomId, double ratio) {
         this.houseId = houseId;
         this.name = name;
         this.type = type;
@@ -32,6 +32,7 @@ public class GetHouseListRes {
         this.sido = sido;
         this.sigungu = sigungu;
         this.roomId = roomId;
+        this.ratio = ratio;
         this.soldout = false;
     }
 }

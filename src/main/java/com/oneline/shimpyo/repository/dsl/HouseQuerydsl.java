@@ -3,7 +3,6 @@ package com.oneline.shimpyo.repository.dsl;
 import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.house.dto.*;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
-import com.oneline.shimpyo.domain.review.ReviewRating;
 import com.oneline.shimpyo.domain.room.Room;
 
 import com.oneline.shimpyo.domain.room.dto.QRoomInfo;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.oneline.shimpyo.domain.house.QHouse.house;
@@ -25,7 +22,6 @@ import static com.oneline.shimpyo.domain.house.QHouseAddress.houseAddress;
 import static com.oneline.shimpyo.domain.house.QHouseImage.houseImage;
 import static com.oneline.shimpyo.domain.house.QHouseOptions.houseOptions;
 import static com.oneline.shimpyo.domain.reservation.QReservation.reservation;
-import static com.oneline.shimpyo.domain.review.QReview.review;
 import static com.oneline.shimpyo.domain.room.QRoom.room;
 import static com.oneline.shimpyo.domain.room.QRoomImage.roomImage;
 
@@ -86,7 +82,7 @@ public class HouseQuerydsl {
     }
 
     public List<GetHouseListRes> findAllHouse(Pageable pageable, SearchFilterReq searchFilter) {
-        List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), houseAddress.sido, houseAddress.sigungu, room.id.min()))
+        List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), houseAddress.sido, houseAddress.sigungu, room.id.min(), house.avgRating))
                 .from(house)
                 .join(house.houseAddress, houseAddress)
                 .on(house.id.eq(houseAddress.house.id))
@@ -97,26 +93,12 @@ public class HouseQuerydsl {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .groupBy(house.id, houseAddress.sido, houseAddress.sigungu)
+                .orderBy(house.avgRating.desc())
                 .fetch();
 
 
-        // 각 객실 평점 및 이미지 저장
+        //이미지 저장
         for (GetHouseListRes houseRes : foundHouseList) {
-            // 평점 저장
-            double result = 0;
-            long totalReviewCount = jqf.select(review.count())
-                    .from(review)
-                    .where(review.house.id.eq(houseRes.getHouseId()))
-                    .fetchOne();
-            if (totalReviewCount > 0) { // 리뷰 존재 시에만 해당 로직 수행
-                long goodReviewCount = jqf.select(review.count())
-                        .from(review)
-                        .where(review.house.id.eq(houseRes.getHouseId()), review.reviewRating.eq(ReviewRating.GOOD))
-                        .fetchOne();
-                result = ((double) goodReviewCount / (double) totalReviewCount) * 100.0;
-            }
-            houseRes.setRatio(result);
-
             // 이미지 저장
             houseRes.setHouseImages(findHouseImagesByHouseId(houseRes.getHouseId()));
         }
@@ -138,9 +120,6 @@ public class HouseQuerydsl {
                 }
             }
         }
-
-        Comparator<GetHouseListRes> resOrderByRating = Comparator.comparing(GetHouseListRes::getRatio).reversed();
-        Collections.sort(foundHouseList, resOrderByRating);
 
         return foundHouseList;
     }
