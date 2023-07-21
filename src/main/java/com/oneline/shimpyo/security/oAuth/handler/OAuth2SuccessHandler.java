@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.*;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 @Component
@@ -40,7 +41,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .encode(UTF_8)
                     .toUriString());
         }
-        
+
         // 최초 로그인이라면 회원가입 창 redirect
         else {
             response.sendRedirect(UriComponentsBuilder.fromUriString("http://shimpyo.o-r.kr/social/add_info")

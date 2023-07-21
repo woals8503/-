@@ -39,10 +39,6 @@ public class MemberController {
 
     @PostMapping("/api/join")
     public BaseResponse<Void> join(@RequestBody MemberReq memberReq) {
-
-        // 이미지 가져온 후
-//        FileReq fileReq = s3FileHandler.uploadFile(defaultImage).get();
-
         boolean isValid = validateRequest(memberReq);
         if(!isValid)
             return new BaseResponse<>(MEMBER_REGEX_WRONG);
@@ -243,8 +239,8 @@ public class MemberController {
         return new BaseResponse<>();
     }
 
-    @GetMapping("/api/show-profile")
-    public BaseResponse<MemberProfileRes> showProfile(@RequestParam Long userId) {
+    @GetMapping("/api/show-profile/{userId}")
+    public BaseResponse<MemberProfileRes> showProfile(@PathVariable Long userId) {
         MemberProfileRes memberProfile = memberService.findMemberProfile(userId);
 
         return new BaseResponse<>(memberProfile);
