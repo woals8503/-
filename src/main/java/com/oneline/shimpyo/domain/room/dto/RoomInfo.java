@@ -22,6 +22,7 @@ public class RoomInfo {
     private int totalCount;
     private LocalTime checkIn;
     private LocalTime checkOut;
+    private boolean soldout;
     private List<String> roomImages;
 
     @QueryProjection
@@ -38,5 +39,6 @@ public class RoomInfo {
         this.totalCount = totalCount;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
+        this.soldout = false;
     }
 }

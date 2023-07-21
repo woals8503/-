@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.oneline.shimpyo.domain.house.QHouse.house;
@@ -117,18 +118,19 @@ public class HouseQuerydsl {
         // 체크인, 체크아웃 기간이 명시되어 있을 경우
         if (searchFilter.getCheckin() != null && searchFilter.getCheckout() != null) {
             for (GetHouseListRes houseRes : foundHouseList) {
-                Room foundRoom = jqf.selectFrom(room)
-                        .where(room.id.eq(houseRes.getRoomId()))
-                        .fetchOne();
-                long reservedCount = jqf.select(reservation.count())
-                        .from(reservation)
-                        .where(reservation.reservationStatus.eq(ReservationStatus.COMPLETE), reservation.room.id.eq(houseRes.getRoomId()),
-                                reservation.checkInDate.loe(searchFilter.getCheckin()),
-                                reservation.checkOutDate.goe(searchFilter.getCheckout()))
-                        .fetchOne();
-                if (foundRoom.getTotalCount() <= reservedCount) { // 얘약인원이 꽉 찬 경우 해당 숙소 정보를 목록에서 제외
-                    houseRes.setSoldout(true);
-                }
+                if (checkReservation(houseRes.getRoomId(), searchFilter.getCheckin(), searchFilter.getCheckout())) houseRes.setSoldout(true);
+//                Room foundRoom = jqf.selectFrom(room)
+//                        .where(room.id.eq(houseRes.getRoomId()))
+//                        .fetchOne();
+//                long reservedCount = jqf.select(reservation.count())
+//                        .from(reservation)
+//                        .where(reservation.reservationStatus.eq(ReservationStatus.COMPLETE), reservation.room.id.eq(houseRes.getRoomId()),
+//                                reservation.checkInDate.loe(searchFilter.getCheckin()),
+//                                reservation.checkOutDate.goe(searchFilter.getCheckout()))
+//                        .fetchOne();
+//                if (foundRoom.getTotalCount() <= reservedCount) { // 얘약인원이 꽉 찬 경우 해당 숙소 정보를 목록에서 제외
+//                    houseRes.setSoldout(true);
+//                }
             }
         }
 
@@ -150,5 +152,19 @@ public class HouseQuerydsl {
     }
     private BooleanExpression districtEq(String district) {
         return district != null ? houseAddress.sigungu.eq(district) : null;
+    }
+
+    // 예약 현황 확인
+    public boolean checkReservation(long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        Room foundRoom = jqf.selectFrom(room)
+                .where(room.id.eq(roomId))
+                .fetchOne();
+        long reservedCount = jqf.select(reservation.count())
+                .from(reservation)
+                .where(reservation.reservationStatus.eq(ReservationStatus.COMPLETE), reservation.room.id.eq(foundRoom.getId()),
+                        reservation.checkInDate.loe(checkIn),
+                        reservation.checkOutDate.goe(checkOut))
+                .fetchOne();
+        return (foundRoom.getTotalCount() <= reservedCount) ? true : false;
     }
 }

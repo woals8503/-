@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -179,9 +181,16 @@ public class HouseServiceImpl implements HouseService {
 
         // 객실 관련 정보
         List<RoomInfo> foundRooms = houseQuerydsl.findRoomsByHouseId(houseId);
+        LocalDateTime checkIn = LocalDateTime.now();
+        LocalDateTime checkOut = checkIn.plus(1, ChronoUnit.DAYS);
+        // 객실 이미지 저장 및 품절여부 체크
         for (int i = 0; i < foundRooms.size(); i++) {
+            // 이미지 저장
             List<String> foundRoomImages = houseQuerydsl.findRoomImagesByRoomId(foundRooms.get(i).getRoomId());
             foundRooms.get(i).setRoomImages(foundRoomImages);
+
+            // 품절 여부 체크
+            if(houseQuerydsl.checkReservation(foundRooms.get(i).getRoomId(), checkIn, checkOut)) foundRooms.get(i).setSoldout(true);
         }
 
         // Response DTO에 저장
