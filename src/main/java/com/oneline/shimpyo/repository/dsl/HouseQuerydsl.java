@@ -1,8 +1,9 @@
 package com.oneline.shimpyo.repository.dsl;
 
+import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.house.dto.*;
+import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
-import com.oneline.shimpyo.domain.review.ReviewRating;
 import com.oneline.shimpyo.domain.room.Room;
 
 import com.oneline.shimpyo.domain.room.dto.QRoomInfo;
@@ -15,8 +16,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.oneline.shimpyo.domain.house.QHouse.house;
@@ -24,9 +24,9 @@ import static com.oneline.shimpyo.domain.house.QHouseAddress.houseAddress;
 import static com.oneline.shimpyo.domain.house.QHouseImage.houseImage;
 import static com.oneline.shimpyo.domain.house.QHouseOptions.houseOptions;
 import static com.oneline.shimpyo.domain.reservation.QReservation.reservation;
-import static com.oneline.shimpyo.domain.review.QReview.review;
 import static com.oneline.shimpyo.domain.room.QRoom.room;
 import static com.oneline.shimpyo.domain.room.QRoomImage.roomImage;
+import static com.oneline.shimpyo.domain.wish.QWish.wish;
 
 @Repository
 public class HouseQuerydsl {
@@ -84,62 +84,55 @@ public class HouseQuerydsl {
                 .fetch();
     }
 
-    public List<GetHouseListRes> findAllHouse(Pageable pageable, SearchFilterReq searchFilter) {
-        List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), house.contents, room.id.min()))
+    public List<GetHouseListRes> findAllHouse(Pageable pageable, SearchFilterReq searchFilter, Member member) {
+        List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), houseAddress.sido, houseAddress.sigungu, room.id.min(), house.avgRating))
                 .from(house)
                 .join(house.houseAddress, houseAddress)
                 .on(house.id.eq(houseAddress.house.id))
                 .join(house.rooms, room)
                 .on(house.id.eq(room.house.id))
-                .where(minPeopleLoe(searchFilter.getPeople()), maxPeopleGoe(searchFilter.getPeople()), cityEq(searchFilter.getCity()),
-                        districtEq(searchFilter.getDistrict()))
+                .where(minPeopleLoe(searchFilter.getPeople()), maxPeopleGoe(searchFilter.getPeople()), typeEq(searchFilter.getType())
+                        , cityEq(searchFilter.getCity()), districtEq(searchFilter.getDistrict()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .groupBy(house.id)
+                .groupBy(house.id, houseAddress.sido, houseAddress.sigungu)
+                .orderBy(house.avgRating.desc())
                 .fetch();
 
 
-        // 각 객실 평점 및 이미지 저장
+        //이미지 저장 및 관심숙소 등록여부 검증
         for (GetHouseListRes houseRes : foundHouseList) {
-            // 평점 저장
-            double result = 0;
-            long totalReviewCount = jqf.select(review.count())
-                    .from(review)
-                    .where(review.house.id.eq(houseRes.getHouseId()))
-                    .fetchOne();
-            if (totalReviewCount > 0) { // 리뷰 존재 시에만 해당 로직 수행
-                long goodReviewCount = jqf.select(review.count())
-                        .from(review)
-                        .where(review.house.id.eq(houseRes.getHouseId()), review.reviewRating.eq(ReviewRating.GOOD))
-                        .fetchOne();
-                result = ((double) goodReviewCount / (double) totalReviewCount) * 100.0;
-            }
-            houseRes.setRatio(result);
-
             // 이미지 저장
             houseRes.setHouseImages(findHouseImagesByHouseId(houseRes.getHouseId()));
+            
+            // 관심숙소 등록여부 검증
+            if (member != null) {
+                long result = jqf.select(wish.member.id.count())
+                        .from(wish)
+                        .where(wish.member.id.eq(member.getId()), wish.house.id.eq(houseRes.getHouseId()))
+                        .fetchOne();
+                if (result > 0) houseRes.setWished(true);
+            }
         }
 
         // 체크인, 체크아웃 기간이 명시되어 있을 경우
         if (searchFilter.getCheckin() != null && searchFilter.getCheckout() != null) {
             for (GetHouseListRes houseRes : foundHouseList) {
-                Room foundRoom = jqf.selectFrom(room)
-                        .where(room.id.eq(houseRes.getRoomId()))
-                        .fetchOne();
-                long reservedCount = jqf.select(reservation.count())
-                        .from(reservation)
-                        .where(reservation.reservationStatus.eq(ReservationStatus.COMPLETE), reservation.room.id.eq(houseRes.getRoomId()),
-                                reservation.checkInDate.loe(searchFilter.getCheckin()),
-                                reservation.checkOutDate.goe(searchFilter.getCheckout()))
-                        .fetchOne();
-                if (foundRoom.getTotalCount() <= reservedCount) { // 얘약인원이 꽉 찬 경우 해당 숙소 정보를 목록에서 제외
-                    houseRes.setSoldout(true);
-                }
+                if (checkReservation(houseRes.getRoomId(), searchFilter.getCheckin(), searchFilter.getCheckout())) houseRes.setSoldout(true);
+//                Room foundRoom = jqf.selectFrom(room)
+//                        .where(room.id.eq(houseRes.getRoomId()))
+//                        .fetchOne();
+//                long reservedCount = jqf.select(reservation.count())
+//                        .from(reservation)
+//                        .where(reservation.reservationStatus.eq(ReservationStatus.COMPLETE), reservation.room.id.eq(houseRes.getRoomId()),
+//                                reservation.checkInDate.loe(searchFilter.getCheckin()),
+//                                reservation.checkOutDate.goe(searchFilter.getCheckout()))
+//                        .fetchOne();
+//                if (foundRoom.getTotalCount() <= reservedCount) { // 얘약인원이 꽉 찬 경우 해당 숙소 정보를 목록에서 제외
+//                    houseRes.setSoldout(true);
+//                }
             }
         }
-
-        Comparator<GetHouseListRes> resOrderByRating = Comparator.comparing(GetHouseListRes::getRatio).reversed();
-        Collections.sort(foundHouseList, resOrderByRating);
 
         return foundHouseList;
     }
@@ -151,10 +144,27 @@ public class HouseQuerydsl {
     private BooleanExpression maxPeopleGoe(int maxPeople) {
         return maxPeople != 0 ? room.maxPeople.goe(maxPeople) : null;
     }
+    private BooleanExpression typeEq(HouseType type) {
+        return type != null ? house.type.eq(type) : null;
+    }
     private BooleanExpression cityEq(String city) {
         return city != null ? houseAddress.sido.eq(city) : null;
     }
     private BooleanExpression districtEq(String district) {
         return district != null ? houseAddress.sigungu.eq(district) : null;
+    }
+
+    // 예약 현황 확인
+    public boolean checkReservation(long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        Room foundRoom = jqf.selectFrom(room)
+                .where(room.id.eq(roomId))
+                .fetchOne();
+        long reservedCount = jqf.select(reservation.count())
+                .from(reservation)
+                .where(reservation.reservationStatus.eq(ReservationStatus.COMPLETE), reservation.room.id.eq(foundRoom.getId()),
+                        reservation.checkInDate.loe(checkIn),
+                        reservation.checkOutDate.goe(checkOut))
+                .fetchOne();
+        return (foundRoom.getTotalCount() <= reservedCount) ? true : false;
     }
 }

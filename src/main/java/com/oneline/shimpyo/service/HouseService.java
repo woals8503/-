@@ -11,7 +11,7 @@ public interface HouseService {
 
     long createHouse(Member member, PostHouseReq houseReq, List<MultipartFile> houseImages, List<MultipartFile> roomImages);
     GetHouseDetailRes readHouseDetail(long houseId);
-    List<GetHouseListRes> readHouseList(Pageable pageable, SearchFilterReq searchFilter);
+    List<GetHouseListRes> readHouseList(Pageable pageable, SearchFilterReq searchFilter, Member member);
     void updateHouse(Member member, long houseId, PatchHouseReq patchHouseReq, List<MultipartFile> houseImages);
     void deleteHouse(Member member, long houseId);
 
