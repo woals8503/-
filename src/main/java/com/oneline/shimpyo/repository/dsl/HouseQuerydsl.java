@@ -2,6 +2,7 @@ package com.oneline.shimpyo.repository.dsl;
 
 import com.oneline.shimpyo.domain.house.HouseType;
 import com.oneline.shimpyo.domain.house.dto.*;
+import com.oneline.shimpyo.domain.member.Member;
 import com.oneline.shimpyo.domain.reservation.ReservationStatus;
 import com.oneline.shimpyo.domain.room.Room;
 
@@ -24,6 +25,7 @@ import static com.oneline.shimpyo.domain.house.QHouseOptions.houseOptions;
 import static com.oneline.shimpyo.domain.reservation.QReservation.reservation;
 import static com.oneline.shimpyo.domain.room.QRoom.room;
 import static com.oneline.shimpyo.domain.room.QRoomImage.roomImage;
+import static com.oneline.shimpyo.domain.wish.QWish.wish;
 
 @Repository
 public class HouseQuerydsl {
@@ -81,7 +83,7 @@ public class HouseQuerydsl {
                 .fetch();
     }
 
-    public List<GetHouseListRes> findAllHouse(Pageable pageable, SearchFilterReq searchFilter) {
+    public List<GetHouseListRes> findAllHouse(Pageable pageable, SearchFilterReq searchFilter, Member member) {
         List<GetHouseListRes> foundHouseList = jqf.select(new QGetHouseListRes(house.id, house.name, house.type, room.price.min(), houseAddress.sido, houseAddress.sigungu, room.id.min(), house.avgRating))
                 .from(house)
                 .join(house.houseAddress, houseAddress)
@@ -97,10 +99,19 @@ public class HouseQuerydsl {
                 .fetch();
 
 
-        //이미지 저장
+        //이미지 저장 및 관심숙소 등록여부 검증
         for (GetHouseListRes houseRes : foundHouseList) {
             // 이미지 저장
             houseRes.setHouseImages(findHouseImagesByHouseId(houseRes.getHouseId()));
+            
+            // 관심숙소 등록여부 검증
+            if (member != null) {
+                long result = jqf.select(wish.member.id.count())
+                        .from(wish)
+                        .where(wish.member.id.eq(member.getId()), wish.house.id.eq(houseRes.getHouseId()))
+                        .fetchOne();
+                if (result > 0) houseRes.setWished(true);
+            }
         }
 
         // 체크인, 체크아웃 기간이 명시되어 있을 경우

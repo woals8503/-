@@ -21,6 +21,7 @@ public class GetHouseListRes {
     private long roomId;
     private double ratio;
     private boolean soldout;
+    private boolean wished;
     private List<String> houseImages;
 
     @QueryProjection
@@ -34,5 +35,6 @@ public class GetHouseListRes {
         this.roomId = roomId;
         this.ratio = ratio;
         this.soldout = false;
+        this.wished = false;
     }
 }

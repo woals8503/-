@@ -37,10 +37,10 @@ public class HouseController {
     }
 
     @PostMapping("/api/houses")
-    public BaseResponse<List<GetHouseListRes>> readHouseList(@RequestBody SearchFilterReq searchFilter) {
+    public BaseResponse<List<GetHouseListRes>> readHouseList(@RequestBody SearchFilterReq searchFilter, @CurrentMember Member member) {
         // city : 시/도,  district : 시/군/구,  checkin : 체크인,  checkout : 체크아웃,  people : 인원수
         PageRequest pageRequest = PageRequest.of(searchFilter.getPage(), 20);
-        List<GetHouseListRes> foundHouseList = houseService.readHouseList(pageRequest, searchFilter);
+        List<GetHouseListRes> foundHouseList = houseService.readHouseList(pageRequest, searchFilter, member);
         return new BaseResponse<>(foundHouseList);
     }
 

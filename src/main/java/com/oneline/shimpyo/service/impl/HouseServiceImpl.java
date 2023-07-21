@@ -192,8 +192,8 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public List<GetHouseListRes> readHouseList(Pageable pageable, SearchFilterReq searchFilter) {
-        List<GetHouseListRes> foundHouseList = houseQuerydsl.findAllHouse(pageable, searchFilter);
+    public List<GetHouseListRes> readHouseList(Pageable pageable, SearchFilterReq searchFilter, Member member) {
+        List<GetHouseListRes> foundHouseList = houseQuerydsl.findAllHouse(pageable, searchFilter, member);
         return foundHouseList;
     }
 
