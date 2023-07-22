@@ -171,7 +171,7 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public GetHouseDetailRes readHouseDetail(long houseId) {
+    public GetHouseDetailRes readHouseDetail(long houseId, SearchFilterReq searchFilter) {
         // 숙소 관련 정보
         HouseInfo foundHouse = Optional.ofNullable(houseQuerydsl.findHouseAndAddressByHouseId(houseId))
                 .orElseThrow(() -> new BaseException(HOUSE_NONEXISTENT));
@@ -181,8 +181,12 @@ public class HouseServiceImpl implements HouseService {
 
         // 객실 관련 정보
         List<RoomInfo> foundRooms = houseQuerydsl.findRoomsByHouseId(houseId);
-        LocalDateTime checkIn = LocalDateTime.now();
+        LocalDateTime checkIn = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime checkOut = checkIn.plus(1, ChronoUnit.DAYS);
+        if (searchFilter != null) {
+            checkIn = searchFilter.getCheckin();
+            checkOut = searchFilter.getCheckout();
+        }
         // 객실 이미지 저장 및 품절여부 체크
         for (int i = 0; i < foundRooms.size(); i++) {
             // 이미지 저장

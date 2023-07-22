@@ -30,9 +30,9 @@ public class HouseController {
         return new BaseResponse<>(new HouseRegisterRes(houseId));
     }
 
-    @GetMapping("/api/houses/{houseId}")
-    public BaseResponse<GetHouseDetailRes> readHouseDetail(@PathVariable long houseId) {
-        GetHouseDetailRes getHouseDetailRes = houseService.readHouseDetail(houseId);
+    @PostMapping("/api/houses/{houseId}")
+    public BaseResponse<GetHouseDetailRes> readHouseDetail(@PathVariable long houseId, @RequestBody(required = false) SearchFilterReq searchFilter) {
+        GetHouseDetailRes getHouseDetailRes = houseService.readHouseDetail(houseId, searchFilter);
         return new BaseResponse<>(getHouseDetailRes);
     }
 
