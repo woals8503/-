@@ -47,8 +47,6 @@ public class MemberQuerydsl {
         return jqf.select(new QMemberInfoRes(member.nickname, member.email, member.phoneNumber, member.id))
                 .from(member)
                 .where(member.id.eq(info.getId())).fetchOne();
-
-
     }
 
     public List<Reservation> findByMemberReservationInfo(Member info) {
@@ -60,7 +58,7 @@ public class MemberQuerydsl {
     }
 
     public MemberProfileRes findMemberProfile(Long memberId) {
-        return jqf.select(new QMemberProfileRes(memberImage.savedPath, member.comments, member.id))
+        return jqf.select(new QMemberProfileRes(memberImage.savedPath, member.comments, member.id, member.nickname))
                 .from(member)
                 .join(memberImage)
                 .on(member.id.eq(memberImage.member.id))

@@ -12,11 +12,13 @@ public class MemberProfileRes {
     String profileImage;
     String selfIntroduce;
     Long id;
+    String nickname;
 
     @QueryProjection
-    public MemberProfileRes(String profileImage, String selfIntroduce, Long id) {
+    public MemberProfileRes(String profileImage, String selfIntroduce, Long id, String nickname) {
         this.profileImage = profileImage;
         this.selfIntroduce = selfIntroduce;
         this.id = id;
+        this.nickname = nickname;
     }
 }
