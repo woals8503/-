@@ -33,6 +33,7 @@ public class MemberProfile {
                 .nickname("임시 닉네임")
                 .social(false)
                 .role(CLIENT)
+                .comments(" ")
                 .point(0)
                 .build();
     }

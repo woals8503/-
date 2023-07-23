@@ -83,7 +83,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
                 .savedPath(" ")
                 .savedPath(" ").build();
         member.setMemberImage(memberImage);
-        
+
         if(member.getSocial()) {
            log.info("이미 회원가입 되있는 사용자");
            return member;
