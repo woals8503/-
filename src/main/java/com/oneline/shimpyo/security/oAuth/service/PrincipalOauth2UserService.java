@@ -75,15 +75,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         Member member = memberRepository.findByEmailAndProvider(memberProfile.getEmail(), memberProfile.getProvider())
                 .map(m -> m.update(memberProfile.getEmail())) // OAuth 서비스 사이트에서 유저 정보 변경이 있을 수 있기 때문에 우리 DB에도 update
                 .orElse(memberProfile.toMember(em, bCryptPasswordEncoder)); // 정보가 없다면 신규회원임으로 가입
-
-        MemberImage memberImage = MemberImage.builder()
-                .member(member)
-                .originalFileName(" ")
-                .savedFileName(" ")
-                .savedPath(" ")
-                .savedPath(" ").build();
-        member.setMemberImage(memberImage);
-
+        
         if(member.getSocial()) {
            log.info("이미 회원가입 되있는 사용자");
            return member;
