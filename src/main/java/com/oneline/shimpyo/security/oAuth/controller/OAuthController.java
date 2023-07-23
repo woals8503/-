@@ -69,10 +69,11 @@ public class OAuthController {
     }
 
     // 이미 회원일 때
-    @GetMapping("/oauth2/oauth2-access")
+    @PostMapping("/oauth2/oauth2-access")
     public BaseResponse<Map<String, String>> oauthToken(@RequestBody OAuth2IdReq request,
                                                         HttpServletResponse response) {
-        Member member = memberRepository.findById(request.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
+        Member member = memberRepository
+                .findById(request.getId()).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
 
         String accessToken = generateOAuth2Token(member, true, AT_EXP_TIME);
         String refreshToken = generateOAuth2Token(member, true, RT_EXP_TIME);
