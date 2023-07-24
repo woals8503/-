@@ -79,7 +79,6 @@ public class ReservationServiceImpl implements ReservationService {
                 .checkOutDate(postReservationReq.stringToLocalDateTime(postReservationReq.getCheckOutDate()))
                 .build();
         reservationRepository.save(reservation);
-        room.setTotalCount(room.getTotalCount() - 1);
 
         return reservation.getId();
     }
@@ -155,7 +154,6 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
 
-        reservation.getRoom().setTotalCount(reservation.getRoom().getTotalCount() + 1);
         reservation.setReservationStatus(ReservationStatus.FINISHED);
     }
 
@@ -166,10 +164,6 @@ public class ReservationServiceImpl implements ReservationService {
 
         if (room.getMaxPeople() < postReservationReq.getPeopleCount()) {
             throw new BaseException(RESERVATION_WRONG_PEOPLE_COUNT);
-        }
-
-        if (room.getTotalCount() <= 0) {
-            throw new BaseException(RESERVATION_ROOM_COUNT);
         }
     }
 

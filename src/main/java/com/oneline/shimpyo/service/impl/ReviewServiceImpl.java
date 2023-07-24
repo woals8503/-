@@ -21,6 +21,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional
     @Override
-    public void createReview(long memberId, PostReviewReq postReviewReq) {
+    public long createReview(long memberId, PostReviewReq postReviewReq) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(MEMBER_NONEXISTENT));
         Reservation reservation = reservationRepository.findById(postReviewReq.getReservationId())
                 .orElseThrow(() -> new BaseException(RESERVATION_NONEXISTENT));
@@ -54,10 +55,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .contents(postReviewReq.getContents()).reviewRating(postReviewReq.getReviewRating()).build();
         reviewRepository.save(review);
 
-        double totalReviewCount = house.getReviews().size();
-        double likeReviewCount = reviewQuerydsl.likeReviewCount(house.getId());
-        double avgRating = (likeReviewCount / totalReviewCount) * 100;
-        house.setAvgRating(avgRating);
+        return house.getId();
     }
 
     @Override
@@ -67,7 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional
     @Override
-    public void updateReview(long reviewId, PatchReviewReq patchReviewReq) {
+    public long updateReview(long reviewId, PatchReviewReq patchReviewReq) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.REVIEW_NONEXISTENT));
         House house = review.getHouse();
@@ -75,25 +73,18 @@ public class ReviewServiceImpl implements ReviewService {
         review.setContents(patchReviewReq.getContents());
         review.setReviewRating(patchReviewReq.getReviewRating());
 
-        double totalReviewCount = house.getReviews().size();
-        double likeReviewCount = reviewQuerydsl.likeReviewCount(house.getId());
-        double avgRating = (likeReviewCount / totalReviewCount) * 100;
-        house.setAvgRating(avgRating);
+        return house.getId();
     }
 
     @Transactional
     @Override
-    public void deleteReview(long reviewId) {
+    public long deleteReview(long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.REVIEW_NONEXISTENT));
-
-        House house = review.getHouse();
-        double totalReviewCount = house.getReviews().size();
-        double likeReviewCount = reviewQuerydsl.likeReviewCount(house.getId());
-        double avgRating = (likeReviewCount / totalReviewCount) * 100;
-        house.setAvgRating(avgRating);
-        
+        Long houseId = review.getHouse().getId();
         reviewRepository.delete(review);
+
+        return houseId;
     }
 
     @Override

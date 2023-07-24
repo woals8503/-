@@ -330,4 +330,14 @@ public class HouseServiceImpl implements HouseService {
         return houseQuerydsl.readMyHouseList(memberId);
     }
 
+    @Transactional
+    @Override
+    public void updateHouseAvgRating(long houseId) {
+        House house = houseRepository.findById(houseId).get(); //reviewService에서 확인
+        double totalReviewCount = house.getReviews().size();
+        double likeReviewCount = reviewQuerydsl.likeReviewCount(house.getId());
+        double avgRating = (likeReviewCount / totalReviewCount) * 100;
+        house.setAvgRating(avgRating);
+    }
+
 }

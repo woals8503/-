@@ -16,4 +16,6 @@ public interface HouseService {
     void deleteHouse(Member member, long houseId);
 
     List<GetMyHouseListRes> readMyHouseList(long memberId);
+
+    void updateHouseAvgRating(long houseId);
 }

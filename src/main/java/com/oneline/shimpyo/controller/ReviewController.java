@@ -8,6 +8,7 @@ import com.oneline.shimpyo.domain.review.dto.PatchReviewReq;
 import com.oneline.shimpyo.domain.review.dto.PostReviewReq;
 import com.oneline.shimpyo.modules.CheckMember;
 import com.oneline.shimpyo.security.auth.CurrentMember;
+import com.oneline.shimpyo.service.HouseService;
 import com.oneline.shimpyo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,13 +22,15 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final HouseService houseService;
     private final CheckMember checkMember;
 
     @PostMapping("/user/reviews")
     public BaseResponse<Void> createReview(@RequestBody PostReviewReq postReviewReq,
                                            @CurrentMember Member member){
         long memberId = checkMember.getMemberId(member, true);
-        reviewService.createReview(memberId, postReviewReq);
+        long houseId = reviewService.createReview(memberId, postReviewReq);
+        houseService.updateHouseAvgRating(houseId);
         return new BaseResponse<>();
     }
 
@@ -46,7 +49,8 @@ public class ReviewController {
         long memberId = checkMember.getMemberId(member, true);
         checkMember.checkCurrentMember(member, memberId);
 
-        reviewService.updateReview(reviewId, patchReviewReq);
+        long houseId = reviewService.updateReview(reviewId, patchReviewReq);
+        houseService.updateHouseAvgRating(houseId);
         return new BaseResponse<>();
     }
 
@@ -55,7 +59,8 @@ public class ReviewController {
         long memberId = checkMember.getMemberId(member, true);
         checkMember.checkCurrentMember(member, memberId);
 
-        reviewService.deleteReview(reviewId);
+        long houseId = reviewService.deleteReview(reviewId);
+        houseService.updateHouseAvgRating(houseId);
         return new BaseResponse<>();
     }
 
