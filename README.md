@@ -33,11 +33,12 @@
 
 ### Architecture
 
-![development_map](https://github.com/Project-Shimpyo/backend/assets/119032680/89dc4c0b-9515-43ee-9250-b0a2c1c2c77c)
+![development_map](![development_map](https://github.com/Project-Shimpyo/backend/assets/119032680/f685df7f-db26-4760-bf17-9a411122ce62))
 
 ### ERD
 
-![KakaoTalk_20230717_170522640](https://github.com/Project-Shimpyo/backend/assets/47111722/610b6480-d23d-496b-9564-8a1a0d3ab376)
+![KakaoTalk_20230717_170522640](![shimpyo_erd](https://github.com/Project-Shimpyo/backend/assets/119032680/2ff83bf6-d791-49b9-a212-8fe9c9af5fee)
+)
 
 ### API
 
